@@ -1,4 +1,4 @@
-# 🎨🌙 Smiling Critters High-Resolution Asset Library (素材库 — 112 Verified Images)
+# 🎨🌙 Smiling Critters High-Resolution Asset Library (素材库 — 118 Verified Images)
 
 > **Curated High-Resolution Smiling Critters & Custom Critters Picture Library for Creative Projects, Games & Printable Temporary Tattoos**
 
@@ -10,7 +10,7 @@
 
 | Category / Character | Count | Formats | Sample Preview |
 | :--- | :---: | :---: | :---: |
-| **Custom Critters (Mom — SunnyFox, LunaBat & PoppyDash)** | `12` | `JPG` | <img src="images/103_PoppyDash_Skunk_Studio_Portrait.jpg" width="72" /> <img src="images/101_SunnyFox_Lantern_Custom_Smiling_Critter.jpg" width="72" /> <img src="images/102_LunaBat_MoonStar_Custom_Smiling_Critter.jpg" width="72" /> |
+| **Custom Critters (Mom — SunnyFox, LunaBat & PoppyDash)** | `18` | `JPG` | <img src="images/103_PoppyDash_Skunk_Studio_Portrait.jpg" width="72" /> <img src="images/101_SunnyFox_Lantern_Custom_Smiling_Critter.jpg" width="72" /> <img src="images/102_LunaBat_MoonStar_Custom_Smiling_Critter.jpg" width="72" /> |
 | **Touille** | `7` | `WEBP` | <img src="images/001_Touille-StandeeArtwork.webp" width="72" /> |
 | **KickinChicken** | `7` | `WEBP` | <img src="images/002_KickinChicken_Cardboard_Cutout.webp" width="72" /> |
 | **DogDay** | `6` | `WEBP` | <img src="images/003_DogDay_Cardboard_Cutout.webp" width="72" /> |
@@ -32,12 +32,18 @@
 
 ---
 
-## 🖼️ Visual Catalog (All 112 High-Res Assets)
+## 🖼️ Visual Catalog (All 118 High-Res Assets)
 
-### 🌟 Custom Critters (Mom — SunnyFox, LunaBat & PoppyDash) (12 assets)
+### 🌟 Custom Critters (Mom — SunnyFox, LunaBat & PoppyDash) (18 assets)
 
 | # | Preview | Title | Dimensions | File Path |
 | :---: | :---: | :--- | :---: | :--- |
+| `#113` | <img src="images/113_Camp_Google_Handcar_Critter_Transformation.jpg" width="96" /> | **Camp Google Handcar (Critter Transformation) — PoppyDash (Craig), LunaBat (Chuyu) & SunnyFox (Kunrui) in Exact Outfits** | `1152×896` | [`images/113_Camp_Google_Handcar_Critter_Transformation.jpg`](images/113_Camp_Google_Handcar_Critter_Transformation.jpg) |
+| `#114` | <img src="images/114_Camp_Google_Handcar_Real_Family_Plus_Critters.jpg" width="96" /> | **Camp Google Handcar (Real Family + 3D Critters) — Craig, Chuyu & Kunrui with PoppyDash, LunaBat & SunnyFox** | `1152×896` | [`images/114_Camp_Google_Handcar_Real_Family_Plus_Critters.jpg`](images/114_Camp_Google_Handcar_Real_Family_Plus_Critters.jpg) |
+| `#115` | <img src="images/115_Shuttle_Bus_Selfie_Critter_Transformation.jpg" width="96" /> | **Blue Shuttle Bus Selfie (Critter Transformation) — Craig (PoppyDash), Chuyu (LunaBat Peace Sign) & Kunrui (SunnyFox)** | `1152×896` | [`images/115_Shuttle_Bus_Selfie_Critter_Transformation.jpg`](images/115_Shuttle_Bus_Selfie_Critter_Transformation.jpg) |
+| `#116` | <img src="images/116_Shuttle_Bus_Selfie_Real_Family_Plus_Critters.jpg" width="96" /> | **Blue Shuttle Bus Selfie (Real Family + 3D Plush Critters) — Craig, Chuyu & Kunrui with Shoulder Companions** | `1152×896` | [`images/116_Shuttle_Bus_Selfie_Real_Family_Plus_Critters.jpg`](images/116_Shuttle_Bus_Selfie_Real_Family_Plus_Critters.jpg) |
+| `#117` | <img src="images/117_Camp_Google_Lake_Tahoe_Popcorn_Sprint_Swim_Floaties.jpg" width="96" /> | **Camp Google × Lake Tahoe — Dad PoppyDash Sprinting with Popcorn & Floaties + SunnyFox & LunaBat on Handcar** | `1152×896` | [`images/117_Camp_Google_Lake_Tahoe_Popcorn_Sprint_Swim_Floaties.jpg`](images/117_Camp_Google_Lake_Tahoe_Popcorn_Sprint_Swim_Floaties.jpg) |
+| `#118` | <img src="images/118_Camp_Google_3Panel_Family_Outfit_Showcase.jpg" width="96" /> | **Camp Google Family Day 3-Panel Outfit Showcase — SunnyFox (Kunrui), LunaBat (Chuyu) & PoppyDash (Craig)** | `1152×896` | [`images/118_Camp_Google_3Panel_Family_Outfit_Showcase.jpg`](images/118_Camp_Google_3Panel_Family_Outfit_Showcase.jpg) |
 | `#109` | <img src="images/109_Google_Family_Day_Welcome_Arch_Kunrui_Chuyu_Craig.jpg" width="96" /> | **Google Family Day — Welcome Arch: SunnyFox (Kunrui), LunaBat (Chuyu) & PoppyDash (Craig)** | `1344×768` | [`images/109_Google_Family_Day_Welcome_Arch_Kunrui_Chuyu_Craig.jpg`](images/109_Google_Family_Day_Welcome_Arch_Kunrui_Chuyu_Craig.jpg) |
 | `#110` | <img src="images/110_Google_Family_Day_Carnival_Race_Kunrui_Chuyu_Craig.jpg" width="96" /> | **Google Family Day — Carnival Race: Dad PoppyDash Running, Chuyu LunaBat & Mom SunnyFox** | `1344×768` | [`images/110_Google_Family_Day_Carnival_Race_Kunrui_Chuyu_Craig.jpg`](images/110_Google_Family_Day_Carnival_Race_Kunrui_Chuyu_Craig.jpg) |
 | `#111` | <img src="images/111_Google_Family_Day_Tandem_Gbike_Kunrui_Chuyu_Craig.jpg" width="96" /> | **Google Family Day — Tandem Gbike Ride: SunnyFox (Mom), LunaBat (Chuyu) & PoppyDash (Dad)** | `1344×768` | [`images/111_Google_Family_Day_Tandem_Gbike_Kunrui_Chuyu_Craig.jpg`](images/111_Google_Family_Day_Tandem_Gbike_Kunrui_Chuyu_Craig.jpg) |
