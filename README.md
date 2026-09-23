@@ -1,4 +1,4 @@
-# 🎨🌙 Smiling Critters High-Resolution Asset Library (素材库 — 102 Verified Images)
+# 🎨🌙 Smiling Critters High-Resolution Asset Library (素材库 — 108 Verified Images)
 
 > **Curated High-Resolution Smiling Critters & Custom Critters Picture Library for Creative Projects, Games & Printable Temporary Tattoos**
 
@@ -10,7 +10,7 @@
 
 | Category / Character | Count | Formats | Sample Preview |
 | :--- | :---: | :---: | :---: |
-| **Custom Critters (Mom)** | `2` | `JPG` | <img src="images/101_SunnyFox_Lantern_Custom_Smiling_Critter.jpg" width="72" /> |
+| **Custom Critters (Mom — PoppyDash, SunnyFox & LunaBat)** | `8` | `JPG` | <img src="images/103_PoppyDash_Skunk_Studio_Portrait.jpg" width="72" /> <img src="images/101_SunnyFox_Lantern_Custom_Smiling_Critter.jpg" width="72" /> <img src="images/102_LunaBat_MoonStar_Custom_Smiling_Critter.jpg" width="72" /> |
 | **Touille** | `7` | `WEBP` | <img src="images/001_Touille-StandeeArtwork.webp" width="72" /> |
 | **KickinChicken** | `7` | `WEBP` | <img src="images/002_KickinChicken_Cardboard_Cutout.webp" width="72" /> |
 | **DogDay** | `6` | `WEBP` | <img src="images/003_DogDay_Cardboard_Cutout.webp" width="72" /> |
@@ -32,14 +32,20 @@
 
 ---
 
-## 🖼️ Visual Catalog (All 102 High-Res Assets)
+## 🖼️ Visual Catalog (All 108 High-Res Assets)
 
-### 🌟 Custom Critters (Mom) (2 assets)
+### 🌟 Custom Critters (Mom — PoppyDash, SunnyFox & LunaBat) (8 assets)
 
 | # | Preview | Title | Dimensions | File Path |
 | :---: | :---: | :--- | :---: | :--- |
-| `#101` | <img src="images/101_SunnyFox_Lantern_Custom_Smiling_Critter.jpg" width="64" /> | **SunnyFox (LanternFox — Mom Custom Creation)** | `1024×1024` | [`images/101_SunnyFox_Lantern_Custom_Smiling_Critter.jpg`](images/101_SunnyFox_Lantern_Custom_Smiling_Critter.jpg) |
-| `#102` | <img src="images/102_LunaBat_MoonStar_Custom_Smiling_Critter.jpg" width="64" /> | **LunaBat (StarBat — Mom Custom Creation)** | `1024×1024` | [`images/102_LunaBat_MoonStar_Custom_Smiling_Critter.jpg`](images/102_LunaBat_MoonStar_Custom_Smiling_Critter.jpg) |
+| `#103` | <img src="images/103_PoppyDash_Skunk_Studio_Portrait.jpg" width="96" /> | **PoppyDash (Custom Popcorn Skunk — Official 3D Plush Studio Portrait)** | `896×1152` | [`images/103_PoppyDash_Skunk_Studio_Portrait.jpg`](images/103_PoppyDash_Skunk_Studio_Portrait.jpg) |
+| `#104` | <img src="images/104_PoppyDash_Skunk_Hobby_Eating_Popcorn.jpg" width="96" /> | **PoppyDash — Hobby #1: Eating Popcorn with SunnyFox & LunaBat** | `1152×896` | [`images/104_PoppyDash_Skunk_Hobby_Eating_Popcorn.jpg`](images/104_PoppyDash_Skunk_Hobby_Eating_Popcorn.jpg) |
+| `#105` | <img src="images/105_PoppyDash_Skunk_Hobby_Super_Running.jpg" width="96" /> | **PoppyDash — Hobby #2: Super-Sonic Rainbow Track Running** | `1152×896` | [`images/105_PoppyDash_Skunk_Hobby_Super_Running.jpg`](images/105_PoppyDash_Skunk_Hobby_Super_Running.jpg) |
+| `#106` | <img src="images/106_PoppyDash_Skunk_Shortcoming_Swimming.jpg" width="96" /> | **PoppyDash — Shortcoming: Swimming (Ducky Floaties & Popcorn Life-Ring)** | `1152×896` | [`images/106_PoppyDash_Skunk_Shortcoming_Swimming.jpg`](images/106_PoppyDash_Skunk_Shortcoming_Swimming.jpg) |
+| `#107` | <img src="images/107_PoppyDash_Skunk_Character_Reference_Sheet.jpg" width="96" /> | **PoppyDash — Character Turnaround & Hobbies/Shortcoming Sheet** | `1344×768` | [`images/107_PoppyDash_Skunk_Character_Reference_Sheet.jpg`](images/107_PoppyDash_Skunk_Character_Reference_Sheet.jpg) |
+| `#108` | <img src="images/108_Custom_Smiling_Critters_Trio_Poster.jpg" width="96" /> | **SunnyFox, LunaBat & PoppyDash — Custom Critters Trio Poster** | `1344×768` | [`images/108_Custom_Smiling_Critters_Trio_Poster.jpg`](images/108_Custom_Smiling_Critters_Trio_Poster.jpg) |
+| `#101` | <img src="images/101_SunnyFox_Lantern_Custom_Smiling_Critter.jpg" width="96" /> | **SunnyFox (LanternFox — Mom Custom Creation)** | `1024×1024` | [`images/101_SunnyFox_Lantern_Custom_Smiling_Critter.jpg`](images/101_SunnyFox_Lantern_Custom_Smiling_Critter.jpg) |
+| `#102` | <img src="images/102_LunaBat_MoonStar_Custom_Smiling_Critter.jpg" width="96" /> | **LunaBat (StarBat — Mom Custom Creation)** | `1024×1024` | [`images/102_LunaBat_MoonStar_Custom_Smiling_Critter.jpg`](images/102_LunaBat_MoonStar_Custom_Smiling_Critter.jpg) |
 
 ### 🌟 Touille (7 assets)
 
