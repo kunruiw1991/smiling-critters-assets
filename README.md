@@ -1,4 +1,4 @@
-# 🎨🌙 Smiling Critters High-Resolution Asset Library (素材库 — 108 Verified Images)
+# 🎨🌙 Smiling Critters High-Resolution Asset Library (素材库 — 112 Verified Images)
 
 > **Curated High-Resolution Smiling Critters & Custom Critters Picture Library for Creative Projects, Games & Printable Temporary Tattoos**
 
@@ -10,7 +10,7 @@
 
 | Category / Character | Count | Formats | Sample Preview |
 | :--- | :---: | :---: | :---: |
-| **Custom Critters (Mom — PoppyDash, SunnyFox & LunaBat)** | `8` | `JPG` | <img src="images/103_PoppyDash_Skunk_Studio_Portrait.jpg" width="72" /> <img src="images/101_SunnyFox_Lantern_Custom_Smiling_Critter.jpg" width="72" /> <img src="images/102_LunaBat_MoonStar_Custom_Smiling_Critter.jpg" width="72" /> |
+| **Custom Critters (Mom — SunnyFox, LunaBat & PoppyDash)** | `12` | `JPG` | <img src="images/103_PoppyDash_Skunk_Studio_Portrait.jpg" width="72" /> <img src="images/101_SunnyFox_Lantern_Custom_Smiling_Critter.jpg" width="72" /> <img src="images/102_LunaBat_MoonStar_Custom_Smiling_Critter.jpg" width="72" /> |
 | **Touille** | `7` | `WEBP` | <img src="images/001_Touille-StandeeArtwork.webp" width="72" /> |
 | **KickinChicken** | `7` | `WEBP` | <img src="images/002_KickinChicken_Cardboard_Cutout.webp" width="72" /> |
 | **DogDay** | `6` | `WEBP` | <img src="images/003_DogDay_Cardboard_Cutout.webp" width="72" /> |
@@ -32,12 +32,16 @@
 
 ---
 
-## 🖼️ Visual Catalog (All 108 High-Res Assets)
+## 🖼️ Visual Catalog (All 112 High-Res Assets)
 
-### 🌟 Custom Critters (Mom — PoppyDash, SunnyFox & LunaBat) (8 assets)
+### 🌟 Custom Critters (Mom — SunnyFox, LunaBat & PoppyDash) (12 assets)
 
 | # | Preview | Title | Dimensions | File Path |
 | :---: | :---: | :--- | :---: | :--- |
+| `#109` | <img src="images/109_Google_Family_Day_Welcome_Arch_Kunrui_Chuyu_Craig.jpg" width="96" /> | **Google Family Day — Welcome Arch: SunnyFox (Kunrui), LunaBat (Chuyu) & PoppyDash (Craig)** | `1344×768` | [`images/109_Google_Family_Day_Welcome_Arch_Kunrui_Chuyu_Craig.jpg`](images/109_Google_Family_Day_Welcome_Arch_Kunrui_Chuyu_Craig.jpg) |
+| `#110` | <img src="images/110_Google_Family_Day_Carnival_Race_Kunrui_Chuyu_Craig.jpg" width="96" /> | **Google Family Day — Carnival Race: Dad PoppyDash Running, Chuyu LunaBat & Mom SunnyFox** | `1344×768` | [`images/110_Google_Family_Day_Carnival_Race_Kunrui_Chuyu_Craig.jpg`](images/110_Google_Family_Day_Carnival_Race_Kunrui_Chuyu_Craig.jpg) |
+| `#111` | <img src="images/111_Google_Family_Day_Tandem_Gbike_Kunrui_Chuyu_Craig.jpg" width="96" /> | **Google Family Day — Tandem Gbike Ride: SunnyFox (Mom), LunaBat (Chuyu) & PoppyDash (Dad)** | `1344×768` | [`images/111_Google_Family_Day_Tandem_Gbike_Kunrui_Chuyu_Craig.jpg`](images/111_Google_Family_Day_Tandem_Gbike_Kunrui_Chuyu_Craig.jpg) |
+| `#112` | <img src="images/112_Google_Family_Day_Collector_Cards_Kunrui_Chuyu_Craig.jpg" width="96" /> | **Google Family Day — Official Collector Cards: Kunrui (Mom), Chuyu & Craig (Dad)** | `1344×768` | [`images/112_Google_Family_Day_Collector_Cards_Kunrui_Chuyu_Craig.jpg`](images/112_Google_Family_Day_Collector_Cards_Kunrui_Chuyu_Craig.jpg) |
 | `#103` | <img src="images/103_PoppyDash_Skunk_Studio_Portrait.jpg" width="96" /> | **PoppyDash (Custom Popcorn Skunk — Official 3D Plush Studio Portrait)** | `896×1152` | [`images/103_PoppyDash_Skunk_Studio_Portrait.jpg`](images/103_PoppyDash_Skunk_Studio_Portrait.jpg) |
 | `#104` | <img src="images/104_PoppyDash_Skunk_Hobby_Eating_Popcorn.jpg" width="96" /> | **PoppyDash — Hobby #1: Eating Popcorn with SunnyFox & LunaBat** | `1152×896` | [`images/104_PoppyDash_Skunk_Hobby_Eating_Popcorn.jpg`](images/104_PoppyDash_Skunk_Hobby_Eating_Popcorn.jpg) |
 | `#105` | <img src="images/105_PoppyDash_Skunk_Hobby_Super_Running.jpg" width="96" /> | **PoppyDash — Hobby #2: Super-Sonic Rainbow Track Running** | `1152×896` | [`images/105_PoppyDash_Skunk_Hobby_Super_Running.jpg`](images/105_PoppyDash_Skunk_Hobby_Super_Running.jpg) |
