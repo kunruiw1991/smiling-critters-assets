@@ -199,38 +199,43 @@
     <div class="brand">
       <span style="font-size:1.6rem;">🐑💀</span>
       <div>
-        <h1>Baba Chops 3D Base Model Studio (3D建模基底模型)</h1>
-        <span>1:1 High-Precision 3D Plush Recreation of <code>images/121_BabaChopsPlush1.webp</code> • Three.js PBR + glTF 2.0 (.GLB) + Wavefront (.OBJ)</span>
+        <h1>Baba Chops 3D Base Model Studio (Blender 4.3 + Cycles + Three.js)</h1>
+        <span>1:1 High-Resolution 3D Plush Recreation of <code>images/121_BabaChopsPlush1.webp</code> • 22-Bone Blender Armature Rig + 5 NLA Animation Clips (.BLEND / .GLB / .OBJ)</span>
       </div>
     </div>
     <div class="top-actions">
       <a class="btn" href="index.html">⬅️ Back to 318-Asset Library</a>
-      <a class="btn primary" href="models/baba_chops_plush_base_model.glb" download="baba_chops_plush_base_model.glb">⬇️ Download .GLB (glTF 2.0)</a>
-      <a class="btn" href="models/baba_chops_plush_base_model.obj" download="baba_chops_plush_base_model.obj">⬇️ Download .OBJ (Mesh)</a>
-      <a class="btn" href="models/baba_chops_model.js" download="baba_chops_model.js">⬇️ Download Three.js Rig (.JS)</a>
+      <a class="btn primary" href="models/baba_chops_plush_base_model.blend" download="baba_chops_plush_base_model.blend">🟧 Download .BLEND (Blender 4.3 Rig)</a>
+      <a class="btn primary" href="models/baba_chops_plush_base_model.glb" download="baba_chops_plush_base_model.glb">⬇️ Download .GLB (Rigged + 5 Clips)</a>
+      <a class="btn" href="models/baba_chops_plush_base_model.obj" download="baba_chops_plush_base_model.obj">⬇️ Download .OBJ</a>
+      <a class="btn" href="models/build_baba_chops_blender.py" download="build_baba_chops_blender.py">🐍 Blender Script (.PY)</a>
     </div>
   </header>
 
   <div class="workspace">
-    <!-- Left Sidebar: Target Reference Photo & Anatomy Checklist -->
+    <!-- Left Sidebar: Target Reference Photo & Blender Cycles Render -->
     <aside class="sidebar">
       <div>
-        <h2 class="section-title">🎯 Reference Asset (#121)</h2>
-        <div class="ref-card">
-          <img src="images/121_BabaChopsPlush1.webp" alt="121_BabaChopsPlush1 Reference" />
-          <div class="ref-caption">Original Target: <code>images/121_BabaChopsPlush1.webp</code> (720×900)</div>
+        <h2 class="section-title">🎯 #121 Ref vs. Blender 4.3 Cycles</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div class="ref-card" style="padding:6px;">
+            <img src="images/121_BabaChopsPlush1.webp" alt="121_BabaChopsPlush1 Reference" style="max-height:175px;" />
+            <div class="ref-caption" style="font-size:0.7rem;">#121 Target Photo</div>
+          </div>
+          <div class="ref-card" style="padding:6px;">
+            <img src="models/baba_chops_blender_cycles_render.png" alt="Blender 4.3 Cycles Render" style="max-height:175px;" />
+            <div class="ref-caption" style="font-size:0.7rem;">Blender Cycles Render</div>
+          </div>
         </div>
       </div>
 
       <div>
-        <h2 class="section-title">🧬 1:1 Base Model Anatomy</h2>
+        <h2 class="section-title">🦴 Blender 4.3 Rig & Anatomy</h2>
         <ul class="spec-list">
-          <li><strong>Crown & Bangs</strong>: 37 sculpted curly black sherpa wool tufts + procedural fleece bump map</li>
-          <li><strong>Eyes & Brow</strong>: Inward-angled (`23°`) soft-grey plush upper eyelids + central bridge + clearcoat acrylic dome eyes with vertical catchlights</li>
-          <li><strong>Muzzle & Grin</strong>: Wide sculpted light-grey velour upper/lower lips, 2 embroidered nostrils, recessed black mouth cavity & twin rounded buck teeth</li>
-          <li><strong>Sheep Ears</strong>: Horizontal cupped grey velour ears with concave inner ear hollows</li>
-          <li><strong>Zipper & Skull Charm</strong>: 34 interlocking silver metal teeth, collar slider/pull tab & bevel-extruded 3D white Skull Pendant with 4 jaw teeth</li>
-          <li><strong>Limbs & Hooves</strong>: Pear-shaped black plush torso, `42°` splayed arms with cloven grey hoof-mittens & standing grey cloven foot hooves</li>
+          <li><strong>22-Bone Armature (<code>BabaChops_Armature</code>)</strong>: <code>Root</code>, <code>Pelvis</code>, <code>Spine</code>, <code>Chest</code>, <code>Neck</code>, <code>Head</code>, <code>Jaw</code>, <code>Eyelid.L/R</code>, <code>Ear.L/R</code>, <code>SkullPendant</code>, <code>Shoulder.L/R</code>, <code>Arm.L/R</code>, <code>HandHoof.L/R</code>, <code>Leg.L/R</code>, <code>FootHoof.L/R</code></li>
+          <li><strong>5 Baked NLA Animation Tracks</strong>: <code>Idle_Breathe</code>, <code>Walk_Cycle</code>, <code>Happy_Bounce</code>, <code>Wave_Hoof</code>, and <code>Curious_Head_Tilt</code></li>
+          <li><strong>3D Sherpa Wool Displacement</strong>: Multi-octave 3D turbulence + Subdivision Surface (<code>SUBSURF</code>) + procedural Cycles fleece bump</li>
+          <li><strong>Flush Facial Topology</strong>: Steep V-brow dove-grey eyelids tucked under overhanging black bangs, contiguous squared-off buck teeth & beveled metal zipper hardware</li>
         </ul>
       </div>
     </aside>
@@ -266,12 +271,14 @@
       </div>
 
       <div>
-        <h2 class="section-title">🎬 Animation & Pose Preset</h2>
+        <h2 class="section-title">🎬 Blender NLA Animation Clips</h2>
         <div class="btn-grid">
           <button class="btn active" onclick="setPoseMode('ref', this)">🧍 #121 Ref Pose</button>
           <button class="btn" onclick="setPoseMode('idle', this)">💨 Idle Breathe</button>
+          <button class="btn" onclick="setPoseMode('walk', this)">🚶 Walk Cycle</button>
           <button class="btn" onclick="setPoseMode('bounce', this)">⭐ Happy Bounce</button>
           <button class="btn" onclick="setPoseMode('wave', this)">👋 Wave Hoof</button>
+          <button class="btn" onclick="setPoseMode('curious', this)">🤔 Curious Tilt</button>
         </div>
       </div>
 
@@ -564,6 +571,16 @@
         baba.leftEarGroup.rotation.z = 0.12 + Math.sin(t * 3.0) * 0.05;
         baba.rightEarGroup.rotation.z = -0.12 - Math.sin(t * 3.0) * 0.05;
         baba.skullPendantGroup.rotation.z = Math.sin(t * 2.4) * 0.06;
+      } else if (poseMode === 'walk') {
+        const ph = t * 5.5;
+        baba.bodyRig.position.y = Math.abs(Math.sin(ph)) * 0.045;
+        baba.bodyRig.rotation.z = Math.cos(ph) * 0.05;
+        baba.bodyRig.rotation.y = Math.sin(ph) * 0.08;
+        baba.leftLegGroup.rotation.x = Math.sin(ph) * 0.36;
+        baba.rightLegGroup.rotation.x = -Math.sin(ph) * 0.36;
+        baba.leftArmGroup.rotation.x = -Math.sin(ph) * 0.25;
+        baba.rightArmGroup.rotation.x = Math.sin(ph) * 0.25;
+        baba.skullPendantGroup.rotation.z = Math.sin(ph) * 0.12;
       } else if (poseMode === 'bounce') {
         baba.bodyRig.position.y = Math.abs(Math.sin(t * 5.0)) * 0.08;
         baba.headGroup.rotation.x = Math.sin(t * 5.0) * 0.08;
@@ -574,6 +591,12 @@
         baba.rightArmGroup.rotation.z = 2.15 + Math.sin(t * 7.0) * 0.28;
         baba.headGroup.rotation.z = -0.10 + Math.sin(t * 3.5) * 0.05;
         baba.skullPendantGroup.rotation.z = Math.sin(t * 3.5) * 0.08;
+      } else if (poseMode === 'curious') {
+        baba.headGroup.rotation.z = Math.sin(t * 2.4) * 0.18;
+        baba.headGroup.rotation.y = Math.cos(t * 2.4) * 0.15;
+        baba.leftEarGroup.rotation.z = 0.12 + Math.sin(t * 4.8) * 0.12;
+        baba.rightEarGroup.rotation.z = -0.12 - Math.sin(t * 4.8) * 0.12;
+        baba.skullPendantGroup.rotation.z = Math.sin(t * 2.4) * 0.10;
       }
 
       renderer.render(scene, camera);

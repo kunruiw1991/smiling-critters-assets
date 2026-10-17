@@ -7,17 +7,19 @@
 
 ---
 
-## 🐑💀 Baba Chops 3D Base Model (`3D建模基地模型` — 1:1 Recreation of `images/121_BabaChopsPlush1.webp`)
+## 🐑💀 Baba Chops 3D Base Model (`3D建模基地模型` — Blender 4.3 + Cycles + Three.js Recreation of `images/121_BabaChopsPlush1.webp`)
 
-A complete, rigged, PBR-shaded 3D plush base model faithfully recreating [`images/121_BabaChopsPlush1.webp`](images/121_BabaChopsPlush1.webp) (`720×900` official Baba Chops plush studio portrait):
+A complete, skeletal-rigged, subdivision-surface 3D plush base model authored directly in **Blender 4.3 (`bpy` / `bmesh`)** and rendered with **Blender Cycles Path Tracing**, faithfully recreating [`images/121_BabaChopsPlush1.webp`](images/121_BabaChopsPlush1.webp) (`720×900` official Baba Chops plush studio portrait):
 
-| Asset / Deliverable | Format | Size / Geometry | Direct Link |
+| Asset / Deliverable | Format | Size / Specs | Direct Link |
 | :--- | :---: | :---: | :--- |
-| **Interactive 3D Base Model Studio** | `HTML5 / Three.js r161 WebGL` | `160` meshes · `70,148` triangles · Orbit/Zoom, 5 Camera Presets, PBR/Wireframe/Clay Modes, 4 Pose Animations & 4 Rig Sliders | [**Launch 3D Studio (`baba-chops-3d.html`)**](https://kunruiw1991.github.io/smiling-critters-assets/baba-chops-3d.html) |
-| **Binary glTF 2.0 3D Base Model** | `.GLB` (`glTF 2.0`) | `941 KB` · 6 PBR Material Groups (Blender / Unity / Unreal / Three.js ready) | [`models/baba_chops_plush_base_model.glb`](models/baba_chops_plush_base_model.glb) |
-| **Wavefront 3D Mesh Export** | `.OBJ` (`Wavefront`) | `2.52 MB` · Named anatomical object groups (`v`, `vn`, `f`) | [`models/baba_chops_plush_base_model.obj`](models/baba_chops_plush_base_model.obj) |
-| **Procedural Three.js Rig Module** | `.JS` (`ES Module`) | Hierarchical articulated rig (`buildBabaChopsPlushModel`) + procedural fleece/velour bump maps | [`models/baba_chops_model.js`](models/baba_chops_model.js) |
-| **3D Studio Preview Render** | `.PNG` (`1440×900`) | Side-by-side 1:1 Reference `#121` vs. 3D Base Model render | [`models/baba_chops_3d_preview.png`](models/baba_chops_3d_preview.png) |
+| **Native Blender 4.3 Master Project** | `.BLEND` (`Blender 4.3.2`) | `1.84 MB` · `BabaChops_Armature` (**22 Deform Bones**) + `SUBSURF` Modifier + 10 Cycles PBR Sherpa/Velour Node Materials + **5 Baked NLA Animation Tracks** (`Idle_Breathe`, `Walk_Cycle`, `Happy_Bounce`, `Wave_Hoof`, `Curious_Head_Tilt`) + 4-Light Cycles Studio Stage | [`models/baba_chops_plush_base_model.blend`](models/baba_chops_plush_base_model.blend) |
+| **Rigged & Animated glTF 2.0 Export** | `.GLB` (`glTF 2.0`) | `3.14 MB` · Exported directly from Blender 4.3 with full 22-bone `SkinnedMesh` weights + 5 embedded NLA `AnimationClip` tracks (Blender / Unity / Unreal / Godot / Three.js ready) | [`models/baba_chops_plush_base_model.glb`](models/baba_chops_plush_base_model.glb) |
+| **Blender Cycles Path-Traced Hero Render** | `.PNG` (`1080×1350`) | `1.58 MB` · 64-sample OpenImageDenoise Cycles studio portrait matching `#121` | [`models/baba_chops_blender_cycles_render.png`](models/baba_chops_blender_cycles_render.png) |
+| **4-Panel Reference vs. Cycles Turnaround Sheet** | `.PNG` (`1920×600`) | `716 KB` · Side-by-side `#121` Reference vs. Cycles Front, 3/4 View, and 90° Side Profile | [`models/baba_chops_3d_preview.png`](models/baba_chops_3d_preview.png) |
+| **Interactive WebGL 3D Base Model Studio** | `HTML5 / Three.js r161` | Real-time Orbit/Zoom, 5 Camera Presets, PBR/Wireframe/Clay Modes, 6 Animation Clips & 4 Rig Sliders | [**Launch 3D Studio (`baba-chops-3d.html`)**](https://kunruiw1991.github.io/smiling-critters-assets/baba-chops-3d.html) |
+| **Reproducible Blender Python Generator** | `.PY` (`bpy` / `bmesh`) | `48 KB` · Full parametric geometry, vertex-group skinning, NLA keyframing & Cycles studio setup | [`models/build_baba_chops_blender.py`](models/build_baba_chops_blender.py) |
+| **Wavefront 3D Mesh + Material Library** | `.OBJ` + `.MTL` | `24 MB` · High-resolution subdivided mesh with material groups | [`models/baba_chops_plush_base_model.obj`](models/baba_chops_plush_base_model.obj) |
 
 ![Baba Chops 3D Base Model Studio Preview](models/baba_chops_3d_preview.png)
 
