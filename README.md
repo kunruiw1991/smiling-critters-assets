@@ -1,4 +1,4 @@
-# 🎨🌙 Smiling Critters High-Resolution Asset Library (素材库 — 118 Verified Images)
+# 🎨🌙 Smiling Critters High-Resolution Asset Library (素材库 — 218 Verified Images · 105 Baba Chops Assets)
 
 > **Curated High-Resolution Smiling Critters & Custom Critters Picture Library for Creative Projects, Games & Printable Temporary Tattoos**
 
@@ -6,7 +6,7 @@
 
 ---
 
-## 📊 Library Summary (`102` Verified High-Resolution Images)
+## 📊 Library Summary (`218` Verified High-Resolution Images)
 
 | Category / Character | Count | Formats | Sample Preview |
 | :--- | :---: | :---: | :---: |
@@ -21,7 +21,7 @@
 | **Rabie Baby** | `8` | `WEBP` | <img src="images/009_RabieBaby.webp" width="72" /> |
 | **Allister Gator** | `7` | `WEBP` | <img src="images/010_Allister_Gator_s_fan_artwork.webp" width="72" /> |
 | **CraftyCorn** | `5` | `WEBP` | <img src="images/011_CraftyCorn_Plushie.webp" width="72" /> |
-| **Baba Chops** | `5` | `WEBP` | <img src="images/014_BabaChops.webp" width="72" /> |
+| **Baba Chops** | `105` (`+100 New`) | `WEBP` | <img src="images/014_BabaChops.webp" width="72" /> <img src="images/056_Baba_Chops.webp" width="72" /> <img src="images/119_Baba_StandeeArtwork.webp" width="72" /> |
 | **Simon Smoke** | `6` | `WEBP` | <img src="images/015_Simon_Smoke.webp" width="72" /> |
 | **PickyPiggy** | `6` | `WEBP` | <img src="images/016_PickyPiggy_Cardboard_Cutout.webp" width="72" /> |
 | **Maggie Mako** | `5` | `WEBP` | <img src="images/019_Maggie_Mako_the_shark_fish_thing.webp" width="72" /> |
@@ -32,7 +32,7 @@
 
 ---
 
-## 🖼️ Visual Catalog (All 118 High-Res Assets)
+## 🖼️ Visual Catalog (All 218 High-Res Assets)
 
 ### 🌟 Custom Critters (Mom — SunnyFox, LunaBat & PoppyDash) (18 assets)
 
@@ -174,10 +174,110 @@
 | `#062` | <img src="images/062_CraftyCorn_s_House.webp" width="64" /> | **CraftyCorn’s House** | `1280×1280` | [`images/062_CraftyCorn_s_House.webp`](images/062_CraftyCorn_s_House.webp) |
 | `#089` | <img src="images/089_CraftyCorn_Desc_Position_ORIGINAL.webp" width="64" /> | **CraftyCorn Desc Position ORIGINAL** | `924×1234` | [`images/089_CraftyCorn_Desc_Position_ORIGINAL.webp`](images/089_CraftyCorn_Desc_Position_ORIGINAL.webp) |
 
-### 🌟 Baba Chops (5 assets)
+### 🌟 Baba Chops (105 assets — 100 New High-Res Original Renders, Cutouts, Plushies & Models + 5 Core Assets)
 
 | # | Preview | Title | Dimensions | File Path |
 | :---: | :---: | :--- | :---: | :--- |
+| `#119` | <img src="images/119_Baba_StandeeArtwork.webp" width="64" /> | **Baba-StandeeArtwork** | `1576×1505` | [`images/119_Baba_StandeeArtwork.webp`](images/119_Baba_StandeeArtwork.webp) |
+| `#120` | <img src="images/120_BabaChopsArt.webp" width="64" /> | **BabaChopsArt** | `782×1118` | [`images/120_BabaChopsArt.webp`](images/120_BabaChopsArt.webp) |
+| `#121` | <img src="images/121_BabaChopsPlush1.webp" width="64" /> | **BabaChopsPlush1** | `720×900` | [`images/121_BabaChopsPlush1.webp`](images/121_BabaChopsPlush1.webp) |
+| `#122` | <img src="images/122_BabaChopsShirt1.webp" width="64" /> | **BabaChopsShirt1** | `1225×1531` | [`images/122_BabaChopsShirt1.webp`](images/122_BabaChopsShirt1.webp) |
+| `#123` | <img src="images/123_BabaChopsSteam.webp" width="64" /> | **BabaChopsSteam** | `1920×2302` | [`images/123_BabaChopsSteam.webp`](images/123_BabaChopsSteam.webp) |
+| `#124` | <img src="images/124_BabaChops_MotyaGamesTV.webp" width="64" /> | **BabaChops MotyaGamesTV** | `2482×2450` | [`images/124_BabaChops_MotyaGamesTV.webp`](images/124_BabaChops_MotyaGamesTV.webp) |
+| `#125` | <img src="images/125_BabaChopsAction_PosePlayer.webp" width="64" /> | **BabaChopsAction PosePlayer** | `2880×1618` | [`images/125_BabaChopsAction_PosePlayer.webp`](images/125_BabaChopsAction_PosePlayer.webp) |
+| `#126` | <img src="images/126_BabaNew.webp" width="64" /> | **BabaNew** | `1715×2560` | [`images/126_BabaNew.webp`](images/126_BabaNew.webp) |
+| `#127` | <img src="images/127_BabaRenderNew.webp" width="64" /> | **BabaRenderNew** | `1768×1986` | [`images/127_BabaRenderNew.webp`](images/127_BabaRenderNew.webp) |
+| `#128` | <img src="images/128_BabaToyRenderNew.webp" width="64" /> | **BabaToyRenderNew** | `2358×2558` | [`images/128_BabaToyRenderNew.webp`](images/128_BabaToyRenderNew.webp) |
+| `#129` | <img src="images/129_Baba_Choppings.webp" width="64" /> | **Baba Choppings** | `1600×1600` | [`images/129_Baba_Choppings.webp`](images/129_Baba_Choppings.webp) |
+| `#130` | <img src="images/130_Baba_Chops_main_model.webp" width="64" /> | **Baba Chops' main model** | `2048×2048` | [`images/130_Baba_Chops_main_model.webp`](images/130_Baba_Chops_main_model.webp) |
+| `#131` | <img src="images/131_Baba_Chops_OLD.webp" width="64" /> | **Baba Chops (OLD)** | `631×998` | [`images/131_Baba_Chops_OLD.webp`](images/131_Baba_Chops_OLD.webp) |
+| `#132` | <img src="images/132_Baba_Chops_Blender.webp" width="64" /> | **Baba Chops Blender** | `362×487` | [`images/132_Baba_Chops_Blender.webp`](images/132_Baba_Chops_Blender.webp) |
+| `#133` | <img src="images/133_Baba_Chops_CH4.webp" width="64" /> | **Baba Chops CH4** | `1266×720` | [`images/133_Baba_Chops_CH4.webp`](images/133_Baba_Chops_CH4.webp) |
+| `#134` | <img src="images/134_Baba_Chops_Description.webp" width="64" /> | **Baba Chops Description** | `4096×2304` | [`images/134_Baba_Chops_Description.webp`](images/134_Baba_Chops_Description.webp) |
+| `#135` | <img src="images/135_Baba_Chops_Funko_POP.webp" width="64" /> | **Baba Chops Funko POP!** | `1300×1300` | [`images/135_Baba_Chops_Funko_POP.webp`](images/135_Baba_Chops_Funko_POP.webp) |
+| `#136` | <img src="images/136_Baba_Chops_Plush.webp" width="64" /> | **Baba Chops Plush** | `536×796` | [`images/136_Baba_Chops_Plush.webp`](images/136_Baba_Chops_Plush.webp) |
+| `#137` | <img src="images/137_Baba_Chops_Plush_Nightmare_Critters_Commercial.webp" width="64" /> | **Baba Chops Plush Nightmare Critters Commercial** | `808×678` | [`images/137_Baba_Chops_Plush_Nightmare_Critters_Commercial.webp`](images/137_Baba_Chops_Plush_Nightmare_Critters_Commercial.webp) |
+| `#138` | <img src="images/138_Baba_Chops_Png_Alt_Standee.webp" width="64" /> | **Baba Chops Png Alt (Standee)** | `500×499` | [`images/138_Baba_Chops_Png_Alt_Standee.webp`](images/138_Baba_Chops_Png_Alt_Standee.webp) |
+| `#139` | <img src="images/139_Baba_Chops_Sketchfab.webp" width="64" /> | **Baba Chops Sketchfab** | `393×634` | [`images/139_Baba_Chops_Sketchfab.webp`](images/139_Baba_Chops_Sketchfab.webp) |
+| `#140` | <img src="images/140_Baba_Chops_Standee.webp" width="64" /> | **Baba Chops Standee** | `786×783` | [`images/140_Baba_Chops_Standee.webp`](images/140_Baba_Chops_Standee.webp) |
+| `#141` | <img src="images/141_Baba_Chops_info_card.webp" width="64" /> | **Baba Chops info card** | `831×480` | [`images/141_Baba_Chops_info_card.webp`](images/141_Baba_Chops_info_card.webp) |
+| `#142` | <img src="images/142_Baba_Chops_plush_teaser.webp" width="64" /> | **Baba Chops plush teaser** | `720×900` | [`images/142_Baba_Chops_plush_teaser.webp`](images/142_Baba_Chops_plush_teaser.webp) |
+| `#143` | <img src="images/143_Baba_Chops_texs.webp" width="64" /> | **Baba Chops texs** | `2048×2048` | [`images/143_Baba_Chops_texs.webp`](images/143_Baba_Chops_texs.webp) |
+| `#144` | <img src="images/144_Baba_Chop_s_fan_artwork.webp" width="64" /> | **Baba Chop’s fan artwork** | `3281×4930` | [`images/144_Baba_Chop_s_fan_artwork.webp`](images/144_Baba_Chop_s_fan_artwork.webp) |
+| `#145` | <img src="images/145_Baba_Plush_1.webp" width="64" /> | **Baba Plush 1** | `800×800` | [`images/145_Baba_Plush_1.webp`](images/145_Baba_Plush_1.webp) |
+| `#146` | <img src="images/146_Baba_Plush_2.webp" width="64" /> | **Baba Plush 2** | `800×800` | [`images/146_Baba_Plush_2.webp`](images/146_Baba_Plush_2.webp) |
+| `#147` | <img src="images/147_Baba_Plush_3.webp" width="64" /> | **Baba Plush 3** | `800×800` | [`images/147_Baba_Plush_3.webp`](images/147_Baba_Plush_3.webp) |
+| `#148` | <img src="images/148_Baba_Plush_4.webp" width="64" /> | **Baba Plush 4** | `800×800` | [`images/148_Baba_Plush_4.webp`](images/148_Baba_Plush_4.webp) |
+| `#149` | <img src="images/149_Baba_and_Maggie_Action_Pose.webp" width="64" /> | **Baba and Maggie Action Pose** | `2880×1620` | [`images/149_Baba_and_Maggie_Action_Pose.webp`](images/149_Baba_and_Maggie_Action_Pose.webp) |
+| `#150` | <img src="images/150_Baba_chops_blender_untextured.webp" width="64" /> | **Baba chops blender untextured** | `363×497` | [`images/150_Baba_chops_blender_untextured.webp`](images/150_Baba_chops_blender_untextured.webp) |
+| `#151` | <img src="images/151_Babachops.webp" width="64" /> | **Babachops** | `538×694` | [`images/151_Babachops.webp`](images/151_Babachops.webp) |
+| `#152` | <img src="images/152_Babalo.webp" width="64" /> | **Babalo** | `2560×2560` | [`images/152_Babalo.webp`](images/152_Babalo.webp) |
+| `#153` | <img src="images/153_Baba_Chops_BigBaba.webp" width="64" /> | **BigBaba** | `2560×2411` | [`images/153_Baba_Chops_BigBaba.webp`](images/153_Baba_Chops_BigBaba.webp) |
+| `#154` | <img src="images/154_Baba_Chops_BigBabaDirtyRemastered.webp" width="64" /> | **BigBabaDirtyRemastered** | `2501×2560` | [`images/154_Baba_Chops_BigBabaDirtyRemastered.webp`](images/154_Baba_Chops_BigBabaDirtyRemastered.webp) |
+| `#155` | <img src="images/155_Baba_Chops_BigBabaRemastered.webp" width="64" /> | **BigBabaRemastered** | `2502×2560` | [`images/155_Baba_Chops_BigBabaRemastered.webp`](images/155_Baba_Chops_BigBabaRemastered.webp) |
+| `#156` | <img src="images/156_Baba_Chops_Chapter_4_Banner_Sheep.webp" width="64" /> | **Baba Chops — Chapter 4 Banner Sheep** | `2210×1030` | [`images/156_Baba_Chops_Chapter_4_Banner_Sheep.webp`](images/156_Baba_Chops_Chapter_4_Banner_Sheep.webp) |
+| `#157` | <img src="images/157_Baba_Chops_FallingintoBabaChopsRoom_Scene.webp" width="64" /> | **FallingintoBabaChopsRoom Scene** | `2880×1622` | [`images/157_Baba_Chops_FallingintoBabaChopsRoom_Scene.webp`](images/157_Baba_Chops_FallingintoBabaChopsRoom_Scene.webp) |
+| `#158` | <img src="images/158_Baba_Chops_Giant_Baba_Chops_Plush_Dynamic_Leap.webp" width="64" /> | **Giant Baba Chops Plush Dynamic Leap** | `1178×641` | [`images/158_Baba_Chops_Giant_Baba_Chops_Plush_Dynamic_Leap.webp`](images/158_Baba_Chops_Giant_Baba_Chops_Plush_Dynamic_Leap.webp) |
+| `#159` | <img src="images/159_Baba_Chops_MiniBabaClean.webp" width="64" /> | **MiniBabaClean** | `1932×2560` | [`images/159_Baba_Chops_MiniBabaClean.webp`](images/159_Baba_Chops_MiniBabaClean.webp) |
+| `#160` | <img src="images/160_Baba_Chops_NL_Baba_Available.webp" width="64" /> | **NL-Baba Available** | `1416×2020` | [`images/160_Baba_Chops_NL_Baba_Available.webp`](images/160_Baba_Chops_NL_Baba_Available.webp) |
+| `#161` | <img src="images/161_Baba_Chops_NL_Baba_Teaser.webp" width="64" /> | **NL-Baba Teaser** | `800×1581` | [`images/161_Baba_Chops_NL_Baba_Teaser.webp`](images/161_Baba_Chops_NL_Baba_Teaser.webp) |
+| `#162` | <img src="images/162_Baba_Chops_PPC4_BabaClose_Up_Pose.webp" width="64" /> | **PPC4-BabaClose-Up Pose** | `800×450` | [`images/162_Baba_Chops_PPC4_BabaClose_Up_Pose.webp`](images/162_Baba_Chops_PPC4_BabaClose_Up_Pose.webp) |
+| `#163` | <img src="images/163_Baba_Chops_PPC4_DoctorsDomain_BabaChopsEnclosure_Sce.webp" width="64" /> | **PPC4-DoctorsDomain BabaChopsEnclosure Scene** | `1920×1080` | [`images/163_Baba_Chops_PPC4_DoctorsDomain_BabaChopsEnclosure_Sce.webp`](images/163_Baba_Chops_PPC4_DoctorsDomain_BabaChopsEnclosure_Sce.webp) |
+| `#164` | <img src="images/164_Baba_Chops_PPC4_DoctorsDomain_BabaChopsRunning_Scene.webp" width="64" /> | **PPC4-DoctorsDomain BabaChopsRunning Scene** | `1920×1080` | [`images/164_Baba_Chops_PPC4_DoctorsDomain_BabaChopsRunning_Scene.webp`](images/164_Baba_Chops_PPC4_DoctorsDomain_BabaChopsRunning_Scene.webp) |
+| `#165` | <img src="images/165_Baba_Chops_PPC4_DoctorsDomain_BabaChopsDebut.webp" width="64" /> | **PPC4-DoctorsDomain BabaChopsDebut** | `1920×1080` | [`images/165_Baba_Chops_PPC4_DoctorsDomain_BabaChopsDebut.webp`](images/165_Baba_Chops_PPC4_DoctorsDomain_BabaChopsDebut.webp) |
+| `#166` | <img src="images/166_Baba_Chops_PPC4_DoctorsDomain_BabaChopsLeap.webp" width="64" /> | **PPC4-DoctorsDomain BabaChopsLeap** | `1920×1080` | [`images/166_Baba_Chops_PPC4_DoctorsDomain_BabaChopsLeap.webp`](images/166_Baba_Chops_PPC4_DoctorsDomain_BabaChopsLeap.webp) |
+| `#167` | <img src="images/167_Baba_Chops_SF_Baba_s_Dark_Reads.webp" width="64" /> | **SF-Baba's Dark Reads** | `2648×4096` | [`images/167_Baba_Chops_SF_Baba_s_Dark_Reads.webp`](images/167_Baba_Chops_SF_Baba_s_Dark_Reads.webp) |
+| `#168` | <img src="images/168_Baba_Chops_SK_NightmareCritter_Sheep.webp" width="64" /> | **Baba Chops (SK NightmareCritter Sheep)** | `873×1282` | [`images/168_Baba_Chops_SK_NightmareCritter_Sheep.webp`](images/168_Baba_Chops_SK_NightmareCritter_Sheep.webp) |
+| `#169` | <img src="images/169_Baba_Chops_Official_Youtooz_9in_Plush_Front_Pose.webp" width="64" /> | **Baba Chops Official Youtooz 9in Plush (Front Pose)** | `752×1000` | [`images/169_Baba_Chops_Official_Youtooz_9in_Plush_Front_Pose.webp`](images/169_Baba_Chops_Official_Youtooz_9in_Plush_Front_Pose.webp) |
+| `#170` | <img src="images/170_Baba_Chops_Official_Youtooz_9in_Plush_Back_View.webp" width="64" /> | **Baba Chops Official Youtooz 9in Plush (Back View)** | `1500×1500` | [`images/170_Baba_Chops_Official_Youtooz_9in_Plush_Back_View.webp`](images/170_Baba_Chops_Official_Youtooz_9in_Plush_Back_View.webp) |
+| `#171` | <img src="images/171_Baba_Chops_Official_Youtooz_9in_Plush_Detail_View.webp" width="64" /> | **Baba Chops Official Youtooz 9in Plush (Detail View)** | `1500×1500` | [`images/171_Baba_Chops_Official_Youtooz_9in_Plush_Detail_View.webp`](images/171_Baba_Chops_Official_Youtooz_9in_Plush_Detail_View.webp) |
+| `#172` | <img src="images/172_Baba_Chops_Official_Mob_Store_Plush_9in_Studio_Main.webp" width="64" /> | **Baba Chops Official Mob Store Plush 9in (Studio Main)** | `1400×1400` | [`images/172_Baba_Chops_Official_Mob_Store_Plush_9in_Studio_Main.webp`](images/172_Baba_Chops_Official_Mob_Store_Plush_9in_Studio_Main.webp) |
+| `#173` | <img src="images/173_Baba_Chops_Official_Mob_Store_Plush_9in_Angle_1.webp" width="64" /> | **Baba Chops Official Mob Store Plush 9in (Angle 1)** | `1400×1400` | [`images/173_Baba_Chops_Official_Mob_Store_Plush_9in_Angle_1.webp`](images/173_Baba_Chops_Official_Mob_Store_Plush_9in_Angle_1.webp) |
+| `#174` | <img src="images/174_Baba_Chops_Official_Mob_Store_Plush_9in_Angle_2.webp" width="64" /> | **Baba Chops Official Mob Store Plush 9in (Angle 2)** | `1400×1400` | [`images/174_Baba_Chops_Official_Mob_Store_Plush_9in_Angle_2.webp`](images/174_Baba_Chops_Official_Mob_Store_Plush_9in_Angle_2.webp) |
+| `#175` | <img src="images/175_Baba_Chops_Official_Mob_Store_Plush_9in_Angle_3.webp" width="64" /> | **Baba Chops Official Mob Store Plush 9in (Angle 3)** | `1400×1400` | [`images/175_Baba_Chops_Official_Mob_Store_Plush_9in_Angle_3.webp`](images/175_Baba_Chops_Official_Mob_Store_Plush_9in_Angle_3.webp) |
+| `#176` | <img src="images/176_Baba_Chops_Poppy_playtime_4_3D_models_by_fintuboi93.webp" width="64" /> | **Baba Chops · Poppy playtime 4 · 3D models · by fintuboi93 on DeviantArt** | `1080×1080` | [`images/176_Baba_Chops_Poppy_playtime_4_3D_models_by_fintuboi93.webp`](images/176_Baba_Chops_Poppy_playtime_4_3D_models_by_fintuboi93.webp) |
+| `#177` | <img src="images/177_Baba_Chops_Poppy_Playtime_Chapter_4_Download_Free_3D.webp" width="64" /> | **Baba Chops-Poppy Playtime Chapter 4 - Download Free 3D model by lesvink [832593a] - Sketchfab** | `1920×1080` | [`images/177_Baba_Chops_Poppy_Playtime_Chapter_4_Download_Free_3D.webp`](images/177_Baba_Chops_Poppy_Playtime_Chapter_4_Download_Free_3D.webp) |
+| `#178` | <img src="images/178_Baba_Chops_Poppy_playtime_chapter_4_3D_model_by_Nood.webp" width="64" /> | **Baba Chops - Poppy playtime chapter 4 - 3D model by Noodles (@crystaldar) [4706794] - Sketchfab** | `1920×1080` | [`images/178_Baba_Chops_Poppy_playtime_chapter_4_3D_model_by_Nood.webp`](images/178_Baba_Chops_Poppy_playtime_chapter_4_3D_model_by_Nood.webp) |
+| `#179` | <img src="images/179_Baba_Chops_Poppy_playtime_4_3D_models_3D_model_by_fi.webp" width="64" /> | **Baba Chops · Poppy playtime 4 · 3D models · - 3D model by fintuboi [dbcb89c] - Sketchfab** | `1920×1080` | [`images/179_Baba_Chops_Poppy_playtime_4_3D_models_3D_model_by_fi.webp`](images/179_Baba_Chops_Poppy_playtime_4_3D_models_3D_model_by_fi.webp) |
+| `#180` | <img src="images/180_BABA_CHOPS_Poppy_playtime_4_rigged_3D_model_by_kuroi.webp" width="64" /> | **BABA CHOPS - Poppy playtime 4 (rigged) - 3D model by kuroikarasun [52d4bb2] - Sketchfab** | `1920×1080` | [`images/180_BABA_CHOPS_Poppy_playtime_4_rigged_3D_model_by_kuroi.webp`](images/180_BABA_CHOPS_Poppy_playtime_4_rigged_3D_model_by_kuroi.webp) |
+| `#181` | <img src="images/181_Baba_Chops_Poppy_Playtime_Chapter_4_3D_model_by_buni.webp" width="64" /> | **Baba Chops · Poppy Playtime Chapter 4 - 3D model by bunidev [7a827c7] - Sketchfab** | `1920×1080` | [`images/181_Baba_Chops_Poppy_Playtime_Chapter_4_3D_model_by_buni.webp`](images/181_Baba_Chops_Poppy_Playtime_Chapter_4_3D_model_by_buni.webp) |
+| `#182` | <img src="images/182_Baba_Chops_Poppy_playtime_4_3D_models_3D_model_by_sk.webp" width="64" /> | **Baba Chops · Poppy playtime 4 · 3D models · - 3D model by sketchfint937800 [57a9b52] - Sketchfa** | `1920×1080` | [`images/182_Baba_Chops_Poppy_playtime_4_3D_models_3D_model_by_sk.webp`](images/182_Baba_Chops_Poppy_playtime_4_3D_models_3D_model_by_sk.webp) |
+| `#183` | <img src="images/183_Baba_Chops_Poppy_Playtime_Wiki_Fandom.webp" width="64" /> | **Baba Chops · Poppy Playtime Wiki · Fandom** | `860×860` | [`images/183_Baba_Chops_Poppy_Playtime_Wiki_Fandom.webp`](images/183_Baba_Chops_Poppy_Playtime_Wiki_Fandom.webp) |
+| `#184` | <img src="images/184_Baba_Chops_AI_Art_Model_Baba_Chops_model_Poppy_playt.webp" width="64" /> | **AI Art Model: Baba Chops model · Poppy playtime · PixAI** | `1000×1270` | [`images/184_Baba_Chops_AI_Art_Model_Baba_Chops_model_Poppy_playt.webp`](images/184_Baba_Chops_AI_Art_Model_Baba_Chops_model_Poppy_playt.webp) |
+| `#185` | <img src="images/185_Baba_Chops_Poppy_Playtime_Chapter_4_Release_Window_T.webp" width="64" /> | **Baba Chops — Poppy Playtime Chapter 4 Release Window, Trailer, New Monster, & Gameplay Details** | `1600×900` | [`images/185_Baba_Chops_Poppy_Playtime_Chapter_4_Release_Window_T.webp`](images/185_Baba_Chops_Poppy_Playtime_Chapter_4_Release_Window_T.webp) |
+| `#186` | <img src="images/186_Baba_Chops_All_Poppy_Playtime_Chapter_4_Characters_P.webp" width="64" /> | **Baba Chops — All Poppy Playtime Chapter 4 Characters · Pro Game Guides** | `1200×675` | [`images/186_Baba_Chops_All_Poppy_Playtime_Chapter_4_Characters_P.webp`](images/186_Baba_Chops_All_Poppy_Playtime_Chapter_4_Characters_P.webp) |
+| `#187` | <img src="images/187_Baba_Chops_All_Poppy_Playtime_Chapter_4_characters.webp" width="64" /> | **Baba Chops — All Poppy Playtime: Chapter 4 characters** | `1200×675` | [`images/187_Baba_Chops_All_Poppy_Playtime_Chapter_4_characters.webp`](images/187_Baba_Chops_All_Poppy_Playtime_Chapter_4_characters.webp) |
+| `#188` | <img src="images/188_Baba_Chops_Poppy_playtime_4_Baba_Chops_critters_2_0.webp" width="64" /> | **Poppy playtime 4 Baba Chops critters 2.0 - Download Free 3D model by Izaqu (@toywar.com ...** | `1920×1080` | [`images/188_Baba_Chops_Poppy_playtime_4_Baba_Chops_critters_2_0.webp`](images/188_Baba_Chops_Poppy_playtime_4_Baba_Chops_critters_2_0.webp) |
+| `#189` | <img src="images/189_Baba_Chops_Poppy_playtime_ibisPaint.webp" width="64" /> | **Baba Chops Poppy playtime - ibisPaint** | `1712×2560` | [`images/189_Baba_Chops_Poppy_playtime_ibisPaint.webp`](images/189_Baba_Chops_Poppy_playtime_ibisPaint.webp) |
+| `#190` | <img src="images/190_Baba_Chops_Wallpapers_Wallpaper_Cave.webp" width="64" /> | **Baba Chops Wallpapers - Wallpaper Cave** | `1920×1080` | [`images/190_Baba_Chops_Wallpapers_Wallpaper_Cave.webp`](images/190_Baba_Chops_Wallpapers_Wallpaper_Cave.webp) |
+| `#191` | <img src="images/191_Baba_chops_monster_Fandom.webp" width="64" /> | **Baba chops (monster) · Fandom** | `755×1117` | [`images/191_Baba_chops_monster_Fandom.webp`](images/191_Baba_chops_monster_Fandom.webp) |
+| `#192` | <img src="images/192_Baba_Chops_Fanart_Poppy_Playtime_Chapter_4_by_Shinin.webp" width="64" /> | **Baba Chops Fanart - Poppy Playtime: Chapter 4 by ShiningPhantom on DeviantArt** | `1280×1160` | [`images/192_Baba_Chops_Fanart_Poppy_Playtime_Chapter_4_by_Shinin.webp`](images/192_Baba_Chops_Fanart_Poppy_Playtime_Chapter_4_by_Shinin.webp) |
+| `#193` | <img src="images/193_Baba_chops_poppy_playtime_chapter_4_by_kittycatczafh.webp" width="64" /> | **Baba chops - poppy playtime chapter 4 by kittycatczafhaye on DeviantArt** | `1098×1270` | [`images/193_Baba_chops_poppy_playtime_chapter_4_by_kittycatczafh.webp`](images/193_Baba_chops_poppy_playtime_chapter_4_by_kittycatczafh.webp) |
+| `#194` | <img src="images/194_Baba_Chops_Poppy_Playtime_Fanart_by_RWGN_on_DeviantA.webp" width="64" /> | **Baba Chops-Poppy Playtime Fanart by RWGN on DeviantArt** | `812×984` | [`images/194_Baba_Chops_Poppy_Playtime_Fanart_by_RWGN_on_DeviantA.webp`](images/194_Baba_Chops_Poppy_Playtime_Fanart_by_RWGN_on_DeviantA.webp) |
+| `#195` | <img src="images/195_Baba_Chops_Poppy_Playtime_Nightmare_Critters_8_Offic.webp" width="64" /> | **Baba Chops Poppy Playtime Nightmare Critters 8" Official Plush · Toy Temple** | `1024×1024` | [`images/195_Baba_Chops_Poppy_Playtime_Nightmare_Critters_8_Offic.webp`](images/195_Baba_Chops_Poppy_Playtime_Nightmare_Critters_8_Offic.webp) |
+| `#196` | <img src="images/196_Baba_Chops_Poppy_Playtime_Nightmare_Critters_8_Offic.webp" width="64" /> | **Baba Chops Poppy Playtime Nightmare Critters 8" Official Plush · Toy Temple** | `1024×1024` | [`images/196_Baba_Chops_Poppy_Playtime_Nightmare_Critters_8_Offic.webp`](images/196_Baba_Chops_Poppy_Playtime_Nightmare_Critters_8_Offic.webp) |
+| `#197` | <img src="images/197_Baba_Chops_NightmareCrittersSecondLogo.webp" width="64" /> | **Baba Chops (NightmareCrittersSecondLogo)** | `3991×2331` | [`images/197_Baba_Chops_NightmareCrittersSecondLogo.webp`](images/197_Baba_Chops_NightmareCrittersSecondLogo.webp) |
+| `#198` | <img src="images/198_Baba_Chops_NC_Joyride.webp" width="64" /> | **Baba Chops — NC-Joyride** | `2560×1754` | [`images/198_Baba_Chops_NC_Joyride.webp`](images/198_Baba_Chops_NC_Joyride.webp) |
+| `#199` | <img src="images/199_Baba_Chops_MiniNightmaresClean.webp" width="64" /> | **Baba Chops (MiniNightmaresClean)** | `2560×931` | [`images/199_Baba_Chops_MiniNightmaresClean.webp`](images/199_Baba_Chops_MiniNightmaresClean.webp) |
+| `#200` | <img src="images/200_Baba_Chops_Scaredy_Cats_2.webp" width="64" /> | **Baba Chops — Scaredy Cats 2** | `1817×2560` | [`images/200_Baba_Chops_Scaredy_Cats_2.webp`](images/200_Baba_Chops_Scaredy_Cats_2.webp) |
+| `#201` | <img src="images/201_Baba_Chops_Scaredy_Cats_3.webp" width="64" /> | **Baba Chops — Scaredy Cats 3** | `1817×2560` | [`images/201_Baba_Chops_Scaredy_Cats_3.webp`](images/201_Baba_Chops_Scaredy_Cats_3.webp) |
+| `#202` | <img src="images/202_Baba_Chops_Scaredy_Cats_4.webp" width="64" /> | **Baba Chops — Scaredy Cats 4** | `1817×2560` | [`images/202_Baba_Chops_Scaredy_Cats_4.webp`](images/202_Baba_Chops_Scaredy_Cats_4.webp) |
+| `#203` | <img src="images/203_Baba_Chops_Christmas2025.webp" width="64" /> | **Baba Chops — Christmas2025** | `2560×1439` | [`images/203_Baba_Chops_Christmas2025.webp`](images/203_Baba_Chops_Christmas2025.webp) |
+| `#204` | <img src="images/204_Baba_Chops_AllNightmaresWiki.webp" width="64" /> | **Baba Chops (AllNightmaresWiki)** | `2560×702` | [`images/204_Baba_Chops_AllNightmaresWiki.webp`](images/204_Baba_Chops_AllNightmaresWiki.webp) |
+| `#205` | <img src="images/205_Baba_Chops_NightmareGroupPhoto.webp" width="64" /> | **Baba Chops (NightmareGroupPhoto)** | `2560×775` | [`images/205_Baba_Chops_NightmareGroupPhoto.webp`](images/205_Baba_Chops_NightmareGroupPhoto.webp) |
+| `#206` | <img src="images/206_Baba_Chops_Wallpaper_NightmareCritters_2560x1440.webp" width="64" /> | **Baba Chops (Wallpaper NightmareCritters 2560x1440)** | `2560×1440` | [`images/206_Baba_Chops_Wallpaper_NightmareCritters_2560x1440.webp`](images/206_Baba_Chops_Wallpaper_NightmareCritters_2560x1440.webp) |
+| `#207` | <img src="images/207_Baba_Chops_Nightmare_Critters_Plushies_Crawling.webp" width="64" /> | **Baba Chops (Nightmare Critters Plushies Crawling)** | `2414×1210` | [`images/207_Baba_Chops_Nightmare_Critters_Plushies_Crawling.webp`](images/207_Baba_Chops_Nightmare_Critters_Plushies_Crawling.webp) |
+| `#208` | <img src="images/208_Baba_Chops_Poppy_Playtime_Merry_Christmas_2024_Artwo.webp" width="64" /> | **Baba Chops — Poppy Playtime Merry Christmas 2024 (Artwork)** | `2048×1326` | [`images/208_Baba_Chops_Poppy_Playtime_Merry_Christmas_2024_Artwo.webp`](images/208_Baba_Chops_Poppy_Playtime_Merry_Christmas_2024_Artwo.webp) |
+| `#209` | <img src="images/209_Baba_Chops_NCs_display.webp" width="64" /> | **Baba Chops — NCs display** | `2080×1171` | [`images/209_Baba_Chops_NCs_display.webp`](images/209_Baba_Chops_NCs_display.webp) |
+| `#210` | <img src="images/210_Baba_Chops_NightmareCrittersRender.webp" width="64" /> | **Baba Chops (NightmareCrittersRender)** | `3433×694` | [`images/210_Baba_Chops_NightmareCrittersRender.webp`](images/210_Baba_Chops_NightmareCrittersRender.webp) |
+| `#211` | <img src="images/211_Baba_Chops_ArtworkHalloweenSpecial.webp" width="64" /> | **Baba Chops — ArtworkHalloweenSpecial** | `2048×1152` | [`images/211_Baba_Chops_ArtworkHalloweenSpecial.webp`](images/211_Baba_Chops_ArtworkHalloweenSpecial.webp) |
+| `#212` | <img src="images/212_Baba_Chops_NightmareCritters.webp" width="64" /> | **Baba Chops (NightmareCritters)** | `1920×1080` | [`images/212_Baba_Chops_NightmareCritters.webp`](images/212_Baba_Chops_NightmareCritters.webp) |
+| `#213` | <img src="images/213_Baba_Chops_NightmareCrittersLivingToys.webp" width="64" /> | **Baba Chops (NightmareCrittersLivingToys)** | `1920×1080` | [`images/213_Baba_Chops_NightmareCrittersLivingToys.webp`](images/213_Baba_Chops_NightmareCrittersLivingToys.webp) |
+| `#214` | <img src="images/214_Baba_Chops_Nightmare_Critters_toy_depiction.webp" width="64" /> | **Baba Chops (Nightmare Critters toy depiction)** | `1920×1080` | [`images/214_Baba_Chops_Nightmare_Critters_toy_depiction.webp`](images/214_Baba_Chops_Nightmare_Critters_toy_depiction.webp) |
+| `#215` | <img src="images/215_Baba_Chops_PPC4_Foundation_NightmareCritters1.webp" width="64" /> | **Baba Chops (PPC4-Foundation NightmareCritters1)** | `1920×1080` | [`images/215_Baba_Chops_PPC4_Foundation_NightmareCritters1.webp`](images/215_Baba_Chops_PPC4_Foundation_NightmareCritters1.webp) |
+| `#216` | <img src="images/216_Baba_Chops_PPC4_Foundation_NightmareCritters2.webp" width="64" /> | **Baba Chops (PPC4-Foundation NightmareCritters2)** | `1920×1080` | [`images/216_Baba_Chops_PPC4_Foundation_NightmareCritters2.webp`](images/216_Baba_Chops_PPC4_Foundation_NightmareCritters2.webp) |
+| `#217` | <img src="images/217_Baba_Chops_PPC4_Foundation_NightmareCritters3.webp" width="64" /> | **Baba Chops (PPC4-Foundation NightmareCritters3)** | `1920×1080` | [`images/217_Baba_Chops_PPC4_Foundation_NightmareCritters3.webp`](images/217_Baba_Chops_PPC4_Foundation_NightmareCritters3.webp) |
+| `#218` | <img src="images/218_Baba_Chops_PPC4_Foundation_NightmareCritters4.webp" width="64" /> | **Baba Chops (PPC4-Foundation NightmareCritters4)** | `1920×1080` | [`images/218_Baba_Chops_PPC4_Foundation_NightmareCritters4.webp`](images/218_Baba_Chops_PPC4_Foundation_NightmareCritters4.webp) |
 | `#014` | <img src="images/014_BabaChops.webp" width="64" /> | **BabaChops** | `2160×1620` | [`images/014_BabaChops.webp`](images/014_BabaChops.webp) |
 | `#018` | <img src="images/018_BigBabaRender.webp" width="64" /> | **BigBabaRender** | `1919×2558` | [`images/018_BigBabaRender.webp`](images/018_BigBabaRender.webp) |
 | `#056` | <img src="images/056_Baba_Chops.webp" width="64" /> | **Baba Chops** | `2584×4112` | [`images/056_Baba_Chops.webp`](images/056_Baba_Chops.webp) |
