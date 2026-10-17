@@ -1,8 +1,25 @@
-# 🎨🌙 Smiling Critters High-Resolution Asset Library (素材库 — 318 Verified Images · 107 CatNap & 105 Baba Chops Assets)
+# 🎨🌙 Smiling Critters High-Resolution Asset Library (素材库 — 318 Verified Images + Baba Chops 3D Base Model Studio)
 
-> **Curated High-Resolution Smiling Critters & Custom Critters Picture Library for Creative Projects, Games & Printable Temporary Tattoos**
+> **Curated High-Resolution Smiling Critters & Custom Critters Picture Library + Interactive 3D Base Model Studio (`3D建模基地模型`)**
 
 ### 🚀 [**Open Interactive iPad Gallery & Asset Browser → https://kunruiw1991.github.io/smiling-critters-assets/**](https://kunruiw1991.github.io/smiling-critters-assets/)
+### 🐑💀 [**Open Baba Chops 3D Base Model Studio (`3D建模基地模型` — 1:1 Recreation of `#121`) → https://kunruiw1991.github.io/smiling-critters-assets/baba-chops-3d.html**](https://kunruiw1991.github.io/smiling-critters-assets/baba-chops-3d.html)
+
+---
+
+## 🐑💀 Baba Chops 3D Base Model (`3D建模基地模型` — 1:1 Recreation of `images/121_BabaChopsPlush1.webp`)
+
+A complete, rigged, PBR-shaded 3D plush base model faithfully recreating [`images/121_BabaChopsPlush1.webp`](images/121_BabaChopsPlush1.webp) (`720×900` official Baba Chops plush studio portrait):
+
+| Asset / Deliverable | Format | Size / Geometry | Direct Link |
+| :--- | :---: | :---: | :--- |
+| **Interactive 3D Base Model Studio** | `HTML5 / Three.js r161 WebGL` | `160` meshes · `70,148` triangles · Orbit/Zoom, 5 Camera Presets, PBR/Wireframe/Clay Modes, 4 Pose Animations & 4 Rig Sliders | [**Launch 3D Studio (`baba-chops-3d.html`)**](https://kunruiw1991.github.io/smiling-critters-assets/baba-chops-3d.html) |
+| **Binary glTF 2.0 3D Base Model** | `.GLB` (`glTF 2.0`) | `941 KB` · 6 PBR Material Groups (Blender / Unity / Unreal / Three.js ready) | [`models/baba_chops_plush_base_model.glb`](models/baba_chops_plush_base_model.glb) |
+| **Wavefront 3D Mesh Export** | `.OBJ` (`Wavefront`) | `2.52 MB` · Named anatomical object groups (`v`, `vn`, `f`) | [`models/baba_chops_plush_base_model.obj`](models/baba_chops_plush_base_model.obj) |
+| **Procedural Three.js Rig Module** | `.JS` (`ES Module`) | Hierarchical articulated rig (`buildBabaChopsPlushModel`) + procedural fleece/velour bump maps | [`models/baba_chops_model.js`](models/baba_chops_model.js) |
+| **3D Studio Preview Render** | `.PNG` (`1440×900`) | Side-by-side 1:1 Reference `#121` vs. 3D Base Model render | [`models/baba_chops_3d_preview.png`](models/baba_chops_3d_preview.png) |
+
+![Baba Chops 3D Base Model Studio Preview](models/baba_chops_3d_preview.png)
 
 ---
 

@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>🐑💀 Baba Chops 3D Base Model Studio — 1:1 Plush Recreation (121_BabaChopsPlush1)</title>
+  <style>
+    :root {
+      --bg: #0f0b1a;
+      --panel: rgba(24, 18, 43, 0.92);
+      --border: rgba(255, 255, 255, 0.14);
+      --accent: #a855f7;
+      --accent2: #ec4899;
+      --text: #f8fafc;
+      --muted: #cbd5e1;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    header {
+      padding: 12px 20px;
+      background: rgba(15, 11, 26, 0.95);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      z-index: 10;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand h1 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+    .brand span {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .btn {
+      padding: 8px 13px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn:hover, .btn.active {
+      background: linear-gradient(135deg, #9333ea, #db2777);
+      border-color: #f472b6;
+    }
+    .btn.primary {
+      background: linear-gradient(135deg, #7c3aed, #ec4899);
+      border-color: #f472b6;
+    }
+    .workspace {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 300px 1fr 310px;
+      min-height: 0;
+    }
+    .sidebar {
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .sidebar.right {
+      border-right: none;
+      border-left: 1px solid var(--border);
+    }
+    .section-title {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #c084fc;
+      margin: 0 0 8px;
+      font-weight: 700;
+    }
+    .ref-card {
+      background: #f4f4f6;
+      border-radius: 14px;
+      padding: 10px;
+      text-align: center;
+      border: 2px solid rgba(168, 85, 247, 0.45);
+    }
+    .ref-card img {
+      width: 100%;
+      max-height: 290px;
+      object-fit: contain;
+      border-radius: 8px;
+      display: block;
+      margin: 0 auto;
+    }
+    .ref-caption {
+      margin-top: 6px;
+      font-size: 0.76rem;
+      color: #1e293b;
+      font-weight: 600;
+    }
+    .viewport-wrap {
+      position: relative;
+      background: #f4f4f6;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #viewport-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab;
+    }
+    #viewport-canvas:active { cursor: grabbing; }
+    .hud-badge {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      background: rgba(15, 11, 26, 0.82);
+      backdrop-filter: blur(8px);
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1px solid rgba(255,255,255,0.15);
+      pointer-events: none;
+    }
+    .btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+    }
+    .slider-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+    .slider-row label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .slider-row input[type="range"] {
+      width: 100%;
+      accent-color: #a855f7;
+    }
+    .spec-list {
+      margin: 0;
+      padding-left: 16px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    @media (max-width: 980px) {
+      .workspace {
+        grid-template-columns: 1fr;
+        grid-template-rows: 58vh auto auto;
+        overflow-y: auto;
+      }
+      body { overflow: auto; height: auto; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span style="font-size:1.6rem;">🐑💀</span>
+      <div>
+        <h1>Baba Chops 3D Base Model Studio (3D建模基底模型)</h1>
+        <span>1:1 High-Precision 3D Plush Recreation of <code>images/121_BabaChopsPlush1.webp</code> • Three.js PBR + glTF 2.0 (.GLB) + Wavefront (.OBJ)</span>
+      </div>
+    </div>
+    <div class="top-actions">
+      <a class="btn" href="index.html">⬅️ Back to 318-Asset Library</a>
+      <a class="btn primary" href="models/baba_chops_plush_base_model.glb" download="baba_chops_plush_base_model.glb">⬇️ Download .GLB (glTF 2.0)</a>
+      <a class="btn" href="models/baba_chops_plush_base_model.obj" download="baba_chops_plush_base_model.obj">⬇️ Download .OBJ (Mesh)</a>
+      <a class="btn" href="models/baba_chops_model.js" download="baba_chops_model.js">⬇️ Download Three.js Rig (.JS)</a>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <!-- Left Sidebar: Target Reference Photo & Anatomy Checklist -->
+    <aside class="sidebar">
+      <div>
+        <h2 class="section-title">🎯 Reference Asset (#121)</h2>
+        <div class="ref-card">
+          <img src="images/121_BabaChopsPlush1.webp" alt="121_BabaChopsPlush1 Reference" />
+          <div class="ref-caption">Original Target: <code>images/121_BabaChopsPlush1.webp</code> (720×900)</div>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="section-title">🧬 1:1 Base Model Anatomy</h2>
+        <ul class="spec-list">
+          <li><strong>Crown & Bangs</strong>: 37 sculpted curly black sherpa wool tufts + procedural fleece bump map</li>
+          <li><strong>Eyes & Brow</strong>: Inward-angled (`23°`) soft-grey plush upper eyelids + central bridge + clearcoat acrylic dome eyes with vertical catchlights</li>
+          <li><strong>Muzzle & Grin</strong>: Wide sculpted light-grey velour upper/lower lips, 2 embroidered nostrils, recessed black mouth cavity & twin rounded buck teeth</li>
+          <li><strong>Sheep Ears</strong>: Horizontal cupped grey velour ears with concave inner ear hollows</li>
+          <li><strong>Zipper & Skull Charm</strong>: 34 interlocking silver metal teeth, collar slider/pull tab & bevel-extruded 3D white Skull Pendant with 4 jaw teeth</li>
+          <li><strong>Limbs & Hooves</strong>: Pear-shaped black plush torso, `42°` splayed arms with cloven grey hoof-mittens & standing grey cloven foot hooves</li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Center 3D WebGL Viewport -->
+    <main class="viewport-wrap" id="viewport-container">
+      <canvas id="viewport-canvas"></canvas>
+      <div class="hud-badge" id="hud-status">🎥 Drag to Orbit • Scroll to Zoom • Studio Lighting Match (#f4f4f6)</div>
+    </main>
+
+    <!-- Right Sidebar: Camera, Shading, Pose & Rig Controls -->
+    <aside class="sidebar right">
+      <div>
+        <h2 class="section-title">📷 Camera Presets</h2>
+        <div class="btn-grid">
+          <button class="btn active" id="cam-front" onclick="setCameraPreset('front', this)">🎯 1:1 Ref Front</button>
+          <button class="btn" id="cam-34" onclick="setCameraPreset('threequarter', this)">📐 3/4 Studio</button>
+          <button class="btn" id="cam-side" onclick="setCameraPreset('side', this)">👉 Side Profile</button>
+          <button class="btn" id="cam-back" onclick="setCameraPreset('back', this)">🔄 Back Wool</button>
+          <button class="btn" id="cam-head" onclick="setCameraPreset('closeup', this)">🔍 Face & Skull</button>
+          <button class="btn" id="cam-spin" onclick="toggleTurntable(this)">🎠 Auto-Turntable</button>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="section-title">🎨 Shading & Inspection Mode</h2>
+        <div class="btn-grid">
+          <button class="btn active" onclick="setShadingMode('pbr', this)">🧸 PBR Plush</button>
+          <button class="btn" onclick="setShadingMode('wireframe', this)">🕸️ Base Wireframe</button>
+          <button class="btn" onclick="setShadingMode('clay', this)">🗿 Clay Sculpt</button>
+          <button class="btn" onclick="setShadingMode('darkbg', this)">🌙 Dark Studio BG</button>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="section-title">🎬 Animation & Pose Preset</h2>
+        <div class="btn-grid">
+          <button class="btn active" onclick="setPoseMode('ref', this)">🧍 #121 Ref Pose</button>
+          <button class="btn" onclick="setPoseMode('idle', this)">💨 Idle Breathe</button>
+          <button class="btn" onclick="setPoseMode('bounce', this)">⭐ Happy Bounce</button>
+          <button class="btn" onclick="setPoseMode('wave', this)">👋 Wave Hoof</button>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="section-title">🎛️ Rig Joint Articulation</h2>
+        <div class="slider-row">
+          <label><span>Head Tilt (Yaw / Pitch)</span><span id="val-head">0°</span></label>
+          <input type="range" id="sl-head" min="-35" max="35" value="0" />
+        </div>
+        <div class="slider-row">
+          <label><span>Arm Splay Angle</span><span id="val-arms">42°</span></label>
+          <input type="range" id="sl-arms" min="15" max="85" value="42" />
+        </div>
+        <div class="slider-row">
+          <label><span>Ear Droop / Wiggle</span><span id="val-ears">0°</span></label>
+          <input type="range" id="sl-ears" min="-25" max="25" value="0" />
+        </div>
+        <div class="slider-row">
+          <label><span>Skull Pendant Swing</span><span id="val-skull">0°</span></label>
+          <input type="range" id="sl-skull" min="-35" max="35" value="0" />
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script type="module">
+    import * as THREE from './models/three.module.min.js';
+    import { buildBabaChopsPlushModel } from './models/baba_chops_model.js';
+
+    const container = document.getElementById('viewport-container');
+    const canvas = document.getElementById('viewport-canvas');
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.NoToneMapping;
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xf4f4f6);
+
+    // Build synthetic studio softbox PMREM environment for realistic clearcoat eye reflections & chrome zipper sheen
+    const pmremGen = new THREE.PMREMGenerator(renderer);
+    const envScene = new THREE.Scene();
+    envScene.background = new THREE.Color(0xdbe0e8);
+    const softboxTop = new THREE.Mesh(
+      new THREE.PlaneGeometry(10, 10),
+      new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide })
+    );
+    softboxTop.position.set(0, 6, 4);
+    softboxTop.lookAt(0, 1, 0);
+    envScene.add(softboxTop);
+    const softboxLeft = new THREE.Mesh(
+      new THREE.PlaneGeometry(6, 8),
+      new THREE.MeshBasicMaterial({ color: 0xf8fafc, side: THREE.DoubleSide })
+    );
+    softboxLeft.position.set(-5, 2, 5);
+    softboxLeft.lookAt(0, 1, 0);
+    envScene.add(softboxLeft);
+    scene.environment = pmremGen.fromScene(envScene, 0.04).texture;
+
+    // Studio Lighting calibrated to 121_BabaChopsPlush1.webp
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0xcbd0db, 1.05);
+    hemiLight.position.set(0, 5, 0);
+    scene.add(hemiLight);
+
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.55);
+    keyLight.position.set(1.4, 3.2, 4.2);
+    keyLight.castShadow = true;
+    keyLight.shadow.mapSize.set(2048, 2048);
+    keyLight.shadow.camera.near = 0.5;
+    keyLight.shadow.camera.far = 12;
+    const d = 1.6;
+    keyLight.shadow.camera.left = -d;
+    keyLight.shadow.camera.right = d;
+    keyLight.shadow.camera.top = d;
+    keyLight.shadow.camera.bottom = -d;
+    keyLight.shadow.bias = -0.0005;
+    scene.add(keyLight);
+
+    const fillLight = new THREE.DirectionalLight(0xeef2f6, 0.85);
+    fillLight.position.set(-2.5, 1.8, 3.0);
+    scene.add(fillLight);
+
+    const rimLight = new THREE.DirectionalLight(0xffffff, 0.75);
+    rimLight.position.set(0, 2.8, -3.5);
+    scene.add(rimLight);
+
+    // Soft studio ground shadow catcher disc under the hooves (matches 121_BabaChopsPlush1.webp floor shadow)
+    const shadowCanvas = document.createElement('canvas');
+    shadowCanvas.width = 256;
+    shadowCanvas.height = 256;
+    const sctx = shadowCanvas.getContext('2d');
+    const sgrad = sctx.createRadialGradient(128, 128, 18, 128, 128, 120);
+    sgrad.addColorStop(0, 'rgba(20, 22, 28, 0.34)');
+    sgrad.addColorStop(0.55, 'rgba(20, 22, 28, 0.14)');
+    sgrad.addColorStop(1, 'rgba(20, 22, 28, 0.0)');
+    sctx.fillStyle = sgrad;
+    sctx.fillRect(0, 0, 256, 256);
+    const shadowTex = new THREE.CanvasTexture(shadowCanvas);
+    const groundShadow = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.15, 0.72),
+      new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false })
+    );
+    groundShadow.rotation.x = -Math.PI / 2;
+    groundShadow.position.set(0, 0.002, 0.02);
+    scene.add(groundShadow);
+
+    // Build Baba Chops 3D Plush Base Model
+    const baba = buildBabaChopsPlushModel(THREE);
+    scene.add(baba.root);
+
+    // Camera & Custom Orbit Controller
+    const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 50);
+    let camState = {
+      theta: 0.0,
+      phi: 1.52,
+      radius: 4.35,
+      target: new THREE.Vector3(0, 0.99, 0)
+    };
+    let autoTurntable = false;
+    let poseMode = 'ref';
+    let darkBg = false;
+
+    function updateCamera() {
+      const x = camState.target.x + camState.radius * Math.sin(camState.phi) * Math.sin(camState.theta);
+      const y = camState.target.y + camState.radius * Math.cos(camState.phi);
+      const z = camState.target.z + camState.radius * Math.sin(camState.phi) * Math.cos(camState.theta);
+      camera.position.set(x, y, z);
+      camera.lookAt(camState.target);
+    }
+
+    function resize() {
+      const w = container.clientWidth || 800;
+      const h = container.clientHeight || 600;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      updateCamera();
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Pointer Orbit & Wheel Zoom
+    let dragging = false;
+    let prevX = 0, prevY = 0;
+    canvas.addEventListener('pointerdown', e => {
+      dragging = true;
+      prevX = e.clientX;
+      prevY = e.clientY;
+      canvas.setPointerCapture(e.pointerId);
+    });
+    canvas.addEventListener('pointermove', e => {
+      if (!dragging) return;
+      const dx = e.clientX - prevX;
+      const dy = e.clientY - prevY;
+      prevX = e.clientX;
+      prevY = e.clientY;
+      camState.theta -= dx * 0.008;
+      camState.phi = Math.max(0.25, Math.min(2.75, camState.phi - dy * 0.008));
+      updateCamera();
+    });
+    canvas.addEventListener('pointerup', () => { dragging = false; });
+    canvas.addEventListener('wheel', e => {
+      e.preventDefault();
+      camState.radius = Math.max(1.8, Math.min(8.5, camState.radius + e.deltaY * 0.0025));
+      updateCamera();
+    }, { passive: false });
+
+    // Expose UI functions globally
+    window.setCameraPreset = (preset, btn) => {
+      document.querySelectorAll('#cam-front,#cam-34,#cam-side,#cam-back,#cam-head').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      if (preset === 'front') {
+        camState = { theta: 0.0, phi: 1.52, radius: 4.35, target: new THREE.Vector3(0, 0.99, 0) };
+      } else if (preset === 'threequarter') {
+        camState = { theta: 0.52, phi: 1.38, radius: 4.35, target: new THREE.Vector3(0, 0.99, 0) };
+      } else if (preset === 'side') {
+        camState = { theta: Math.PI / 2, phi: 1.50, radius: 4.35, target: new THREE.Vector3(0, 0.99, 0) };
+      } else if (preset === 'back') {
+        camState = { theta: Math.PI, phi: 1.50, radius: 4.35, target: new THREE.Vector3(0, 0.99, 0) };
+      } else if (preset === 'closeup') {
+        camState = { theta: 0.0, phi: 1.48, radius: 2.65, target: new THREE.Vector3(0, 1.18, 0.1) };
+      }
+      updateCamera();
+    };
+
+    window.toggleTurntable = (btn) => {
+      autoTurntable = !autoTurntable;
+      if (btn) btn.classList.toggle('active', autoTurntable);
+    };
+
+    const clayMat = new THREE.MeshStandardMaterial({
+      color: 0xd6cfc7,
+      roughness: 0.55,
+      metalness: 0.08
+    });
+    const origMats = new Map();
+    baba.root.traverse(obj => {
+      if (obj.isMesh) origMats.set(obj, obj.material);
+    });
+
+    window.setShadingMode = (mode, btn) => {
+      if (mode === 'darkbg') {
+        darkBg = !darkBg;
+        scene.background = new THREE.Color(darkBg ? 0x130d24 : 0xf4f4f6);
+        if (btn) btn.classList.toggle('active', darkBg);
+        return;
+      }
+      baba.root.traverse(obj => {
+        if (!obj.isMesh) return;
+        const baseM = origMats.get(obj);
+        if (mode === 'pbr') {
+          obj.material = baseM;
+          obj.material.wireframe = false;
+        } else if (mode === 'wireframe') {
+          obj.material = baseM;
+          obj.material.wireframe = true;
+        } else if (mode === 'clay') {
+          obj.material = clayMat;
+          obj.material.wireframe = false;
+        }
+      });
+    };
+
+    window.setPoseMode = (mode, btn) => {
+      poseMode = mode;
+      if (btn) {
+        btn.parentElement.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      if (mode === 'ref') {
+        baba.bodyRig.position.set(0, 0, 0);
+        baba.bodyRig.rotation.set(0, 0, 0);
+        baba.headGroup.rotation.set(0, 0, 0);
+        baba.leftArmGroup.rotation.z = -0.74;
+        baba.rightArmGroup.rotation.z = 0.74;
+        baba.leftLegGroup.rotation.x = 0;
+        baba.rightLegGroup.rotation.x = 0;
+        baba.skullPendantGroup.rotation.set(0, 0, 0);
+      }
+    };
+
+    // Sliders
+    const slHead = document.getElementById('sl-head');
+    const slArms = document.getElementById('sl-arms');
+    const slEars = document.getElementById('sl-ears');
+    const slSkull = document.getElementById('sl-skull');
+
+    slHead.addEventListener('input', () => {
+      const deg = Number(slHead.value);
+      document.getElementById('val-head').textContent = deg + '°';
+      baba.headGroup.rotation.y = THREE.MathUtils.degToRad(deg);
+      baba.headGroup.rotation.z = THREE.MathUtils.degToRad(deg * 0.25);
+    });
+    slArms.addEventListener('input', () => {
+      const deg = Number(slArms.value);
+      document.getElementById('val-arms').textContent = deg + '°';
+      const rad = THREE.MathUtils.degToRad(deg);
+      baba.leftArmGroup.rotation.z = -rad;
+      baba.rightArmGroup.rotation.z = rad;
+    });
+    slEars.addEventListener('input', () => {
+      const deg = Number(slEars.value);
+      document.getElementById('val-ears').textContent = deg + '°';
+      const rad = THREE.MathUtils.degToRad(deg);
+      baba.leftEarGroup.rotation.z = 0.12 + rad;
+      baba.rightEarGroup.rotation.z = -0.12 - rad;
+    });
+    slSkull.addEventListener('input', () => {
+      const deg = Number(slSkull.value);
+      document.getElementById('val-skull').textContent = deg + '°';
+      baba.skullPendantGroup.rotation.z = THREE.MathUtils.degToRad(deg);
+    });
+
+    const clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+      const t = clock.getElapsedTime();
+
+      if (autoTurntable) {
+        camState.theta += 0.012;
+        updateCamera();
+      }
+
+      if (poseMode === 'idle') {
+        baba.bodyRig.position.y = Math.sin(t * 2.2) * 0.012;
+        baba.headGroup.rotation.z = Math.sin(t * 1.5) * 0.035;
+        baba.leftEarGroup.rotation.z = 0.12 + Math.sin(t * 3.0) * 0.05;
+        baba.rightEarGroup.rotation.z = -0.12 - Math.sin(t * 3.0) * 0.05;
+        baba.skullPendantGroup.rotation.z = Math.sin(t * 2.4) * 0.06;
+      } else if (poseMode === 'bounce') {
+        baba.bodyRig.position.y = Math.abs(Math.sin(t * 5.0)) * 0.08;
+        baba.headGroup.rotation.x = Math.sin(t * 5.0) * 0.08;
+        baba.leftArmGroup.rotation.z = -0.74 - Math.sin(t * 5.0) * 0.25;
+        baba.rightArmGroup.rotation.z = 0.74 + Math.sin(t * 5.0) * 0.25;
+        baba.skullPendantGroup.rotation.x = -Math.abs(Math.cos(t * 5.0)) * 0.18;
+      } else if (poseMode === 'wave') {
+        baba.rightArmGroup.rotation.z = 2.15 + Math.sin(t * 7.0) * 0.28;
+        baba.headGroup.rotation.z = -0.10 + Math.sin(t * 3.5) * 0.05;
+        baba.skullPendantGroup.rotation.z = Math.sin(t * 3.5) * 0.08;
+      }
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Count meshes & triangles for telemetry
+    let meshCount = 0, triCount = 0;
+    baba.root.traverse(o => {
+      if (o.isMesh && o.geometry) {
+        meshCount++;
+        const idx = o.geometry.index;
+        triCount += idx ? (idx.count / 3) : (o.geometry.attributes.position.count / 3);
+      }
+    });
+
+    // Expose scene/renderer for automated visual testing
+    window.__babaStudio = { scene, camera, renderer, baba };
+    window.__BABA_3D = { scene, camera, renderer, baba, stats: { meshes: meshCount, triangles: Math.round(triCount) } };
+  </script>
+</body>
+</html>
