@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Native Blender 4.3 Builder, Rigging, Animation & Cycles Studio Renderer (v3 Final Calibrated)
+Native Blender 4.3 Builder, Rigging, Animation & Cycles Studio Renderer (v4 — With Baba_Fart_Blast Animation)
 for Baba Chops (#121 Official Plush Base Model - Smiling Critters / Nightmare Critters).
 
 Run headless via:
@@ -14,7 +14,9 @@ import bmesh
 from mathutils import Vector, Matrix, Euler, noise
 
 OUT_DIR = "/tmp/smiling-critters-assets/models"
+ANIM_DIR = "/tmp/smiling-critters-assets/animations"
 os.makedirs(OUT_DIR, exist_ok=True)
+os.makedirs(ANIM_DIR, exist_ok=True)
 
 BLEND_PATH = os.path.join(OUT_DIR, "baba_chops_plush_base_model.blend")
 GLB_PATH = os.path.join(OUT_DIR, "baba_chops_plush_base_model.glb")
@@ -22,7 +24,9 @@ OBJ_PATH = os.path.join(OUT_DIR, "baba_chops_plush_base_model.obj")
 RENDER_FRONT_PATH = os.path.join(OUT_DIR, "baba_chops_blender_cycles_render.png")
 RENDER_PREVIEW_PATH = os.path.join(OUT_DIR, "baba_chops_3d_preview.png")
 RENDER_SHEET_DIR = "/tmp/baba_blender_renders"
+FART_FRAMES_DIR = "/tmp/baba_fart_frames"
 os.makedirs(RENDER_SHEET_DIR, exist_ok=True)
+os.makedirs(FART_FRAMES_DIR, exist_ok=True)
 
 
 # ==============================================================================
@@ -84,7 +88,7 @@ def sherpa_fur_displacement(p_world):
 
 
 # ==============================================================================
-# 2. PROCEDURAL CYCLES / GLTF PBR MATERIALS (HIGH-CONTRAST PLUSH CALIBRATION)
+# 2. PROCEDURAL CYCLES / GLTF PBR MATERIALS (HIGH-CONTRAST PLUSH + FART CLOUD)
 # ==============================================================================
 def create_plush_material(name, hex_color, roughness=0.88, spec_ior=0.12,
                           sheen=0.25, sheen_tint_mult=1.0,
@@ -149,7 +153,7 @@ def create_plush_material(name, hex_color, roughness=0.88, spec_ior=0.12,
 
 
 MATS = {
-    # Deep light-absorbing jet-black sherpa wool (low Specular IOR so it stays rich black!)
+    # Deep light-absorbing jet-black sherpa wool
     "WoolBlack": create_plush_material(
         "Baba_Wool_Black", 0x050507, roughness=0.93, spec_ior=0.05,
         sheen=0.14, sheen_tint_mult=1.2, bump_scale=46.0, bump_strength=0.42
@@ -159,7 +163,7 @@ MATS = {
         "Baba_Plush_Body_Black", 0x060609, roughness=0.88, spec_ior=0.06,
         sheen=0.14, sheen_tint_mult=1.2, bump_scale=80.0, bump_strength=0.18
     ),
-    # Medium dove-grey velour for muzzle, eyelids, ears, buck teeth & hooves (distinctly darker than white skull!)
+    # Medium dove-grey velour for muzzle, eyelids, ears, buck teeth & hooves
     "DoveGrey": create_plush_material(
         "Baba_Velour_Dove_Grey", 0x5A5D64, roughness=0.78, spec_ior=0.14,
         sheen=0.28, sheen_tint_mult=1.02, bump_scale=95.0, bump_strength=0.14, subsurface=0.03
@@ -175,7 +179,7 @@ MATS = {
         sheen=0.20, sheen_tint_mult=1.0, bump_scale=120.0, bump_strength=0.02,
         coat=0.15, emission_strength=0.08
     ),
-    # Deep jet-black glossy acrylic dome eyes (controlled spec_ior so they don't wash out grey)
+    # Deep jet-black glossy acrylic dome eyes
     "EyeGloss": create_plush_material(
         "Baba_Eye_Acrylic_Black", 0x020203, roughness=0.04, spec_ior=0.12,
         sheen=0.0, bump_strength=0.0, coat=0.28, coat_rough=0.015
@@ -199,6 +203,22 @@ MATS = {
     "ZipperTrack": create_plush_material(
         "Baba_Zipper_Track_Dark", 0x101115, roughness=0.86, spec_ior=0.06,
         sheen=0.10, bump_strength=0.06
+    ),
+    # 3D Cartoon Fart Cloud Materials (Vibrant Toxic Lime, Neon Blast Core, Nightmare Lavender Swirl)
+    "FartCloudLime": create_plush_material(
+        "Baba_Fart_Cloud_Lime", 0x4CE629, roughness=0.68, spec_ior=0.18,
+        sheen=0.45, sheen_tint_mult=1.15, bump_scale=24.0, bump_strength=0.22,
+        subsurface=0.35, emission_strength=0.28
+    ),
+    "FartCloudNeon": create_plush_material(
+        "Baba_Fart_Cloud_Neon_YellowGreen", 0xC4FF33, roughness=0.45, spec_ior=0.25,
+        sheen=0.35, sheen_tint_mult=1.1, bump_scale=30.0, bump_strength=0.14,
+        subsurface=0.25, emission_strength=0.55
+    ),
+    "FartCloudPurple": create_plush_material(
+        "Baba_Fart_Cloud_Nightmare_Purple", 0x9D4EDD, roughness=0.62, spec_ior=0.20,
+        sheen=0.40, sheen_tint_mult=1.1, bump_scale=28.0, bump_strength=0.18,
+        subsurface=0.25, emission_strength=0.32
     ),
 }
 
@@ -232,6 +252,9 @@ BONE_NAMES = [
     "FootHoof.L",
     "Leg.R",
     "FootHoof.R",
+    "FartCloud.1",
+    "FartCloud.2",
+    "FartCloud.3",
 ]
 BONE_IDX = {name: i for i, name in enumerate(BONE_NAMES)}
 
@@ -246,6 +269,9 @@ MAT_LIST = [
     MATS["MouthVoidBlack"],
     MATS["ZipperMetal"],
     MATS["ZipperTrack"],
+    MATS["FartCloudLime"],
+    MATS["FartCloudNeon"],
+    MATS["FartCloudPurple"],
 ]
 MAT_IDX = {
     "WoolBlack": 0,
@@ -258,6 +284,9 @@ MAT_IDX = {
     "MouthVoidBlack": 7,
     "ZipperMetal": 8,
     "ZipperTrack": 9,
+    "FartCloudLime": 10,
+    "FartCloudNeon": 11,
+    "FartCloudPurple": 12,
 }
 
 
@@ -397,7 +426,6 @@ head_core_bm = make_uv_sphere_bm(
 )
 append_bmesh_part(head_core_bm, "WoolBlack", lambda x, y, z: {"Head": 1.0})
 
-# Dense shaggy wool tufts: compact peaked crown (#121 silhouette, narrower than arm span!)
 wool_puffs = [
     # Pointed top crown tuft
     (0.00, 2.56, 0.12, 0.24), (-0.19, 2.51, 0.14, 0.22), (0.19, 2.51, 0.14, 0.22),
@@ -497,7 +525,6 @@ for side in (-1, 1):
     ey = 1.985
     ez = 0.600
 
-    # Deep jet-black acrylic eye dome
     eye_bm = make_uv_sphere_bm(
         0.180, 0.172, 0.132,
         cx=ex, cy=ey, cz=ez,
@@ -506,7 +533,6 @@ for side in (-1, 1):
     )
     append_bmesh_part(eye_bm, "EyeGloss", lambda x, y, z: {"Head": 1.0})
 
-    # Vertical studio softbox reflection bar on the black eye dome
     hi1_bm = make_uv_sphere_bm(
         0.020, 0.050, 0.012,
         cx=ex - side * 0.032, cy=ey - 0.012, cz=ez + 0.125,
@@ -515,8 +541,6 @@ for side in (-1, 1):
     )
     append_bmesh_part(hi1_bm, "CatchlightWhite", lambda x, y, z: {"Head": 1.0})
 
-    # Single-piece Spherical-Hood Dove-Grey Upper Eyelid slanted +side * 0.48 rad (V-brow!)
-    # Flush with the eye dome in side profile and tucked underneath the overhanging black wool bangs!
     def eyelid_hood_deform(p, s=side):
         if p.y < 0.008:
             p.y = 0.008 + (p.y - 0.008) * 0.14
@@ -538,7 +562,6 @@ for side in (-1, 1):
         lambda x, y, z, b=lid_bone: {b: 0.92, "Head": 0.08}
     )
 
-    # Flush lower eyelid rim crease along the V-brow diagonal
     lid_rim_pts = []
     rot_lid = Euler((-0.04, side * 0.18, side * 0.48), 'XYZ').to_matrix()
     for k in range(21):
@@ -617,7 +640,6 @@ append_bmesh_part(
                      "Head": 1.0 - max(0.0, min(1.0, (1.75 - y) * 3.0))}
 )
 
-# Upper Smile Lip Rim
 upper_lip_pts = []
 for k in range(37):
     t = -1.0 + 2.0 * k / 36.0
@@ -633,7 +655,6 @@ upper_lip_bm = make_torus_tube_bm(
 )
 append_bmesh_part(upper_lip_bm, "DoveGrey", lambda x, y, z: {"Head": 0.88, "Jaw": 0.12})
 
-# Lower Smile Lip Rim (bottom at y=1.425 so collar zipper slider is clearly visible below chin!)
 lower_lip_pts = []
 for k in range(41):
     t = -1.0 + 2.0 * k / 40.0
@@ -653,7 +674,6 @@ append_bmesh_part(
                      "Head": 1.0 - max(0.0, min(1.0, (1.75 - y) * 2.8))}
 )
 
-# Cheek corner plush folds wrapping the ends of the smile
 for side in (-1, 1):
     cheek_pts = []
     for k in range(13):
@@ -665,19 +685,16 @@ for side in (-1, 1):
     cheek_bm = make_torus_tube_bm(cheek_pts, 0.036, radial_segs=14, closed=False)
     append_bmesh_part(cheek_bm, "DoveGrey", lambda x, y, z: {"Head": 0.90, "Jaw": 0.10})
 
-# Twin Contiguous Squared-Off Dove-Grey Buck Teeth (#121 rounded-rectangle plush teeth)
 for side in (-1, 1):
     tx = side * 0.072
     ty = 1.685
     tz = head_front_z(tx, ty) + 0.002
 
     def tooth_deform(p, s=side):
-        # Widen the lower corners into a plush rounded-square tooth before clamping the medial edge
         if p.y < 0:
             p.x *= (1.0 + 0.18 * min(1.0, (p.y / -0.105) ** 2))
         if p.y < -0.108:
             p.y = -0.108 + (p.y + 0.108) * 0.25
-        # Medial inner edge at x=0: clamp cleanly so left and right teeth kiss at x=0
         if s * p.x < -0.070:
             p.x = -s * (0.070 + (abs(p.x) - 0.070) * 0.08)
         return p
@@ -761,7 +778,6 @@ def torso_front_z(y):
     return r * 0.88
 
 
-# Zipper fabric track + interlocking silver metal zipper teeth along the vertical center seam
 zip_pts = [(0.0, 0.58 + (1.42 - 0.58) * k / 24.0, torso_front_z(0.58 + (1.42 - 0.58) * k / 24.0) + 0.005)
            for k in range(25)]
 zip_track_bm = make_torus_tube_bm(zip_pts, 0.024, radial_segs=10, closed=False)
@@ -774,18 +790,15 @@ for i in range(36):
     t_bm = make_beveled_box_bm(0.036, 0.014, 0.020, zx, zy, zz)
     append_bmesh_part(t_bm, "ZipperMetal", torso_weights)
 
-# Collar silver zipper slider + metallic pull clasp visible right under the chin (y=1.26..1.38)
 slider_bm = make_beveled_box_bm(0.068, 0.082, 0.044, 0.0, 1.338, 0.448)
 append_bmesh_part(slider_bm, "ZipperMetal", lambda x, y, z: {"Chest": 0.7, "SkullPendant": 0.3})
 
 clasp_bm = make_beveled_box_bm(0.038, 0.065, 0.038, 0.0, 1.282, 0.464)
 append_bmesh_part(clasp_bm, "ZipperMetal", lambda x, y, z: {"SkullPendant": 1.0})
 
-# White rectangular top tab connecting the Skull Pendant to the silver zipper pull (#121 detail)
 bail_bm = make_beveled_box_bm(0.068, 0.058, 0.036, 0.0, 1.236, 0.470)
 append_bmesh_part(bail_bm, "SkullWhite", lambda x, y, z: {"SkullPendant": 1.0})
 
-# Stark Bright-White 3D Skull Pendant Charm centered on chest (y=0.88..1.22)
 skull_cranium_bm = make_uv_sphere_bm(
     0.205, 0.162, 0.048,
     cx=0.0, cy=1.095, cz=0.482,
@@ -811,7 +824,6 @@ skull_jaw_bm = make_uv_sphere_bm(
 )
 append_bmesh_part(skull_jaw_bm, "SkullWhite", lambda x, y, z: {"SkullPendant": 1.0})
 
-# Skull large angled dark oval eye sockets, central nasal triangle & 3 stitched tooth bars
 for side in (-1, 1):
     s_eye_bm = make_uv_sphere_bm(
         0.062, 0.056, 0.022,
@@ -966,6 +978,89 @@ for side in (-1, 1):
     append_bmesh_part(fcleft_bm, "InnerEarGrey", lambda x, y, z, fb=foot_bone: {fb: 1.0})
 
 
+# ------------------------------------------------------------------------------
+# 3.8 3D SCULPTED CARTOON FART CLOUD CLUSTER (WEIGHTED TO FartCloud.1 / .2 / .3)
+# ------------------------------------------------------------------------------
+# Stage 1 (`FartCloud.1`): Nozzle Blast Jet + 3D Shockwave Ring right behind Pelvis
+fart_stage1_puffs = [
+    (0.00, 0.68, -0.50, 0.12, 0.11, 0.14, "FartCloudNeon"),
+    (0.00, 0.69, -0.64, 0.18, 0.16, 0.18, "FartCloudLime"),
+    (-0.10, 0.72, -0.68, 0.14, 0.13, 0.14, "FartCloudLime"),
+    (0.10, 0.66, -0.68, 0.14, 0.13, 0.14, "FartCloudLime"),
+]
+for idx, (fx, fy, fz, rx, ry, rz, mkey) in enumerate(fart_stage1_puffs):
+    def fc1_disp(p_w, n_w, s=idx):
+        return p_w + n_w * (sherpa_fur_displacement(p_w + Vector((s * 1.1, 0.0, s * 0.7))) * 0.85)
+    bm_p = make_uv_sphere_bm(rx, ry, rz, cx=fx, cy=fy, cz=fz, u_segs=22, v_segs=16, world_deform_fn=fc1_disp)
+    append_bmesh_part(bm_p, mkey, lambda x, y, z: {"FartCloud.1": 1.0})
+
+# 3D Shockwave Torus Ring around the nozzle blast (`FartCloud.1`)
+ring_pts = []
+for k in range(28):
+    ang = 2.0 * math.pi * k / 28.0
+    ring_pts.append((0.24 * math.cos(ang), 0.69 + 0.24 * math.sin(ang), -0.62))
+shock_ring_bm = make_torus_tube_bm(ring_pts, 0.036, radial_segs=14, closed=True)
+append_bmesh_part(shock_ring_bm, "FartCloudNeon", lambda x, y, z: {"FartCloud.1": 1.0})
+
+# Stage 2 (`FartCloud.2`): Giant Billowing Cauliflower Cartoon Green Cloud
+fart_stage2_puffs = [
+    (0.00, 0.76, -0.92, 0.28, 0.26, 0.28, "FartCloudLime"),
+    (-0.20, 0.82, -0.96, 0.23, 0.22, 0.22, "FartCloudLime"),
+    (0.20, 0.80, -0.96, 0.23, 0.22, 0.22, "FartCloudLime"),
+    (0.00, 0.94, -1.02, 0.25, 0.24, 0.24, "FartCloudNeon"),
+    (-0.16, 0.64, -0.90, 0.20, 0.18, 0.20, "FartCloudLime"),
+    (0.16, 0.64, -0.90, 0.20, 0.18, 0.20, "FartCloudLime"),
+    (0.00, 0.78, -1.16, 0.30, 0.28, 0.28, "FartCloudLime"),
+    (-0.24, 0.88, -1.14, 0.22, 0.22, 0.22, "FartCloudNeon"),
+    (0.24, 0.86, -1.14, 0.22, 0.22, 0.22, "FartCloudPurple"),
+    (-0.14, 0.98, -1.18, 0.21, 0.20, 0.21, "FartCloudLime"),
+    (0.14, 0.98, -1.18, 0.21, 0.20, 0.21, "FartCloudLime"),
+]
+for idx, (fx, fy, fz, rx, ry, rz, mkey) in enumerate(fart_stage2_puffs):
+    def fc2_disp(p_w, n_w, s=idx):
+        return p_w + n_w * (sherpa_fur_displacement(p_w + Vector((s * 1.7, s * 0.9, 0.0))) * 1.15)
+    bm_p = make_uv_sphere_bm(rx, ry, rz, cx=fx, cy=fy, cz=fz, u_segs=24, v_segs=18, world_deform_fn=fc2_disp)
+    append_bmesh_part(bm_p, mkey, lambda x, y, z: {"FartCloud.2": 1.0})
+
+# Stage 3 (`FartCloud.3`): Outer Expanding Puff Balls & Curly Comic Waft Ribbons
+fart_stage3_puffs = [
+    (0.00, 0.92, -1.42, 0.32, 0.30, 0.30, "FartCloudLime"),
+    (-0.28, 1.02, -1.38, 0.24, 0.23, 0.24, "FartCloudNeon"),
+    (0.28, 1.00, -1.38, 0.24, 0.23, 0.24, "FartCloudLime"),
+    (0.00, 1.14, -1.46, 0.26, 0.25, 0.25, "FartCloudPurple"),
+    (-0.20, 0.76, -1.36, 0.22, 0.20, 0.22, "FartCloudLime"),
+    (0.20, 0.76, -1.36, 0.22, 0.20, 0.22, "FartCloudPurple"),
+    (-0.36, 0.88, -1.52, 0.18, 0.18, 0.18, "FartCloudNeon"),
+    (0.36, 0.90, -1.52, 0.18, 0.18, 0.18, "FartCloudLime"),
+    (0.00, 1.02, -1.66, 0.22, 0.22, 0.22, "FartCloudNeon"),
+]
+for idx, (fx, fy, fz, rx, ry, rz, mkey) in enumerate(fart_stage3_puffs):
+    def fc3_disp(p_w, n_w, s=idx):
+        return p_w + n_w * (sherpa_fur_displacement(p_w + Vector((0.0, s * 1.4, s * 2.1))) * 1.20)
+    bm_p = make_uv_sphere_bm(rx, ry, rz, cx=fx, cy=fy, cz=fz, u_segs=22, v_segs=16, world_deform_fn=fc3_disp)
+    append_bmesh_part(bm_p, mkey, lambda x, y, z: {"FartCloud.3": 1.0})
+
+# 3 Wavy Cartoon Stink Swirl Ribbons rising above the cloud (`FartCloud.3`)
+for s_idx, (sx_off, sz_off, mkey) in enumerate([
+    (-0.18, -1.15, "FartCloudNeon"),
+    (0.02, -1.38, "FartCloudPurple"),
+    (0.20, -1.24, "FartCloudNeon"),
+]):
+    swirl_pts = []
+    for k in range(19):
+        t = k / 18.0
+        wx = sx_off + 0.07 * math.sin(t * 2.5 * math.pi + s_idx)
+        wy = 1.08 + 0.48 * t
+        wz = sz_off - 0.18 * t + 0.06 * math.cos(t * 2.5 * math.pi + s_idx)
+        swirl_pts.append((wx, wy, wz))
+    swirl_bm = make_torus_tube_bm(
+        swirl_pts,
+        lambda t: 0.026 * math.sin(math.pi * (0.08 + 0.84 * t)),
+        radial_segs=10, closed=False
+    )
+    append_bmesh_part(swirl_bm, mkey, lambda x, y, z: {"FartCloud.3": 1.0})
+
+
 # ==============================================================================
 # 4. CREATE BLENDER MESH OBJECT + SUBSURF MODIFIER
 # ==============================================================================
@@ -985,7 +1080,7 @@ for bname in BONE_NAMES:
 
 
 # ==============================================================================
-# 5. CREATE SKELETAL ARMATURE RIG (22 BONES) & BIND SKINNING
+# 5. CREATE SKELETAL ARMATURE RIG (25 BONES) & BIND SKINNING
 # ==============================================================================
 arm_data = bpy.data.armatures.new("BabaChops_ArmatureData")
 arm_data.display_type = 'OCTAHEDRAL'
@@ -1037,6 +1132,12 @@ add_ebone("FootHoof.L", (0.30, 0.24, 0.02), (0.31, 0.06, 0.22), "Leg.L", True)
 add_ebone("Leg.R", (-0.24, 0.66, 0.0), (-0.30, 0.24, 0.02), "Pelvis", False)
 add_ebone("FootHoof.R", (-0.30, 0.24, 0.02), (-0.31, 0.06, 0.22), "Leg.R", True)
 
+# 3 Fart Cloud Bones with heads tucked inside the opaque black Pelvis (z_fwd = -0.22)
+# so when scaled to 0.0001 during normal poses, the cloud vertices collapse deep inside the torso!
+add_ebone("FartCloud.1", (0.0, 0.68, -0.22), (0.0, 0.68, -0.65), "Root", False)
+add_ebone("FartCloud.2", (0.0, 0.74, -0.22), (0.0, 0.78, -0.95), "Root", False)
+add_ebone("FartCloud.3", (0.0, 0.80, -0.22), (0.0, 0.92, -1.35), "Root", False)
+
 bpy.ops.object.mode_set(mode='OBJECT')
 
 mesh_obj.parent = arm_obj
@@ -1051,7 +1152,7 @@ subsurf_mod.quality = 3
 
 
 # ==============================================================================
-# 6. AUTHOR 5 NLA / ACTION ANIMATION CLIPS ON THE ARMATURE
+# 6. AUTHOR 6 NLA / ACTION ANIMATION CLIPS ON THE ARMATURE (INCLUDING Baba_Fart_Blast)
 # ==============================================================================
 bpy.context.view_layer.objects.active = arm_obj
 bpy.ops.object.mode_set(mode='POSE')
@@ -1060,21 +1161,51 @@ for pb in arm_obj.pose.bones:
     pb.rotation_mode = 'XYZ'
 
 
-def reset_pose():
+def reset_pose(hide_fart_cloud=True):
     for pb in arm_obj.pose.bones:
         pb.location = (0.0, 0.0, 0.0)
         pb.rotation_euler = (0.0, 0.0, 0.0)
-        pb.scale = (1.0, 1.0, 1.0)
+        if hide_fart_cloud and pb.name.startswith("FartCloud."):
+            pb.scale = (0.0001, 0.0001, 0.0001)
+        else:
+            pb.scale = (1.0, 1.0, 1.0)
 
 
-def key_bone(action_frame, bone_name, rot=None, loc=None):
+def key_char_bone(action_frame, bone_name, pitch_x=0.0, yaw_y=0.0, roll_z=0.0,
+                  dx=0.0, dy_up=0.0, dz_fwd=0.0, scale=None):
+    """
+    Pose and keyframe `bone_name` using intuitive character-space axes:
+      - pitch_x: +nods forward/down, -tilts backward/up (around +X)
+      - yaw_y:   +turns left, -turns right (around +Z_blender / +y_up)
+      - roll_z:  frontal tilt (around +Y_blender)
+      - (dx, dy_up, dz_fwd): character translation in meters
+      - scale: uniform float or (sx, sy, sz)
+    """
     pb = arm_obj.pose.bones[bone_name]
-    if rot is not None:
-        pb.rotation_euler = Euler(rot, 'XYZ')
-        pb.keyframe_insert(data_path="rotation_euler", frame=action_frame)
-    if loc is not None:
-        pb.location = Vector(loc)
-        pb.keyframe_insert(data_path="location", frame=action_frame)
+    rest_rot = pb.bone.matrix_local.to_3x3()
+    rest_inv = rest_rot.inverted()
+
+    t_arm = Vector((float(dx), float(-dz_fwd), float(dy_up)))
+    pb.location = rest_inv @ t_arm
+    pb.keyframe_insert(data_path="location", frame=action_frame)
+
+    r_arm = Euler((float(pitch_x), float(roll_z), float(yaw_y)), 'XYZ').to_matrix()
+    r_local = rest_inv @ r_arm @ rest_rot
+    pb.rotation_euler = r_local.to_euler('XYZ')
+    pb.keyframe_insert(data_path="rotation_euler", frame=action_frame)
+
+    if scale is not None:
+        if isinstance(scale, (int, float)):
+            pb.scale = (float(scale), float(scale), float(scale))
+        else:
+            pb.scale = Vector(scale)
+        pb.keyframe_insert(data_path="scale", frame=action_frame)
+
+
+def hide_fart_clouds_for_standard_clip(frames):
+    for f in frames:
+        for fc_name in ("FartCloud.1", "FartCloud.2", "FartCloud.3"):
+            key_char_bone(f, fc_name, scale=0.0001)
 
 
 def bake_action_to_nla(name, frame_end, keyframe_builder):
@@ -1083,107 +1214,228 @@ def bake_action_to_nla(name, frame_end, keyframe_builder):
     act = bpy.data.actions.new(name=name)
     act.use_fake_user = True
     arm_obj.animation_data.action = act
-    reset_pose()
+    reset_pose(hide_fart_cloud=True)
     keyframe_builder(act)
     track = arm_obj.animation_data.nla_tracks.new()
     track.name = name
     strip = track.strips.new(name=name, start=1, action=act)
     strip.action_frame_start = 1
     strip.action_frame_end = frame_end
-    track.mute = False
+    track.mute = True  # Keep tracks muted by default so they don't stack on top of each other
     arm_obj.animation_data.action = None
-    reset_pose()
+    reset_pose(hide_fart_cloud=True)
+    return act, track
+
+
+def build_baba_fart_blast(act):
+    """
+    36-Frame (1.5s @ 24fps) High-Energy Cartoon Animation: `Baba_Fart_Blast`
+      - Frames 1..10:  Deep squat, tummy clench, trembling strain & tight V-brow squint
+      - Frames 11..22: Big green 3D Fart Cloud explosion + shockwave ring + surprise jump!
+      - Frames 23..36: Landing, cheeky hoof-wafting behind back & buck-toothed belly laugh!
+    """
+    # Keyframes forBaba Chops body & face:
+    # (frame, pelvis_dy, pelvis_dz, pelvis_pitch, chest_pitch, head_pitch, head_yaw, head_roll,
+    #  jaw_pitch, lid_pitch, ear_roll, armL_pitch, armL_roll, armR_pitch, armR_roll, leg_pitch, skull_pitch, pelvis_dx)
+    body_keys = [
+        # Frame 1: Neutral start
+        (1,   0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.000),
+        # Frame 4: Squatting down & clenching arms in
+        (4,  -0.09, -0.02,  0.22,  0.14,  0.16, -0.06,  0.00,  0.04,  0.22, -0.18,  0.22,  0.28,  0.22, -0.28, -0.22,  0.18,  0.000),
+        # Frames 6, 8, 10: High-tension strain tremble before the blast!
+        (6,  -0.13, -0.04,  0.30,  0.18,  0.22, -0.10,  0.05,  0.06,  0.30, -0.25,  0.30,  0.35,  0.30, -0.35, -0.28,  0.24,  0.020),
+        (8,  -0.14, -0.04,  0.32,  0.20,  0.24, -0.08, -0.05,  0.06,  0.32, -0.28,  0.32,  0.38,  0.32, -0.38, -0.30,  0.26, -0.020),
+        (10, -0.15, -0.05,  0.35,  0.22,  0.26, -0.12,  0.05,  0.08,  0.34, -0.30,  0.34,  0.40,  0.34, -0.40, -0.32,  0.28,  0.018),
+        # Frame 12: KABOOM-TOOT! Big upward/forward rocket jump + wide-eyed gasp!
+        (12,  0.14,  0.06,  0.28, -0.16, -0.22,  0.16, -0.08, -0.26, -0.12,  0.35, -0.20, -0.48, -0.20,  0.48,  0.24, -0.42,  0.000),
+        # Frame 15: Peak of the toot blast — legs dangling, mouth wide open, skull charm flying!
+        (15,  0.17,  0.08,  0.22, -0.18, -0.24,  0.24, -0.12, -0.30, -0.14,  0.40, -0.25, -0.54, -0.25,  0.54,  0.28, -0.48,  0.000),
+        # Frame 19: Mid-air secondary toot ripple
+        (19,  0.10,  0.05,  0.14, -0.10, -0.14,  0.26, -0.10, -0.22, -0.08,  0.25, -0.12, -0.38, -0.15,  0.40,  0.16, -0.30,  0.000),
+        # Frame 23: Landing cushion bounce on hooves
+        (23, -0.04,  0.01,  0.08,  0.04,  0.04,  0.28, -0.12, -0.12,  0.04, -0.10,  0.38, -0.15, -0.10,  0.25, -0.08,  0.12,  0.000),
+        # Frames 26, 29, 32: Cheeky hoof-wafting behind back (Arm.L fans the green cloud!) + buck-tooth giggle!
+        (26,  0.02,  0.00,  0.04, -0.04, -0.08,  0.30, -0.16, -0.26,  0.08,  0.18,  0.62, -0.32, -0.18,  0.32,  0.00, -0.15,  0.000),
+        (29, -0.01,  0.00,  0.05,  0.02,  0.02,  0.26, -0.10, -0.06,  0.12, -0.08,  0.42,  0.12, -0.08,  0.18,  0.00,  0.10,  0.000),
+        (32,  0.02,  0.00,  0.02, -0.03, -0.06,  0.20, -0.14, -0.22,  0.06,  0.14,  0.58, -0.28, -0.14,  0.26,  0.00, -0.10,  0.000),
+        # Frame 36: Seamless return to neutral start pose
+        (36,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.000),
+    ]
+
+    for (f, p_dy, p_dz, p_pitch, c_pitch, h_pitch, h_yaw, h_roll,
+         j_pitch, l_pitch, e_roll, al_p, al_r, ar_p, ar_r, lg_p, sk_p, p_dx) in body_keys:
+        key_char_bone(f, "Pelvis", pitch_x=p_pitch, dx=p_dx, dy_up=p_dy, dz_fwd=p_dz)
+        key_char_bone(f, "Spine", pitch_x=c_pitch * 0.5)
+        key_char_bone(f, "Chest", pitch_x=c_pitch, yaw_y=h_yaw * 0.3)
+        key_char_bone(f, "Head", pitch_x=h_pitch, yaw_y=h_yaw, roll_z=h_roll)
+        key_char_bone(f, "Jaw", pitch_x=j_pitch)
+        key_char_bone(f, "Eyelid.L", pitch_x=l_pitch)
+        key_char_bone(f, "Eyelid.R", pitch_x=l_pitch)
+        key_char_bone(f, "Ear.L", roll_z=-e_roll)
+        key_char_bone(f, "Ear.R", roll_z=e_roll)
+        key_char_bone(f, "Arm.L", pitch_x=al_p, roll_z=al_r)
+        key_char_bone(f, "HandHoof.L", pitch_x=al_p * 0.6, roll_z=al_r * 0.5)
+        key_char_bone(f, "Arm.R", pitch_x=ar_p, roll_z=ar_r)
+        key_char_bone(f, "HandHoof.R", pitch_x=ar_p * 0.5, roll_z=ar_r * 0.4)
+        key_char_bone(f, "Leg.L", pitch_x=lg_p)
+        key_char_bone(f, "Leg.R", pitch_x=lg_p)
+        key_char_bone(f, "FootHoof.L", pitch_x=-lg_p * 0.7)
+        key_char_bone(f, "FootHoof.R", pitch_x=-lg_p * 0.7)
+        key_char_bone(f, "SkullPendant", pitch_x=sk_p, roll_z=p_dx * 3.0)
+
+    # Keyframes for the 3-Stage 3D Cartoon Fart Cloud (`FartCloud.1`, `FartCloud.2`, `FartCloud.3`):
+    # Stage 1: Nozzle Jet & Shockwave Ring (`FartCloud.1`)
+    fc1_keys = [
+        (1,  0.0001, 0.0,  0.00,  0.00, 0.00),
+        (9,  0.0001, 0.0,  0.00,  0.00, 0.00),
+        (10, 0.30,   0.0, -0.08, -0.02, 0.00),
+        (12, 1.05,   0.0, -0.04, -0.06, 0.25),
+        (15, 1.32,   0.0,  0.04, -0.16, 0.65),
+        (19, 1.10,   0.0,  0.10, -0.26, 1.10),
+        (24, 0.65,   0.0,  0.18, -0.36, 1.55),
+        (29, 0.22,   0.0,  0.24, -0.44, 1.95),
+        (32, 0.0001, 0.0,  0.00,  0.00, 0.00),
+        (36, 0.0001, 0.0,  0.00,  0.00, 0.00),
+    ]
+    for f, sc, dx, dy, dz, r_z in fc1_keys:
+        key_char_bone(f, "FartCloud.1", roll_z=r_z, dx=dx, dy_up=dy, dz_fwd=dz, scale=sc)
+
+    # Stage 2: Giant Billowing Cauliflower Lime Cloud (`FartCloud.2`)
+    fc2_keys = [
+        (1,  0.0001,  0.00,  0.00,  0.00,  0.00),
+        (10, 0.0001,  0.00,  0.00,  0.00,  0.00),
+        (12, 0.68,    0.00, -0.02, -0.04,  0.00),
+        (15, 1.22,   -0.02,  0.06, -0.14, -0.18),
+        (19, 1.48,   -0.04,  0.16, -0.28, -0.38),
+        (24, 1.38,   -0.06,  0.28, -0.42, -0.60),
+        (29, 0.92,   -0.08,  0.42, -0.56, -0.85),
+        (33, 0.35,   -0.10,  0.54, -0.68, -1.05),
+        (35, 0.0001,  0.00,  0.00,  0.00,  0.00),
+        (36, 0.0001,  0.00,  0.00,  0.00,  0.00),
+    ]
+    for f, sc, dx, dy, dz, r_z in fc2_keys:
+        key_char_bone(f, "FartCloud.2", roll_z=r_z, dx=dx, dy_up=dy, dz_fwd=dz, scale=sc)
+
+    # Stage 3: Outer Expanding Puff Balls & Curly Stink Ribbons (`FartCloud.3`)
+    fc3_keys = [
+        (1,  0.0001,  0.00,  0.00,  0.00,  0.00),
+        (12, 0.0001,  0.00,  0.00,  0.00,  0.00),
+        (14, 0.62,    0.00,  0.02, -0.05,  0.00),
+        (18, 1.18,    0.03,  0.12, -0.18,  0.15),
+        (23, 1.45,    0.05,  0.26, -0.34,  0.32),
+        (28, 1.32,    0.08,  0.42, -0.50,  0.52),
+        (32, 0.78,    0.10,  0.58, -0.64,  0.70),
+        (35, 0.22,    0.12,  0.70, -0.74,  0.85),
+        (36, 0.0001,  0.00,  0.00,  0.00,  0.00),
+    ]
+    for f, sc, dx, dy, dz, r_z in fc3_keys:
+        key_char_bone(f, "FartCloud.3", roll_z=r_z, dx=dx, dy_up=dy, dz_fwd=dz, scale=sc)
 
 
 def build_idle_breathe(act):
+    frames = [1, 15, 30, 45, 60]
+    hide_fart_clouds_for_standard_clip(frames)
     for f, ph in [(1, 0.0), (15, 0.5 * math.pi), (30, math.pi), (45, 1.5 * math.pi), (60, 2.0 * math.pi)]:
         s = math.sin(ph)
         c = math.cos(ph)
-        key_bone(f, "Pelvis", loc=(0.0, 0.0, 0.015 * s), rot=(0.02 * s, 0.0, 0.0))
-        key_bone(f, "Chest", rot=(0.03 * s, 0.0, 0.015 * c))
-        key_bone(f, "Head", rot=(0.035 * s, 0.04 * c, 0.025 * s))
-        key_bone(f, "Ear.L", rot=(0.0, 0.0, 0.06 * s))
-        key_bone(f, "Ear.R", rot=(0.0, 0.0, -0.06 * s))
-        key_bone(f, "Arm.L", rot=(0.04 * s, 0.0, 0.05 * c))
-        key_bone(f, "Arm.R", rot=(-0.04 * s, 0.0, -0.05 * c))
-        key_bone(f, "SkullPendant", rot=(0.06 * c, 0.04 * s, 0.0))
+        key_char_bone(f, "Pelvis", pitch_x=0.02 * s, dy_up=0.015 * s)
+        key_char_bone(f, "Chest", pitch_x=0.03 * s, roll_z=0.015 * c)
+        key_char_bone(f, "Head", pitch_x=0.035 * s, yaw_y=0.04 * c, roll_z=0.025 * s)
+        key_char_bone(f, "Ear.L", roll_z=0.06 * s)
+        key_char_bone(f, "Ear.R", roll_z=-0.06 * s)
+        key_char_bone(f, "Arm.L", pitch_x=0.04 * s, roll_z=0.05 * c)
+        key_char_bone(f, "Arm.R", pitch_x=-0.04 * s, roll_z=-0.05 * c)
+        key_char_bone(f, "SkullPendant", pitch_x=0.06 * c, yaw_y=0.04 * s)
         blink = 0.22 if f == 30 else 0.0
-        key_bone(f, "Eyelid.L", rot=(blink, 0.0, 0.0))
-        key_bone(f, "Eyelid.R", rot=(blink, 0.0, 0.0))
+        key_char_bone(f, "Eyelid.L", pitch_x=blink)
+        key_char_bone(f, "Eyelid.R", pitch_x=blink)
 
 
 def build_walk_cycle(act):
+    frames = [1, 12, 24, 36, 48]
+    hide_fart_clouds_for_standard_clip(frames)
     for f, ph in [(1, 0.0), (12, 0.5 * math.pi), (24, math.pi), (36, 1.5 * math.pi), (48, 2.0 * math.pi)]:
         s = math.sin(ph)
         c = math.cos(ph)
         s2 = math.sin(2.0 * ph)
-        key_bone(f, "Pelvis", loc=(0.03 * s, 0.045 * abs(s), 0.0), rot=(0.04 * s2, 0.10 * s, 0.06 * c))
-        key_bone(f, "Chest", rot=(0.05 * s2, -0.08 * s, -0.05 * c))
-        key_bone(f, "Head", rot=(-0.04 * s2, 0.06 * s, 0.05 * c))
-        key_bone(f, "Leg.L", rot=(0.38 * s, 0.0, 0.0))
-        key_bone(f, "Leg.R", rot=(-0.38 * s, 0.0, 0.0))
-        key_bone(f, "FootHoof.L", rot=(-0.18 * c, 0.0, 0.0))
-        key_bone(f, "FootHoof.R", rot=(0.18 * c, 0.0, 0.0))
-        key_bone(f, "Arm.L", rot=(-0.28 * s, 0.0, 0.06 * c))
-        key_bone(f, "Arm.R", rot=(0.28 * s, 0.0, -0.06 * c))
-        key_bone(f, "Ear.L", rot=(0.05 * s2, 0.0, 0.10 * c))
-        key_bone(f, "Ear.R", rot=(0.05 * s2, 0.0, -0.10 * c))
-        key_bone(f, "SkullPendant", rot=(0.14 * s2, 0.12 * s, 0.0))
+        key_char_bone(f, "Pelvis", pitch_x=0.04 * s2, yaw_y=0.10 * s, roll_z=0.06 * c, dx=0.03 * s, dy_up=0.045 * abs(s))
+        key_char_bone(f, "Chest", pitch_x=0.05 * s2, yaw_y=-0.08 * s, roll_z=-0.05 * c)
+        key_char_bone(f, "Head", pitch_x=-0.04 * s2, yaw_y=0.06 * s, roll_z=0.05 * c)
+        key_char_bone(f, "Leg.L", pitch_x=0.38 * s)
+        key_char_bone(f, "Leg.R", pitch_x=-0.38 * s)
+        key_char_bone(f, "FootHoof.L", pitch_x=-0.18 * c)
+        key_char_bone(f, "FootHoof.R", pitch_x=0.18 * c)
+        key_char_bone(f, "Arm.L", pitch_x=-0.28 * s, roll_z=0.06 * c)
+        key_char_bone(f, "Arm.R", pitch_x=0.28 * s, roll_z=-0.06 * c)
+        key_char_bone(f, "Ear.L", pitch_x=0.05 * s2, roll_z=0.10 * c)
+        key_char_bone(f, "Ear.R", pitch_x=0.05 * s2, roll_z=-0.10 * c)
+        key_char_bone(f, "SkullPendant", pitch_x=0.14 * s2, yaw_y=0.12 * s)
 
 
 def build_happy_bounce(act):
+    frames = [1, 10, 20, 30, 40]
+    hide_fart_clouds_for_standard_clip(frames)
     for f, ph in [(1, 0.0), (10, 0.5 * math.pi), (20, math.pi), (30, 1.5 * math.pi), (40, 2.0 * math.pi)]:
         s = math.sin(ph)
         c = math.cos(ph)
         jump = max(0.0, s) * 0.12
-        key_bone(f, "Pelvis", loc=(0.0, jump, 0.0), rot=(-0.06 * s, 0.0, 0.0))
-        key_bone(f, "Chest", rot=(-0.08 * s, 0.0, 0.0))
-        key_bone(f, "Head", rot=(-0.10 * s, 0.06 * c, 0.0))
-        key_bone(f, "Ear.L", rot=(0.0, 0.0, 0.22 * s))
-        key_bone(f, "Ear.R", rot=(0.0, 0.0, -0.22 * s))
-        key_bone(f, "Arm.L", rot=(0.0, 0.0, 0.25 * s))
-        key_bone(f, "Arm.R", rot=(0.0, 0.0, -0.25 * s))
-        key_bone(f, "SkullPendant", rot=(0.22 * c, 0.0, 0.0))
-        key_bone(f, "Jaw", rot=(0.10 * max(0.0, s), 0.0, 0.0))
+        key_char_bone(f, "Pelvis", pitch_x=-0.06 * s, dy_up=jump)
+        key_char_bone(f, "Chest", pitch_x=-0.08 * s)
+        key_char_bone(f, "Head", pitch_x=-0.10 * s, yaw_y=0.06 * c)
+        key_char_bone(f, "Ear.L", roll_z=0.22 * s)
+        key_char_bone(f, "Ear.R", roll_z=-0.22 * s)
+        key_char_bone(f, "Arm.L", roll_z=-0.25 * s)
+        key_char_bone(f, "Arm.R", roll_z=0.25 * s)
+        key_char_bone(f, "SkullPendant", pitch_x=-0.22 * c)
+        key_char_bone(f, "Jaw", pitch_x=-0.12 * max(0.0, s))
 
 
 def build_wave_hoof(act):
+    frames = [1, 15, 30, 45, 60]
+    hide_fart_clouds_for_standard_clip(frames)
     for f, ph in [(1, 0.0), (15, 0.5 * math.pi), (30, math.pi), (45, 1.5 * math.pi), (60, 2.0 * math.pi)]:
         s = math.sin(ph)
         w = math.sin(3.0 * ph)
         lift = math.sin(0.5 * ph)
-        key_bone(f, "Shoulder.R", rot=(0.0, 0.0, -0.45 * lift))
-        key_bone(f, "Arm.R", rot=(-0.35 * lift, 0.20 * w * lift, -0.55 * lift))
-        key_bone(f, "HandHoof.R", rot=(0.0, 0.0, 0.30 * w * lift))
-        key_bone(f, "Head", rot=(0.04 * s, -0.12 * lift, 0.14 * lift))
-        key_bone(f, "Ear.L", rot=(0.0, 0.0, 0.12 * lift))
-        key_bone(f, "Ear.R", rot=(0.0, 0.0, -0.08 * lift))
-        key_bone(f, "SkullPendant", rot=(0.08 * s, 0.08 * lift, 0.0))
+        key_char_bone(f, "Shoulder.R", roll_z=0.45 * lift)
+        key_char_bone(f, "Arm.R", pitch_x=-0.35 * lift, yaw_y=0.20 * w * lift, roll_z=0.55 * lift)
+        key_char_bone(f, "HandHoof.R", roll_z=0.30 * w * lift)
+        key_char_bone(f, "Head", pitch_x=0.04 * s, yaw_y=-0.12 * lift, roll_z=0.14 * lift)
+        key_char_bone(f, "Ear.L", roll_z=0.12 * lift)
+        key_char_bone(f, "Ear.R", roll_z=-0.08 * lift)
+        key_char_bone(f, "SkullPendant", pitch_x=0.08 * s, yaw_y=0.08 * lift)
 
 
 def build_curious_tilt(act):
+    frames = [1, 15, 30, 45, 60]
+    hide_fart_clouds_for_standard_clip(frames)
     for f, ph in [(1, 0.0), (15, 0.5 * math.pi), (30, math.pi), (45, 1.5 * math.pi), (60, 2.0 * math.pi)]:
         s = math.sin(ph)
         c = math.cos(ph)
         talk = abs(math.sin(2.0 * ph))
-        key_bone(f, "Head", rot=(0.06 * c, 0.18 * s, -0.16 * s))
-        key_bone(f, "Jaw", rot=(0.14 * talk, 0.0, 0.0))
-        key_bone(f, "Eyelid.L", rot=(0.12 * max(0.0, s), 0.0, 0.0))
-        key_bone(f, "Eyelid.R", rot=(0.12 * max(0.0, -s), 0.0, 0.0))
-        key_bone(f, "Ear.L", rot=(0.0, 0.0, -0.14 * s))
-        key_bone(f, "Ear.R", rot=(0.0, 0.0, -0.14 * s))
-        key_bone(f, "Chest", rot=(0.0, 0.06 * s, -0.04 * s))
+        key_char_bone(f, "Head", pitch_x=0.06 * c, yaw_y=0.18 * s, roll_z=-0.16 * s)
+        key_char_bone(f, "Jaw", pitch_x=-0.14 * talk)
+        key_char_bone(f, "Eyelid.L", pitch_x=0.12 * max(0.0, s))
+        key_char_bone(f, "Eyelid.R", pitch_x=0.12 * max(0.0, -s))
+        key_char_bone(f, "Ear.L", roll_z=-0.14 * s)
+        key_char_bone(f, "Ear.R", roll_z=-0.14 * s)
+        key_char_bone(f, "Chest", yaw_y=0.06 * s, roll_z=-0.04 * s)
 
 
-bake_action_to_nla("Idle_Breathe", 60, build_idle_breathe)
-bake_action_to_nla("Walk_Cycle", 48, build_walk_cycle)
-bake_action_to_nla("Happy_Bounce", 40, build_happy_bounce)
-bake_action_to_nla("Wave_Hoof", 60, build_wave_hoof)
-bake_action_to_nla("Curious_Head_Tilt", 60, build_curious_tilt)
+fart_act, fart_track = bake_action_to_nla("Baba_Fart_Blast", 36, build_baba_fart_blast)
+idle_act, idle_track = bake_action_to_nla("Idle_Breathe", 60, build_idle_breathe)
+walk_act, walk_track = bake_action_to_nla("Walk_Cycle", 48, build_walk_cycle)
+bounce_act, bounce_track = bake_action_to_nla("Happy_Bounce", 40, build_happy_bounce)
+wave_act, wave_track = bake_action_to_nla("Wave_Hoof", 60, build_wave_hoof)
+curious_act, curious_track = bake_action_to_nla("Curious_Head_Tilt", 60, build_curious_tilt)
+
+# Unmute all tracks transiently during GLB export so glTF exporter writes all 6 NLA tracks
+for trk in arm_obj.animation_data.nla_tracks:
+    trk.mute = False
 
 bpy.ops.object.mode_set(mode='OBJECT')
 scene.frame_start = 1
-scene.frame_end = 60
+scene.frame_end = 36
 scene.frame_set(1)
 
 
@@ -1207,6 +1459,14 @@ bpy.ops.export_scene.gltf(
     export_lights=False,
     export_cameras=False,
 )
+
+# For static .OBJ export, mute tracks and reset pose so FartCloud is collapsed inside torso
+for trk in arm_obj.animation_data.nla_tracks:
+    trk.mute = True
+bpy.ops.object.mode_set(mode='POSE')
+reset_pose(hide_fart_cloud=True)
+bpy.ops.object.mode_set(mode='OBJECT')
+bpy.context.view_layer.update()
 
 bpy.ops.wm.obj_export(
     filepath=OBJ_PATH,
@@ -1256,7 +1516,6 @@ if bg_node:
     bg_node.inputs[0].default_value = hex_to_rgba(0xF5F6F8)
     bg_node.inputs[1].default_value = 1.05
 
-# Color management: High Contrast for deep plush blacks + crisp studio whites
 for look_name in ('AgX - High Contrast', 'High Contrast'):
     try:
         scene.view_settings.look = look_name
@@ -1278,14 +1537,26 @@ def aim_camera(loc, target=(0.0, 0.0, 1.34), lens=62.0):
     cam_obj.rotation_euler = direction.to_track_quat('-Z', 'Y').to_euler()
 
 
-aim_camera((0.0, -5.85, 1.38), target=(0.0, 0.0, 1.32), lens=62.0)
+# ==============================================================================
+# 9. RENDER THE 36-FRAME `Baba_Fart_Blast` CYCLES ANIMATION SEQUENCE!
+# ==============================================================================
+# Activate ONLY the `Baba_Fart_Blast` NLA track for the animation render
+for trk in arm_obj.animation_data.nla_tracks:
+    trk.mute = (trk.name != "Baba_Fart_Blast")
 
-# Save native .blend master file
+# Aim camera from 3/4 Front-Left-Side so Baba Chops's expressive face, Skull Pendant,
+# waving hoof AND rear pelvis + giant green 3D Fart Cloud blast are all framed together!
+aim_camera((4.85, -3.55, 1.48), target=(-0.05, 0.36, 1.18), lens=54.0)
+
+# Save native .blend master file with `Baba_Fart_Blast` active in timeline (frames 1..36)
+scene.frame_start = 1
+scene.frame_end = 36
+scene.frame_set(16)  # Save .blend thumbnail right at the peak of the green fart blast!
 bpy.ops.wm.save_as_mainfile(filepath=BLEND_PATH, compress=True)
 
 scene.render.engine = 'CYCLES'
 scene.cycles.device = 'CPU'
-scene.cycles.samples = 64
+scene.cycles.samples = 24
 scene.cycles.use_denoising = True
 if hasattr(scene.cycles, "denoiser"):
     for d_opt in ('OPENIMAGEDENOISE', 'OPTIX'):
@@ -1295,28 +1566,18 @@ if hasattr(scene.cycles, "denoiser"):
         except Exception:
             pass
 
-scene.render.resolution_x = 1080
-scene.render.resolution_y = 1350
+scene.render.resolution_x = 640
+scene.render.resolution_y = 640
 scene.render.resolution_percentage = 100
+scene.render.fps = 24
 scene.render.image_settings.file_format = 'PNG'
 scene.render.image_settings.color_mode = 'RGBA'
 
-scene.render.filepath = RENDER_FRONT_PATH
-bpy.ops.render.render(write_still=True)
+for f in range(1, 37):
+    scene.frame_set(f)
+    scene.render.filepath = os.path.join(FART_FRAMES_DIR, f"frame_{f:03d}.png")
+    bpy.ops.render.render(write_still=True)
 
-scene.render.resolution_x = 800
-scene.render.resolution_y = 1000
-scene.cycles.samples = 40
-
-aim_camera((-4.10, -4.20, 1.48), target=(0.0, 0.0, 1.32), lens=62.0)
-scene.render.filepath = os.path.join(RENDER_SHEET_DIR, "cycles_3q.png")
-bpy.ops.render.render(write_still=True)
-
-aim_camera((-5.85, 0.0, 1.38), target=(0.0, 0.0, 1.32), lens=62.0)
-scene.render.filepath = os.path.join(RENDER_SHEET_DIR, "cycles_side.png")
-bpy.ops.render.render(write_still=True)
-
-print("SUCCESS v3: Built .blend, .glb, .obj, and rendered high-contrast Cycles studio images!")
+print("SUCCESS v4: Rendered all 36 Cycles frames of Baba_Fart_Blast!")
 print(f"  BLEND: {BLEND_PATH} ({os.path.getsize(BLEND_PATH)} bytes)")
 print(f"  GLB:   {GLB_PATH} ({os.path.getsize(GLB_PATH)} bytes)")
-print(f"  FRONT: {RENDER_FRONT_PATH} ({os.path.getsize(RENDER_FRONT_PATH)} bytes)")

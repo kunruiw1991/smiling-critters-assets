@@ -1,0 +1,129 @@
+{
+  "character": "Baba Chops (#121 Official Plush Base Model)",
+  "reference_image": "images/121_BabaChopsPlush1.webp",
+  "blender_version": "Blender 4.3.2 (Cycles Path Tracer + OpenImageDenoise)",
+  "armature": {
+    "name": "BabaChops_Armature",
+    "bone_count": 25,
+    "bones": [
+      "Root",
+      "Pelvis",
+      "Spine",
+      "Chest",
+      "Neck",
+      "Head",
+      "Jaw",
+      "Eyelid.L",
+      "Eyelid.R",
+      "Ear.L",
+      "Ear.R",
+      "SkullPendant",
+      "Shoulder.L",
+      "Arm.L",
+      "HandHoof.L",
+      "Shoulder.R",
+      "Arm.R",
+      "HandHoof.R",
+      "Leg.L",
+      "FootHoof.L",
+      "Leg.R",
+      "FootHoof.R",
+      "FartCloud.1",
+      "FartCloud.2",
+      "FartCloud.3"
+    ]
+  },
+  "models": [
+    {
+      "name": "Native Blender 4.3 Master File",
+      "path": "models/baba_chops_plush_base_model.blend",
+      "format": "BLEND",
+      "description": "25-bone rigged subdivision-surface mesh + 13 Cycles PBR/Emission materials + 6 baked NLA animation clips + 4-light studio stage"
+    },
+    {
+      "name": "Rigged & Animated glTF 2.0 Binary",
+      "path": "models/baba_chops_plush_base_model.glb",
+      "format": "GLB",
+      "description": "Full 25-bone SkinnedMesh + 6 embedded NLA AnimationClips ready for Blender, Unity, Unreal, Godot, and Three.js"
+    },
+    {
+      "name": "Wavefront 3D Base Cage & Material Library",
+      "path": "models/baba_chops_plush_base_model.obj",
+      "format": "OBJ",
+      "description": "Static subdivided mesh in #121 reference pose with .mtl materials"
+    },
+    {
+      "name": "Blender Cycles Path-Traced Hero Render",
+      "path": "models/baba_chops_blender_cycles_render.png",
+      "format": "PNG",
+      "dimensions": "1080x1350"
+    },
+    {
+      "name": "4-Panel Reference vs. Cycles Turnaround Sheet",
+      "path": "models/baba_chops_3d_preview.png",
+      "format": "PNG",
+      "dimensions": "1920x600"
+    },
+    {
+      "name": "Reproducible Blender 4.3 Python Generator",
+      "path": "models/build_baba_chops_blender.py",
+      "format": "PY"
+    },
+    {
+      "name": "Interactive Three.js WebGL Rig & Fart Cloud Module",
+      "path": "models/baba_chops_model.js",
+      "format": "JS"
+    }
+  ],
+  "animations": [
+    {
+      "id": "Baba_Fart_Blast",
+      "title": "Baba Chops Fart Blast (3D Comedy Animation)",
+      "frames": 36,
+      "fps": 24,
+      "duration_seconds": 1.5,
+      "looped_video_duration_seconds": 6.0,
+      "files": {
+        "mp4_with_audio": "animations/baba_chops_fart_animation.mp4",
+        "looping_gif": "animations/baba_chops_fart_animation.gif",
+        "animated_webp": "animations/baba_chops_fart_animation.webp",
+        "storyboard_sheet": "animations/baba_chops_fart_storyboard.png"
+      },
+      "choreography": [
+        "Act 1 (Frames 1-10): Deep squat, tummy clench, high-frequency strain tremble & tight V-brow squint",
+        "Act 2 (Frames 11-22): Big 3-stage green/lime/purple 3D cartoon fart cloud explosion + shockwave torus ring + rocket surprise jump",
+        "Act 3 (Frames 23-36): Cushioned hoof landing, cheeky hoof-fanning behind back & buck-toothed belly giggle"
+      ]
+    },
+    {
+      "id": "Idle_Breathe",
+      "title": "Idle Breathing & Blink",
+      "frames": 60,
+      "fps": 24
+    },
+    {
+      "id": "Walk_Cycle",
+      "title": "Plush Strut Walk Cycle",
+      "frames": 48,
+      "fps": 24
+    },
+    {
+      "id": "Happy_Bounce",
+      "title": "Excited Plush Jump Bounce",
+      "frames": 40,
+      "fps": 24
+    },
+    {
+      "id": "Wave_Hoof",
+      "title": "Friendly Right Hoof Wave",
+      "frames": 60,
+      "fps": 24
+    },
+    {
+      "id": "Curious_Head_Tilt",
+      "title": "Curious Head Tilt & Jaw Chatter",
+      "frames": 60,
+      "fps": 24
+    }
+  ]
+}

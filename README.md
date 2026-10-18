@@ -1,9 +1,42 @@
-# 🎨🌙 Smiling Critters High-Resolution Asset Library (素材库 — 318 Verified Images + Baba Chops 3D Base Model Studio)
+# 🎨🌙 Smiling Critters High-Resolution Asset Library (素材库 — 318 Verified Images + Blender 4.3 Baba Chops 3D Model & Fart Animation Studio)
 
-> **Curated High-Resolution Smiling Critters & Custom Critters Picture Library + Interactive 3D Base Model Studio (`3D建模基地模型`)**
+> **Organized Repository of 318 High-Resolution 2D Character Assets (`images/`), Native Blender 4.3 3D Base Models (`models/`), Rendered Cycles 3D Animations (`animations/`), and Structured JSON Manifests (`catalog/`)**
 
 ### 🚀 [**Open Interactive iPad Gallery & Asset Browser → https://kunruiw1991.github.io/smiling-critters-assets/**](https://kunruiw1991.github.io/smiling-critters-assets/)
-### 🐑💀 [**Open Baba Chops 3D Base Model Studio (`3D建模基地模型` — 1:1 Recreation of `#121`) → https://kunruiw1991.github.io/smiling-critters-assets/baba-chops-3d.html**](https://kunruiw1991.github.io/smiling-critters-assets/baba-chops-3d.html)
+### 🐑💀 [**Open Baba Chops 3D Base Model & Fart Animation Studio (`3D建模基地模型`) → https://kunruiw1991.github.io/smiling-critters-assets/baba-chops-3d.html**](https://kunruiw1991.github.io/smiling-critters-assets/baba-chops-3d.html)
+### 🎬💨 [**Watch / Download Baba Chops Fart Animation (`.MP4` with Cartoon Toot + Giggle Audio) → `animations/baba_chops_fart_animation.mp4`**](animations/baba_chops_fart_animation.mp4)
+
+---
+
+## 📁 Repository Directory & Organization Map
+
+| Directory / File | Contents | Key Files & Manifests |
+| :--- | :--- | :--- |
+| **[`animations/`](animations/)** | **Blender 4.3 Cycles Rendered 3D Animations** (`Baba_Fart_Blast` 36-frame 24fps comedy animation with 3D green/lime/purple puff clouds, shockwave torus ring & synthesized cartoon toot audio) | [`baba_chops_fart_animation.mp4`](animations/baba_chops_fart_animation.mp4) · [`baba_chops_fart_animation.gif`](animations/baba_chops_fart_animation.gif) · [`baba_chops_fart_animation.webp`](animations/baba_chops_fart_animation.webp) · [`baba_chops_fart_storyboard.png`](animations/baba_chops_fart_storyboard.png) · [`animations/README.md`](animations/README.md) |
+| **[`models/`](models/)** | **Native Blender 4.3 3D Base Model (`#121` Plush Recreation)** — 25-bone `BabaChops_Armature` skeletal rig, 6 baked NLA animation clips, `SUBSURF` modifier, 13 Cycles PBR/Emission materials & Three.js WebGL rig | [`baba_chops_plush_base_model.blend`](models/baba_chops_plush_base_model.blend) · [`baba_chops_plush_base_model.glb`](models/baba_chops_plush_base_model.glb) · [`baba_chops_plush_base_model.obj`](models/baba_chops_plush_base_model.obj) · [`build_baba_chops_blender.py`](models/build_baba_chops_blender.py) · [`models/README.md`](models/README.md) |
+| **[`catalog/`](catalog/)** | **Structured JSON Indexes & Character Manifests** — All 318 2D assets grouped by character (`19` categories) plus 3D model & animation metadata | [`catalog/by_character.json`](catalog/by_character.json) · [`catalog/models_and_animations.json`](catalog/models_and_animations.json) · [`catalog.json`](catalog.json) · [`catalog/README.md`](catalog/README.md) |
+| **[`images/`](images/)** | **318 Verified High-Resolution 2D Character Images** (`#001`–`#318`) — Including **107 CatNap**, **105 Baba Chops**, and **18 Custom Critters** | `images/001_*.webp` … `images/318_*.webp` |
+| **[`baba-chops-3d.html`](baba-chops-3d.html)** | **Interactive WebGL 3D Studio & Animation Player** — Real-time 60fps Three.js viewport with the **`💨💚 Baba Fart Blast! (With Toot SFX)`** animation button, 6 camera presets & joint sliders | [Launch Interactive 3D Studio](https://kunruiw1991.github.io/smiling-critters-assets/baba-chops-3d.html) |
+| **[`index.html`](index.html)** | **Interactive iPad / Desktop Asset Gallery** — Filterable browser for all 318 2D pictures + 3D model & animation showcase | [Launch Asset Browser](https://kunruiw1991.github.io/smiling-critters-assets/) |
+
+---
+
+## 💨💚 Featured Blender 4.3 Animation: `Baba_Fart_Blast` (Baba Chops Fart Comedy Clip)
+
+Authored and path-traced directly in **Blender 4.3.2 (`CYCLES` + OpenImageDenoise)** using the 25-bone `BabaChops_Armature` skeletal rig (`Root`, `Pelvis`, `Spine`, `Chest`, `Neck`, `Head`, `Jaw`, `Eyelid.L/R`, `Ear.L/R`, `SkullPendant`, `Shoulder.L/R`, `Arm.L/R`, `HandHoof.L/R`, `Leg.L/R`, `FootHoof.L/R`, and 3 multi-stage 3D gas cloud bones `FartCloud.1`, `FartCloud.2`, `FartCloud.3`):
+
+<p align="center">
+  <img src="animations/baba_chops_fart_animation.gif" width="420" alt="Baba Chops Fart Animation (Blender 4.3 Cycles)" />
+</p>
+
+![Baba Chops Fart 4-Act Storyboard](animations/baba_chops_fart_storyboard.png)
+
+| Animation Deliverable | Format | Specs | Direct Link |
+| :--- | :---: | :---: | :--- |
+| **MP4 Video (with Synthesized Cartoon Toot + Giggle Audio)** | `.MP4` (`H.264 + AAC`) | `640×640` · `24 fps` · `6.0s` (`4×` seamless loop · `850 KB`) | [`animations/baba_chops_fart_animation.mp4`](animations/baba_chops_fart_animation.mp4) |
+| **Looping Animated GIF** | `.GIF` (`256-color Lanczos`) | `480×480` · `24 fps` · Infinite loop (`2.2 MB`) | [`animations/baba_chops_fart_animation.gif`](animations/baba_chops_fart_animation.gif) |
+| **Looping Animated WebP** | `.WEBP` | `560×560` · `24 fps` · Infinite loop (`278 KB`) | [`animations/baba_chops_fart_animation.webp`](animations/baba_chops_fart_animation.webp) |
+| **4-Act Keyframe Storyboard Strip** | `.PNG` | `1920×536` · Frames `08` (Squat & Strain), `14` (Blast!), `19` (Rocket Jump), `28` (Hoof Waft & Giggle) | [`animations/baba_chops_fart_storyboard.png`](animations/baba_chops_fart_storyboard.png) |
 
 ---
 
@@ -13,13 +46,13 @@ A complete, skeletal-rigged, subdivision-surface 3D plush base model authored di
 
 | Asset / Deliverable | Format | Size / Specs | Direct Link |
 | :--- | :---: | :---: | :--- |
-| **Native Blender 4.3 Master Project** | `.BLEND` (`Blender 4.3.2`) | `1.84 MB` · `BabaChops_Armature` (**22 Deform Bones**) + `SUBSURF` Modifier + 10 Cycles PBR Sherpa/Velour Node Materials + **5 Baked NLA Animation Tracks** (`Idle_Breathe`, `Walk_Cycle`, `Happy_Bounce`, `Wave_Hoof`, `Curious_Head_Tilt`) + 4-Light Cycles Studio Stage | [`models/baba_chops_plush_base_model.blend`](models/baba_chops_plush_base_model.blend) |
-| **Rigged & Animated glTF 2.0 Export** | `.GLB` (`glTF 2.0`) | `3.14 MB` · Exported directly from Blender 4.3 with full 22-bone `SkinnedMesh` weights + 5 embedded NLA `AnimationClip` tracks (Blender / Unity / Unreal / Godot / Three.js ready) | [`models/baba_chops_plush_base_model.glb`](models/baba_chops_plush_base_model.glb) |
+| **Native Blender 4.3 Master Project** | `.BLEND` (`Blender 4.3.2`) | `2.19 MB` · `BabaChops_Armature` (**25 Deform Bones**) + `SUBSURF` Modifier + 13 Cycles PBR/Emission Materials + **6 Baked NLA Animation Tracks** (`Baba_Fart_Blast`, `Idle_Breathe`, `Walk_Cycle`, `Happy_Bounce`, `Wave_Hoof`, `Curious_Head_Tilt`) + 4-Light Cycles Studio Stage | [`models/baba_chops_plush_base_model.blend`](models/baba_chops_plush_base_model.blend) |
+| **Rigged & Animated glTF 2.0 Export** | `.GLB` (`glTF 2.0`) | `3.74 MB` · Exported directly from Blender 4.3 with full 25-bone `SkinnedMesh` weights + 6 embedded NLA `AnimationClip` tracks (Blender / Unity / Unreal / Godot / Three.js ready) | [`models/baba_chops_plush_base_model.glb`](models/baba_chops_plush_base_model.glb) |
 | **Blender Cycles Path-Traced Hero Render** | `.PNG` (`1080×1350`) | `1.58 MB` · 64-sample OpenImageDenoise Cycles studio portrait matching `#121` | [`models/baba_chops_blender_cycles_render.png`](models/baba_chops_blender_cycles_render.png) |
 | **4-Panel Reference vs. Cycles Turnaround Sheet** | `.PNG` (`1920×600`) | `716 KB` · Side-by-side `#121` Reference vs. Cycles Front, 3/4 View, and 90° Side Profile | [`models/baba_chops_3d_preview.png`](models/baba_chops_3d_preview.png) |
-| **Interactive WebGL 3D Base Model Studio** | `HTML5 / Three.js r161` | Real-time Orbit/Zoom, 5 Camera Presets, PBR/Wireframe/Clay Modes, 6 Animation Clips & 4 Rig Sliders | [**Launch 3D Studio (`baba-chops-3d.html`)**](https://kunruiw1991.github.io/smiling-critters-assets/baba-chops-3d.html) |
-| **Reproducible Blender Python Generator** | `.PY` (`bpy` / `bmesh`) | `48 KB` · Full parametric geometry, vertex-group skinning, NLA keyframing & Cycles studio setup | [`models/build_baba_chops_blender.py`](models/build_baba_chops_blender.py) |
-| **Wavefront 3D Mesh + Material Library** | `.OBJ` + `.MTL` | `24 MB` · High-resolution subdivided mesh with material groups | [`models/baba_chops_plush_base_model.obj`](models/baba_chops_plush_base_model.obj) |
+| **Interactive WebGL 3D Base Model & Fart Animation Studio** | `HTML5 / Three.js r161` | Real-time Orbit/Zoom, 5 Camera Presets, PBR/Wireframe/Clay Modes, **7 Pose/Animation Modes (including `💨💚 Baba Fart Blast!`)** & 4 Rig Sliders | [**Launch 3D Studio (`baba-chops-3d.html`)**](https://kunruiw1991.github.io/smiling-critters-assets/baba-chops-3d.html) |
+| **Reproducible Blender Python Generator** | `.PY` (`bpy` / `bmesh`) | `38 KB` · Full parametric geometry, vertex-group skinning, 6 NLA tracks, 3D Fart Cloud builder & Cycles studio setup | [`models/build_baba_chops_blender.py`](models/build_baba_chops_blender.py) |
+| **Wavefront 3D Mesh + Material Library** | `.OBJ` + `.MTL` | `5.8 MB` · High-resolution subdivided mesh with material groups | [`models/baba_chops_plush_base_model.obj`](models/baba_chops_plush_base_model.obj) |
 
 ![Baba Chops 3D Base Model Studio Preview](models/baba_chops_3d_preview.png)
 

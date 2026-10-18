@@ -149,6 +149,32 @@ export function buildBabaChopsPlushModel(THREE) {
       color: 0x101014,
       roughness: 0.92,
       metalness: 0.02
+    }),
+    fartLime: new THREE.MeshStandardMaterial({
+      name: 'Baba_Fart_Cloud_Lime',
+      color: 0x4ce629,
+      emissive: 0x228b12,
+      emissiveIntensity: 0.35,
+      roughness: 0.65,
+      metalness: 0.02,
+      bumpMap: woolBump,
+      bumpScale: 0.015
+    }),
+    fartNeon: new THREE.MeshStandardMaterial({
+      name: 'Baba_Fart_Cloud_Neon_YellowGreen',
+      color: 0xc4ff33,
+      emissive: 0x84cc16,
+      emissiveIntensity: 0.50,
+      roughness: 0.45,
+      metalness: 0.05
+    }),
+    fartPurple: new THREE.MeshStandardMaterial({
+      name: 'Baba_Fart_Cloud_Nightmare_Purple',
+      color: 0x9d4edd,
+      emissive: 0x5b21b6,
+      emissiveIntensity: 0.35,
+      roughness: 0.60,
+      metalness: 0.04
     })
   };
 
@@ -847,6 +873,81 @@ export function buildBabaChopsPlushModel(THREE) {
   toothSeam.rotation.x = -0.34;
   jawGroup.add(toothSeam);
 
+  // ============================================================================
+  // 9. 3D SCULPTED CARTOON FART CLOUD CLUSTER (FOR `Baba_Fart_Blast` ANIMATION)
+  // ============================================================================
+  const fartCloudGroup = new THREE.Group();
+  fartCloudGroup.name = 'Baba_Fart_Cloud_Group';
+  fartCloudGroup.visible = false;
+  root.add(fartCloudGroup);
+
+  const fartStage1 = new THREE.Group();
+  fartStage1.position.set(0, 0.56, -0.26);
+  fartCloudGroup.add(fartStage1);
+
+  const shockRing = new THREE.Mesh(
+    new THREE.TorusGeometry(0.16, 0.024, 16, 32),
+    materials.fartNeon
+  );
+  shockRing.position.set(0, 0, -0.10);
+  fartStage1.add(shockRing);
+
+  [
+    [0.00, 0.00, -0.04, 0.08, 0.075, 0.09, materials.fartNeon],
+    [0.00, 0.01, -0.13, 0.12, 0.11, 0.12, materials.fartLime],
+    [-0.07, 0.03, -0.15, 0.095, 0.09, 0.095, materials.fartLime],
+    [0.07, -0.02, -0.15, 0.095, 0.09, 0.095, materials.fartLime]
+  ].forEach(([fx, fy, fz, sx, sy, sz, mat]) => {
+    const p = new THREE.Mesh(baseTuftGeo, mat);
+    p.position.set(fx, fy, fz);
+    p.scale.set(sx, sy, sz);
+    fartStage1.add(p);
+  });
+
+  const fartStage2 = new THREE.Group();
+  fartStage2.position.set(0, 0.60, -0.52);
+  fartCloudGroup.add(fartStage2);
+
+  [
+    [0.00, 0.00, 0.00, 0.19, 0.18, 0.19, materials.fartLime],
+    [-0.14, 0.04, -0.03, 0.155, 0.15, 0.155, materials.fartLime],
+    [0.14, 0.03, -0.03, 0.155, 0.15, 0.155, materials.fartLime],
+    [0.00, 0.12, -0.06, 0.17, 0.16, 0.16, materials.fartNeon],
+    [-0.11, -0.08, 0.02, 0.135, 0.12, 0.135, materials.fartLime],
+    [0.11, -0.08, 0.02, 0.135, 0.12, 0.135, materials.fartLime],
+    [0.00, 0.02, -0.16, 0.20, 0.19, 0.19, materials.fartLime],
+    [-0.16, 0.08, -0.15, 0.15, 0.15, 0.15, materials.fartNeon],
+    [0.16, 0.07, -0.15, 0.15, 0.15, 0.15, materials.fartPurple],
+    [-0.09, 0.15, -0.18, 0.14, 0.135, 0.14, materials.fartLime],
+    [0.09, 0.15, -0.18, 0.14, 0.135, 0.14, materials.fartLime]
+  ].forEach(([fx, fy, fz, sx, sy, sz, mat]) => {
+    const p = new THREE.Mesh(baseTuftGeo, mat);
+    p.position.set(fx, fy, fz);
+    p.scale.set(sx, sy, sz);
+    fartStage2.add(p);
+  });
+
+  const fartStage3 = new THREE.Group();
+  fartStage3.position.set(0, 0.70, -0.85);
+  fartCloudGroup.add(fartStage3);
+
+  [
+    [0.00, 0.00, 0.00, 0.21, 0.20, 0.20, materials.fartLime],
+    [-0.19, 0.07, 0.02, 0.16, 0.155, 0.16, materials.fartNeon],
+    [0.19, 0.06, 0.02, 0.16, 0.155, 0.16, materials.fartLime],
+    [0.00, 0.15, -0.03, 0.175, 0.17, 0.17, materials.fartPurple],
+    [-0.14, -0.10, 0.04, 0.145, 0.135, 0.145, materials.fartLime],
+    [0.14, -0.10, 0.04, 0.145, 0.135, 0.145, materials.fartPurple],
+    [-0.24, -0.02, -0.06, 0.12, 0.12, 0.12, materials.fartNeon],
+    [0.24, 0.00, -0.06, 0.12, 0.12, 0.12, materials.fartLime],
+    [0.00, 0.07, -0.16, 0.15, 0.15, 0.15, materials.fartNeon]
+  ].forEach(([fx, fy, fz, sx, sy, sz, mat]) => {
+    const p = new THREE.Mesh(baseTuftGeo, mat);
+    p.position.set(fx, fy, fz);
+    p.scale.set(sx, sy, sz);
+    fartStage3.add(p);
+  });
+
   return {
     root,
     bodyRig,
@@ -862,6 +963,10 @@ export function buildBabaChopsPlushModel(THREE) {
     leftLegGroup,
     rightLegGroup,
     skullPendantGroup,
+    fartCloudGroup,
+    fartStage1,
+    fartStage2,
+    fartStage3,
     materials
   };
 }
