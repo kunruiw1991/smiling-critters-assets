@@ -1,129 +1,502 @@
 {
-  "character": "Baba Chops (#121 Official Plush Base Model)",
-  "reference_image": "images/121_BabaChopsPlush1.webp",
-  "blender_version": "Blender 4.3.2 (Cycles Path Tracer + OpenImageDenoise)",
-  "armature": {
-    "name": "BabaChops_Armature",
-    "bone_count": 25,
-    "bones": [
-      "Root",
-      "Pelvis",
-      "Spine",
-      "Chest",
-      "Neck",
-      "Head",
-      "Jaw",
-      "Eyelid.L",
-      "Eyelid.R",
-      "Ear.L",
-      "Ear.R",
-      "SkullPendant",
-      "Shoulder.L",
-      "Arm.L",
-      "HandHoof.L",
-      "Shoulder.R",
-      "Arm.R",
-      "HandHoof.R",
-      "Leg.L",
-      "FootHoof.L",
-      "Leg.R",
-      "FootHoof.R",
-      "FartCloud.1",
-      "FartCloud.2",
-      "FartCloud.3"
-    ]
-  },
+  "character_count": 9,
   "models": [
     {
-      "name": "Native Blender 4.3 Master File",
-      "path": "models/baba_chops_plush_base_model.blend",
-      "format": "BLEND",
-      "description": "25-bone rigged subdivision-surface mesh + 13 Cycles PBR/Emission materials + 6 baked NLA animation clips + 4-light studio stage"
+      "id": "baba_chops_plush_base_model",
+      "character": "Baba Chops",
+      "emoji": "🐑💀",
+      "group": "Nightmare Critters",
+      "species": "Black Sheep",
+      "pendant": "White Skull Pendant",
+      "reference_image": "images/121_BabaChopsPlush1.webp",
+      "blender_version": "4.3.2",
+      "render_engine": "CYCLES",
+      "armature": "BabaChops_Armature",
+      "bone_count": 25,
+      "nla_tracks": [
+        "Idle_Breathe",
+        "Walk_Cycle",
+        "Happy_Bounce",
+        "Wave_Hoof",
+        "Curious_Head_Tilt",
+        "Baba_Fart_Blast"
+      ],
+      "files": {
+        "blend": "models/baba_chops_plush_base_model.blend",
+        "glb": "models/baba_chops_plush_base_model.glb",
+        "obj": "models/baba_chops_plush_base_model.obj",
+        "mtl": "models/baba_chops_plush_base_model.mtl",
+        "blender_generator_py": "models/build_baba_chops_blender.py",
+        "threejs_procedural_module": "models/baba_chops_model.js",
+        "cycles_hero_render_png": "models/baba_chops_blender_cycles_render.png",
+        "cycles_4panel_turnaround_png": "models/baba_chops_3d_preview.png",
+        "interactive_3d_studio_html": "baba-chops-3d.html"
+      }
     },
     {
-      "name": "Rigged & Animated glTF 2.0 Binary",
-      "path": "models/baba_chops_plush_base_model.glb",
-      "format": "GLB",
-      "description": "Full 25-bone SkinnedMesh + 6 embedded NLA AnimationClips ready for Blender, Unity, Unreal, Godot, and Three.js"
+      "id": "catnap_plush_base_model",
+      "character": "CatNap",
+      "emoji": "🐱🌙",
+      "group": "Smiling Critters",
+      "species": "Purple Cat",
+      "pendant": "Gold Crescent Moon Pendant",
+      "reference_image": "images/022_CatNap_Plushie.webp",
+      "blender_version": "4.3.2",
+      "render_engine": "CYCLES",
+      "armature": "CatNap_Armature",
+      "bone_count": 25,
+      "nla_tracks": [
+        "Idle_Breathe",
+        "Walk_Cycle",
+        "Happy_Bounce",
+        "Wave_Hoof",
+        "Curious_Head_Tilt",
+        "CatNap_Fart_Blast"
+      ],
+      "files": {
+        "blend": "models/catnap_plush_base_model.blend",
+        "glb": "models/catnap_plush_base_model.glb",
+        "obj": "models/catnap_plush_base_model.obj",
+        "mtl": "models/catnap_plush_base_model.mtl",
+        "blender_generator_py": "models/build_catnap_blender.py",
+        "threejs_procedural_module": "models/catnap_model.js",
+        "cycles_hero_render_png": "models/catnap_blender_cycles_render.png",
+        "cycles_4panel_turnaround_png": "models/catnap_3d_preview.png",
+        "interactive_3d_studio_html": "catnap-3d.html"
+      }
     },
     {
-      "name": "Wavefront 3D Base Cage & Material Library",
-      "path": "models/baba_chops_plush_base_model.obj",
-      "format": "OBJ",
-      "description": "Static subdivided mesh in #121 reference pose with .mtl materials"
+      "id": "dogday_plush_base_model",
+      "character": "DogDay",
+      "emoji": "🐶☀️",
+      "group": "Smiling Critters",
+      "species": "Orange-Gold Spaniel Dog",
+      "pendant": "Gold Sun Pendant with Orange Center",
+      "reference_image": "images/008_DogDay_Plushie.webp",
+      "blender_version": "4.3.2",
+      "render_engine": "CYCLES",
+      "armature": "DogDay_Armature",
+      "bone_count": 25,
+      "nla_tracks": [
+        "Idle_Breathe",
+        "Walk_Cycle",
+        "Happy_Bounce",
+        "Wave_Hoof",
+        "Curious_Head_Tilt",
+        "DogDay_Fart_Blast"
+      ],
+      "files": {
+        "blend": "models/dogday_plush_base_model.blend",
+        "glb": "models/dogday_plush_base_model.glb",
+        "obj": "models/dogday_plush_base_model.obj",
+        "mtl": "models/dogday_plush_base_model.mtl",
+        "blender_generator_py": "models/build_dogday_blender.py",
+        "threejs_procedural_module": "models/dogday_model.js",
+        "cycles_hero_render_png": "models/dogday_blender_cycles_render.png",
+        "cycles_4panel_turnaround_png": "models/dogday_3d_preview.png",
+        "interactive_3d_studio_html": "dogday-3d.html"
+      }
     },
     {
-      "name": "Blender Cycles Path-Traced Hero Render",
-      "path": "models/baba_chops_blender_cycles_render.png",
-      "format": "PNG",
-      "dimensions": "1080x1350"
+      "id": "bobby_bearhug_plush_base_model",
+      "character": "Bobby BearHug",
+      "emoji": "🐻❤️",
+      "group": "Smiling Critters",
+      "species": "Rose-Red Bear",
+      "pendant": "Red Heart Pendant",
+      "reference_image": "images/018_Bobby_BearHug_Plushie.webp",
+      "blender_version": "4.3.2",
+      "render_engine": "CYCLES",
+      "armature": "BobbyBearHug_Armature",
+      "bone_count": 25,
+      "nla_tracks": [
+        "Idle_Breathe",
+        "Walk_Cycle",
+        "Happy_Bounce",
+        "Wave_Hoof",
+        "Curious_Head_Tilt",
+        "Bobby_Fart_Blast"
+      ],
+      "files": {
+        "blend": "models/bobby_bearhug_plush_base_model.blend",
+        "glb": "models/bobby_bearhug_plush_base_model.glb",
+        "obj": "models/bobby_bearhug_plush_base_model.obj",
+        "mtl": "models/bobby_bearhug_plush_base_model.mtl",
+        "blender_generator_py": "models/build_bobby_bearhug_blender.py",
+        "threejs_procedural_module": "models/bobby_bearhug_model.js",
+        "cycles_hero_render_png": "models/bobby_bearhug_blender_cycles_render.png",
+        "cycles_4panel_turnaround_png": "models/bobby_bearhug_3d_preview.png",
+        "interactive_3d_studio_html": "bobby-bearhug-3d.html"
+      }
     },
     {
-      "name": "4-Panel Reference vs. Cycles Turnaround Sheet",
-      "path": "models/baba_chops_3d_preview.png",
-      "format": "PNG",
-      "dimensions": "1920x600"
+      "id": "bubba_bubbaphant_plush_base_model",
+      "character": "Bubba Bubbaphant",
+      "emoji": "🐘💡",
+      "group": "Smiling Critters",
+      "species": "Sky-Blue Elephant",
+      "pendant": "Bright Yellow Lightbulb Pendant",
+      "reference_image": "images/024_BubbaBubbaphantPlush.webp",
+      "blender_version": "4.3.2",
+      "render_engine": "CYCLES",
+      "armature": "BubbaBubbaphant_Armature",
+      "bone_count": 25,
+      "nla_tracks": [
+        "Idle_Breathe",
+        "Walk_Cycle",
+        "Happy_Bounce",
+        "Wave_Hoof",
+        "Curious_Head_Tilt",
+        "Bubba_Fart_Blast"
+      ],
+      "files": {
+        "blend": "models/bubba_bubbaphant_plush_base_model.blend",
+        "glb": "models/bubba_bubbaphant_plush_base_model.glb",
+        "obj": "models/bubba_bubbaphant_plush_base_model.obj",
+        "mtl": "models/bubba_bubbaphant_plush_base_model.mtl",
+        "blender_generator_py": "models/build_bubba_bubbaphant_blender.py",
+        "threejs_procedural_module": "models/bubba_bubbaphant_model.js",
+        "cycles_hero_render_png": "models/bubba_bubbaphant_blender_cycles_render.png",
+        "cycles_4panel_turnaround_png": "models/bubba_bubbaphant_3d_preview.png",
+        "interactive_3d_studio_html": "bubba-bubbaphant-3d.html"
+      }
     },
     {
-      "name": "Reproducible Blender 4.3 Python Generator",
-      "path": "models/build_baba_chops_blender.py",
-      "format": "PY"
+      "id": "craftycorn_plush_base_model",
+      "character": "CraftyCorn",
+      "emoji": "🦄🌈",
+      "group": "Smiling Critters",
+      "species": "White & Cyan Unicorn",
+      "pendant": "Rainbow-Petaled Flower Pendant",
+      "reference_image": "images/011_CraftyCorn_Plushie.webp",
+      "blender_version": "4.3.2",
+      "render_engine": "CYCLES",
+      "armature": "CraftyCorn_Armature",
+      "bone_count": 25,
+      "nla_tracks": [
+        "Idle_Breathe",
+        "Walk_Cycle",
+        "Happy_Bounce",
+        "Wave_Hoof",
+        "Curious_Head_Tilt",
+        "CraftyCorn_Fart_Blast"
+      ],
+      "files": {
+        "blend": "models/craftycorn_plush_base_model.blend",
+        "glb": "models/craftycorn_plush_base_model.glb",
+        "obj": "models/craftycorn_plush_base_model.obj",
+        "mtl": "models/craftycorn_plush_base_model.mtl",
+        "blender_generator_py": "models/build_craftycorn_blender.py",
+        "threejs_procedural_module": "models/craftycorn_model.js",
+        "cycles_hero_render_png": "models/craftycorn_blender_cycles_render.png",
+        "cycles_4panel_turnaround_png": "models/craftycorn_3d_preview.png",
+        "interactive_3d_studio_html": "craftycorn-3d.html"
+      }
     },
     {
-      "name": "Interactive Three.js WebGL Rig & Fart Cloud Module",
-      "path": "models/baba_chops_model.js",
-      "format": "JS"
+      "id": "hoppy_hopscotch_plush_base_model",
+      "character": "Hoppy Hopscotch",
+      "emoji": "🐰⚡",
+      "group": "Smiling Critters",
+      "species": "Mint-Green Rabbit",
+      "pendant": "Yellow Lightning Bolt Pendant",
+      "reference_image": "images/012_Hoppy_Hopscotch_Plushie.webp",
+      "blender_version": "4.3.2",
+      "render_engine": "CYCLES",
+      "armature": "HoppyHopscotch_Armature",
+      "bone_count": 25,
+      "nla_tracks": [
+        "Idle_Breathe",
+        "Walk_Cycle",
+        "Happy_Bounce",
+        "Wave_Hoof",
+        "Curious_Head_Tilt",
+        "Hoppy_Fart_Blast"
+      ],
+      "files": {
+        "blend": "models/hoppy_hopscotch_plush_base_model.blend",
+        "glb": "models/hoppy_hopscotch_plush_base_model.glb",
+        "obj": "models/hoppy_hopscotch_plush_base_model.obj",
+        "mtl": "models/hoppy_hopscotch_plush_base_model.mtl",
+        "blender_generator_py": "models/build_hoppy_hopscotch_blender.py",
+        "threejs_procedural_module": "models/hoppy_hopscotch_model.js",
+        "cycles_hero_render_png": "models/hoppy_hopscotch_blender_cycles_render.png",
+        "cycles_4panel_turnaround_png": "models/hoppy_hopscotch_3d_preview.png",
+        "interactive_3d_studio_html": "hoppy-hopscotch-3d.html"
+      }
+    },
+    {
+      "id": "kickin_chicken_plush_base_model",
+      "character": "KickinChicken",
+      "emoji": "🐓⭐",
+      "group": "Smiling Critters",
+      "species": "Golden-Yellow Rooster",
+      "pendant": "Gold 5-Pointed Star Pendant",
+      "reference_image": "images/053_KickinChicken.webp",
+      "blender_version": "4.3.2",
+      "render_engine": "CYCLES",
+      "armature": "KickinChicken_Armature",
+      "bone_count": 25,
+      "nla_tracks": [
+        "Idle_Breathe",
+        "Walk_Cycle",
+        "Happy_Bounce",
+        "Wave_Hoof",
+        "Curious_Head_Tilt",
+        "Kickin_Fart_Blast"
+      ],
+      "files": {
+        "blend": "models/kickin_chicken_plush_base_model.blend",
+        "glb": "models/kickin_chicken_plush_base_model.glb",
+        "obj": "models/kickin_chicken_plush_base_model.obj",
+        "mtl": "models/kickin_chicken_plush_base_model.mtl",
+        "blender_generator_py": "models/build_kickin_chicken_blender.py",
+        "threejs_procedural_module": "models/kickin_chicken_model.js",
+        "cycles_hero_render_png": "models/kickin_chicken_blender_cycles_render.png",
+        "cycles_4panel_turnaround_png": "models/kickin_chicken_3d_preview.png",
+        "interactive_3d_studio_html": "kickin-chicken-3d.html"
+      }
+    },
+    {
+      "id": "picky_piggy_plush_base_model",
+      "character": "PickyPiggy",
+      "emoji": "🐷🍎",
+      "group": "Smiling Critters",
+      "species": "Bubblegum-Pink Pig",
+      "pendant": "Red Apple with Green Leaf Pendant",
+      "reference_image": "images/025_PickyPiggy_Plushie.webp",
+      "blender_version": "4.3.2",
+      "render_engine": "CYCLES",
+      "armature": "PickyPiggy_Armature",
+      "bone_count": 25,
+      "nla_tracks": [
+        "Idle_Breathe",
+        "Walk_Cycle",
+        "Happy_Bounce",
+        "Wave_Hoof",
+        "Curious_Head_Tilt",
+        "Picky_Fart_Blast"
+      ],
+      "files": {
+        "blend": "models/picky_piggy_plush_base_model.blend",
+        "glb": "models/picky_piggy_plush_base_model.glb",
+        "obj": "models/picky_piggy_plush_base_model.obj",
+        "mtl": "models/picky_piggy_plush_base_model.mtl",
+        "blender_generator_py": "models/build_picky_piggy_blender.py",
+        "threejs_procedural_module": "models/picky_piggy_model.js",
+        "cycles_hero_render_png": "models/picky_piggy_blender_cycles_render.png",
+        "cycles_4panel_turnaround_png": "models/picky_piggy_3d_preview.png",
+        "interactive_3d_studio_html": "picky-piggy-3d.html"
+      }
     }
   ],
   "animations": [
     {
-      "id": "Baba_Fart_Blast",
-      "title": "Baba Chops Fart Blast (3D Comedy Animation)",
+      "id": "baba_chops_fart_animation",
+      "character": "Baba Chops",
+      "emoji": "🐑💀",
+      "nla_clip": "Baba_Fart_Blast",
+      "title": "Baba Chops Fart Blast Comedy Animation (Blender 4.3 Cycles + Synthesized Cartoon Audio)",
       "frames": 36,
       "fps": 24,
-      "duration_seconds": 1.5,
-      "looped_video_duration_seconds": 6.0,
+      "duration_single_loop_sec": 1.5,
+      "mp4_duration_sec": 6.0,
+      "acts": [
+        "Frames 1-9: Deep squat, leaning forward, embarrassed eyes squeezed shut, cheeks puffed straining",
+        "Frames 10-14: Explosive green/lime/purple 3D cartoon fart cloud bursts from behind with shockwave torus ring & stink ribbons",
+        "Frames 15-26: Rocket recoil jump into the air as the multi-layered fart cloud billows outward and rises",
+        "Frames 27-36: Lands, turns toward camera, waves hoof behind back to fan away the smelly cloud & giggles"
+      ],
       "files": {
         "mp4_with_audio": "animations/baba_chops_fart_animation.mp4",
-        "looping_gif": "animations/baba_chops_fart_animation.gif",
-        "animated_webp": "animations/baba_chops_fart_animation.webp",
-        "storyboard_sheet": "animations/baba_chops_fart_storyboard.png"
-      },
-      "choreography": [
-        "Act 1 (Frames 1-10): Deep squat, tummy clench, high-frequency strain tremble & tight V-brow squint",
-        "Act 2 (Frames 11-22): Big 3-stage green/lime/purple 3D cartoon fart cloud explosion + shockwave torus ring + rocket surprise jump",
-        "Act 3 (Frames 23-36): Cushioned hoof landing, cheeky hoof-fanning behind back & buck-toothed belly giggle"
-      ]
+        "gif_loop": "animations/baba_chops_fart_animation.gif",
+        "webp_loop": "animations/baba_chops_fart_animation.webp",
+        "storyboard_4act_png": "animations/baba_chops_fart_storyboard.png"
+      }
     },
     {
-      "id": "Idle_Breathe",
-      "title": "Idle Breathing & Blink",
-      "frames": 60,
-      "fps": 24
+      "id": "catnap_fart_animation",
+      "character": "CatNap",
+      "emoji": "🐱🌙",
+      "nla_clip": "CatNap_Fart_Blast",
+      "title": "CatNap Fart Blast Comedy Animation (Blender 4.3 Cycles + Synthesized Cartoon Audio)",
+      "frames": 36,
+      "fps": 24,
+      "duration_single_loop_sec": 1.5,
+      "mp4_duration_sec": 6.0,
+      "acts": [
+        "Frames 1-9: Deep squat, leaning forward, embarrassed eyes squeezed shut, cheeks puffed straining",
+        "Frames 10-14: Explosive green/lime/purple 3D cartoon fart cloud bursts from behind with shockwave torus ring & stink ribbons",
+        "Frames 15-26: Rocket recoil jump into the air as the multi-layered fart cloud billows outward and rises",
+        "Frames 27-36: Lands, turns toward camera, waves hoof behind back to fan away the smelly cloud & giggles"
+      ],
+      "files": {
+        "mp4_with_audio": "animations/catnap_fart_animation.mp4",
+        "gif_loop": "animations/catnap_fart_animation.gif",
+        "webp_loop": "animations/catnap_fart_animation.webp",
+        "storyboard_4act_png": "animations/catnap_fart_storyboard.png"
+      }
     },
     {
-      "id": "Walk_Cycle",
-      "title": "Plush Strut Walk Cycle",
-      "frames": 48,
-      "fps": 24
+      "id": "dogday_fart_animation",
+      "character": "DogDay",
+      "emoji": "🐶☀️",
+      "nla_clip": "DogDay_Fart_Blast",
+      "title": "DogDay Fart Blast Comedy Animation (Blender 4.3 Cycles + Synthesized Cartoon Audio)",
+      "frames": 36,
+      "fps": 24,
+      "duration_single_loop_sec": 1.5,
+      "mp4_duration_sec": 6.0,
+      "acts": [
+        "Frames 1-9: Deep squat, leaning forward, embarrassed eyes squeezed shut, cheeks puffed straining",
+        "Frames 10-14: Explosive green/lime/purple 3D cartoon fart cloud bursts from behind with shockwave torus ring & stink ribbons",
+        "Frames 15-26: Rocket recoil jump into the air as the multi-layered fart cloud billows outward and rises",
+        "Frames 27-36: Lands, turns toward camera, waves hoof behind back to fan away the smelly cloud & giggles"
+      ],
+      "files": {
+        "mp4_with_audio": "animations/dogday_fart_animation.mp4",
+        "gif_loop": "animations/dogday_fart_animation.gif",
+        "webp_loop": "animations/dogday_fart_animation.webp",
+        "storyboard_4act_png": "animations/dogday_fart_storyboard.png"
+      }
     },
     {
-      "id": "Happy_Bounce",
-      "title": "Excited Plush Jump Bounce",
-      "frames": 40,
-      "fps": 24
+      "id": "bobby_bearhug_fart_animation",
+      "character": "Bobby BearHug",
+      "emoji": "🐻❤️",
+      "nla_clip": "Bobby_Fart_Blast",
+      "title": "Bobby BearHug Fart Blast Comedy Animation (Blender 4.3 Cycles + Synthesized Cartoon Audio)",
+      "frames": 36,
+      "fps": 24,
+      "duration_single_loop_sec": 1.5,
+      "mp4_duration_sec": 6.0,
+      "acts": [
+        "Frames 1-9: Deep squat, leaning forward, embarrassed eyes squeezed shut, cheeks puffed straining",
+        "Frames 10-14: Explosive green/lime/purple 3D cartoon fart cloud bursts from behind with shockwave torus ring & stink ribbons",
+        "Frames 15-26: Rocket recoil jump into the air as the multi-layered fart cloud billows outward and rises",
+        "Frames 27-36: Lands, turns toward camera, waves hoof behind back to fan away the smelly cloud & giggles"
+      ],
+      "files": {
+        "mp4_with_audio": "animations/bobby_bearhug_fart_animation.mp4",
+        "gif_loop": "animations/bobby_bearhug_fart_animation.gif",
+        "webp_loop": "animations/bobby_bearhug_fart_animation.webp",
+        "storyboard_4act_png": "animations/bobby_bearhug_fart_storyboard.png"
+      }
     },
     {
-      "id": "Wave_Hoof",
-      "title": "Friendly Right Hoof Wave",
-      "frames": 60,
-      "fps": 24
+      "id": "bubba_bubbaphant_fart_animation",
+      "character": "Bubba Bubbaphant",
+      "emoji": "🐘💡",
+      "nla_clip": "Bubba_Fart_Blast",
+      "title": "Bubba Bubbaphant Fart Blast Comedy Animation (Blender 4.3 Cycles + Synthesized Cartoon Audio)",
+      "frames": 36,
+      "fps": 24,
+      "duration_single_loop_sec": 1.5,
+      "mp4_duration_sec": 6.0,
+      "acts": [
+        "Frames 1-9: Deep squat, leaning forward, embarrassed eyes squeezed shut, cheeks puffed straining",
+        "Frames 10-14: Explosive green/lime/purple 3D cartoon fart cloud bursts from behind with shockwave torus ring & stink ribbons",
+        "Frames 15-26: Rocket recoil jump into the air as the multi-layered fart cloud billows outward and rises",
+        "Frames 27-36: Lands, turns toward camera, waves hoof behind back to fan away the smelly cloud & giggles"
+      ],
+      "files": {
+        "mp4_with_audio": "animations/bubba_bubbaphant_fart_animation.mp4",
+        "gif_loop": "animations/bubba_bubbaphant_fart_animation.gif",
+        "webp_loop": "animations/bubba_bubbaphant_fart_animation.webp",
+        "storyboard_4act_png": "animations/bubba_bubbaphant_fart_storyboard.png"
+      }
     },
     {
-      "id": "Curious_Head_Tilt",
-      "title": "Curious Head Tilt & Jaw Chatter",
-      "frames": 60,
-      "fps": 24
+      "id": "craftycorn_fart_animation",
+      "character": "CraftyCorn",
+      "emoji": "🦄🌈",
+      "nla_clip": "CraftyCorn_Fart_Blast",
+      "title": "CraftyCorn Fart Blast Comedy Animation (Blender 4.3 Cycles + Synthesized Cartoon Audio)",
+      "frames": 36,
+      "fps": 24,
+      "duration_single_loop_sec": 1.5,
+      "mp4_duration_sec": 6.0,
+      "acts": [
+        "Frames 1-9: Deep squat, leaning forward, embarrassed eyes squeezed shut, cheeks puffed straining",
+        "Frames 10-14: Explosive green/lime/purple 3D cartoon fart cloud bursts from behind with shockwave torus ring & stink ribbons",
+        "Frames 15-26: Rocket recoil jump into the air as the multi-layered fart cloud billows outward and rises",
+        "Frames 27-36: Lands, turns toward camera, waves hoof behind back to fan away the smelly cloud & giggles"
+      ],
+      "files": {
+        "mp4_with_audio": "animations/craftycorn_fart_animation.mp4",
+        "gif_loop": "animations/craftycorn_fart_animation.gif",
+        "webp_loop": "animations/craftycorn_fart_animation.webp",
+        "storyboard_4act_png": "animations/craftycorn_fart_storyboard.png"
+      }
+    },
+    {
+      "id": "hoppy_hopscotch_fart_animation",
+      "character": "Hoppy Hopscotch",
+      "emoji": "🐰⚡",
+      "nla_clip": "Hoppy_Fart_Blast",
+      "title": "Hoppy Hopscotch Fart Blast Comedy Animation (Blender 4.3 Cycles + Synthesized Cartoon Audio)",
+      "frames": 36,
+      "fps": 24,
+      "duration_single_loop_sec": 1.5,
+      "mp4_duration_sec": 6.0,
+      "acts": [
+        "Frames 1-9: Deep squat, leaning forward, embarrassed eyes squeezed shut, cheeks puffed straining",
+        "Frames 10-14: Explosive green/lime/purple 3D cartoon fart cloud bursts from behind with shockwave torus ring & stink ribbons",
+        "Frames 15-26: Rocket recoil jump into the air as the multi-layered fart cloud billows outward and rises",
+        "Frames 27-36: Lands, turns toward camera, waves hoof behind back to fan away the smelly cloud & giggles"
+      ],
+      "files": {
+        "mp4_with_audio": "animations/hoppy_hopscotch_fart_animation.mp4",
+        "gif_loop": "animations/hoppy_hopscotch_fart_animation.gif",
+        "webp_loop": "animations/hoppy_hopscotch_fart_animation.webp",
+        "storyboard_4act_png": "animations/hoppy_hopscotch_fart_storyboard.png"
+      }
+    },
+    {
+      "id": "kickin_chicken_fart_animation",
+      "character": "KickinChicken",
+      "emoji": "🐓⭐",
+      "nla_clip": "Kickin_Fart_Blast",
+      "title": "KickinChicken Fart Blast Comedy Animation (Blender 4.3 Cycles + Synthesized Cartoon Audio)",
+      "frames": 36,
+      "fps": 24,
+      "duration_single_loop_sec": 1.5,
+      "mp4_duration_sec": 6.0,
+      "acts": [
+        "Frames 1-9: Deep squat, leaning forward, embarrassed eyes squeezed shut, cheeks puffed straining",
+        "Frames 10-14: Explosive green/lime/purple 3D cartoon fart cloud bursts from behind with shockwave torus ring & stink ribbons",
+        "Frames 15-26: Rocket recoil jump into the air as the multi-layered fart cloud billows outward and rises",
+        "Frames 27-36: Lands, turns toward camera, waves hoof behind back to fan away the smelly cloud & giggles"
+      ],
+      "files": {
+        "mp4_with_audio": "animations/kickin_chicken_fart_animation.mp4",
+        "gif_loop": "animations/kickin_chicken_fart_animation.gif",
+        "webp_loop": "animations/kickin_chicken_fart_animation.webp",
+        "storyboard_4act_png": "animations/kickin_chicken_fart_storyboard.png"
+      }
+    },
+    {
+      "id": "picky_piggy_fart_animation",
+      "character": "PickyPiggy",
+      "emoji": "🐷🍎",
+      "nla_clip": "Picky_Fart_Blast",
+      "title": "PickyPiggy Fart Blast Comedy Animation (Blender 4.3 Cycles + Synthesized Cartoon Audio)",
+      "frames": 36,
+      "fps": 24,
+      "duration_single_loop_sec": 1.5,
+      "mp4_duration_sec": 6.0,
+      "acts": [
+        "Frames 1-9: Deep squat, leaning forward, embarrassed eyes squeezed shut, cheeks puffed straining",
+        "Frames 10-14: Explosive green/lime/purple 3D cartoon fart cloud bursts from behind with shockwave torus ring & stink ribbons",
+        "Frames 15-26: Rocket recoil jump into the air as the multi-layered fart cloud billows outward and rises",
+        "Frames 27-36: Lands, turns toward camera, waves hoof behind back to fan away the smelly cloud & giggles"
+      ],
+      "files": {
+        "mp4_with_audio": "animations/picky_piggy_fart_animation.mp4",
+        "gif_loop": "animations/picky_piggy_fart_animation.gif",
+        "webp_loop": "animations/picky_piggy_fart_animation.webp",
+        "storyboard_4act_png": "animations/picky_piggy_fart_storyboard.png"
+      }
     }
   ]
 }

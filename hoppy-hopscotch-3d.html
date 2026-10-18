@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>🐰⚡ Hoppy Hopscotch 3D Base Model Studio — 1:1 Plush Recreation (012_Hoppy_Hopscotch_Plushie)</title>
+  <style>
+    :root {
+      --bg: #081810;
+      --panel: rgba(12, 34, 22, 0.92);
+      --border: rgba(255, 255, 255, 0.14);
+      --accent: #34b857;
+      --accent2: #facc15;
+      --text: #f8fafc;
+      --muted: #cbd5e1;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    header {
+      padding: 12px 20px;
+      background: rgba(8, 24, 16, 0.95);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      z-index: 10;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand h1 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+    .brand span {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .btn {
+      padding: 8px 13px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn:hover, .btn.active {
+      background: linear-gradient(135deg, #16a34a, #ca8a04);
+      border-color: #fde047;
+    }
+    .btn.primary {
+      background: linear-gradient(135deg, #15803d, #eab308);
+      border-color: #fde047;
+    }
+    .workspace {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 300px 1fr 310px;
+      min-height: 0;
+    }
+    .sidebar {
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .sidebar.right {
+      border-right: none;
+      border-left: 1px solid var(--border);
+    }
+    .section-title {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #4ade80;
+      margin: 0 0 8px;
+      font-weight: 700;
+    }
+    .ref-card {
+      background: #f4f4f6;
+      border-radius: 14px;
+      padding: 10px;
+      text-align: center;
+      border: 2px solid rgba(52, 184, 87, 0.55);
+    }
+    .ref-card img {
+      width: 100%;
+      max-height: 290px;
+      object-fit: contain;
+      border-radius: 8px;
+      display: block;
+      margin: 0 auto;
+    }
+    .ref-caption {
+      margin-top: 6px;
+      font-size: 0.76rem;
+      color: #1e293b;
+      font-weight: 600;
+    }
+    .viewport-wrap {
+      position: relative;
+      background: #f4f4f6;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #viewport-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab;
+    }
+    #viewport-canvas:active { cursor: grabbing; }
+    .hud-badge {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      background: rgba(8, 24, 16, 0.84);
+      backdrop-filter: blur(8px);
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1px solid rgba(255,255,255,0.15);
+      pointer-events: none;
+    }
+    .btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+    }
+    .slider-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+    .slider-row label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .slider-row input[type="range"] {
+      width: 100%;
+      accent-color: #34b857;
+    }
+    .spec-list {
+      margin: 0;
+      padding-left: 16px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    @media (max-width: 980px) {
+      .workspace {
+        grid-template-columns: 1fr;
+        grid-template-rows: 58vh auto auto;
+        overflow-y: auto;
+      }
+      body { overflow: auto; height: auto; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span style="font-size:1.6rem;">🐰⚡</span>
+      <div>
+        <h1>Hoppy Hopscotch 3D Base Model &amp; Animation Studio (Blender 4.3 + Cycles + Three.js)</h1>
+        <span>1:1 High-Resolution 3D Plush Recreation of <code>images/012_Hoppy_Hopscotch_Plushie.webp</code> • 25-Bone Blender Armature Rig + 6 NLA Animation Clips (Featuring <code>Hoppy_Fart_Blast</code> 💨💚)</span>
+      </div>
+    </div>
+    <div class="top-actions">
+      <a class="btn" href="index.html">⬅️ Back to Asset Library</a>
+      <a class="btn primary" href="animations/hoppy_hopscotch_fart_animation.mp4" download="hoppy_hopscotch_fart_animation.mp4">🎬💨 Download Fart Animation (.MP4 + Sound)</a>
+      <a class="btn primary" href="models/hoppy_hopscotch_plush_base_model.blend" download="hoppy_hopscotch_plush_base_model.blend">🟧 Download .BLEND (Blender 4.3 Rig)</a>
+      <a class="btn primary" href="models/hoppy_hopscotch_plush_base_model.glb" download="hoppy_hopscotch_plush_base_model.glb">⬇️ Download .GLB (Rigged + 6 Clips)</a>
+      <a class="btn" href="models/hoppy_hopscotch_plush_base_model.obj" download="hoppy_hopscotch_plush_base_model.obj">⬇️ Download .OBJ</a>
+      <a class="btn" href="models/build_hoppy_hopscotch_blender.py" download="build_hoppy_hopscotch_blender.py">🐍 Blender Script (.PY)</a>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <!-- Left Sidebar: Target Reference Photo & Blender Cycles Render -->
+    <aside class="sidebar">
+      <div>
+        <h2 class="section-title">🎯 #012 Ref vs. Blender 4.3 Cycles</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div class="ref-card" style="padding:6px;">
+            <img src="images/012_Hoppy_Hopscotch_Plushie.webp" alt="012_Hoppy_Hopscotch_Plushie Reference" style="max-height:175px;" />
+            <div class="ref-caption" style="font-size:0.7rem;">#012 Target Photo</div>
+          </div>
+          <div class="ref-card" style="padding:6px;">
+            <img src="models/hoppy_hopscotch_blender_cycles_render.png" alt="Blender 4.3 Cycles Render" style="max-height:175px;" />
+            <div class="ref-caption" style="font-size:0.7rem;">Blender Cycles Render</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="section-title">💨💚 Blender Cycles Fart Animation</h2>
+        <div class="ref-card" style="padding:8px; border-color: #4ce629;">
+          <img src="animations/hoppy_hopscotch_fart_animation.gif" alt="Hoppy Hopscotch Fart Animation (Blender Cycles)" style="max-height:200px;" />
+          <div class="ref-caption" style="font-size:0.74rem; color:#15803d;"><code>Hoppy_Fart_Blast</code> (36-Frame Cycles Render)</div>
+          <div style="display:flex;gap:6px;margin-top:6px;justify-content:center;">
+            <a class="btn primary" href="animations/hoppy_hopscotch_fart_animation.mp4" download style="padding:4px 8px;font-size:0.72rem;">🔊 MP4 Video</a>
+            <a class="btn" href="animations/hoppy_hopscotch_fart_animation.gif" download style="padding:4px 8px;font-size:0.72rem;color:#1e293b;background:#e2e8f0;">🖼️ GIF</a>
+            <a class="btn" href="animations/hoppy_hopscotch_fart_storyboard.png" target="_blank" style="padding:4px 8px;font-size:0.72rem;color:#1e293b;background:#e2e8f0;">🎞️ 4-Act Sheet</a>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="section-title">🦴 Blender 4.3 Rig &amp; Anatomy</h2>
+        <ul class="spec-list">
+          <li><strong>25-Bone Armature (<code>HoppyHopscotch_Armature</code>)</strong>: <code>Root</code>, <code>Pelvis</code>, <code>Spine</code>, <code>Chest</code>, <code>Tail</code>, <code>Head</code>, <code>Jaw</code>, <code>Eyelid.L/R</code>, <code>Ear.L/R</code>, <code>SkullPendant</code>, <code>Shoulder.L/R</code>, <code>Arm.L/R</code>, <code>HandHoof.L/R</code>, <code>Leg.L/R</code>, <code>FootHoof.L/R</code>, <code>FartCloud.1/2/3</code></li>
+          <li><strong>6 Baked NLA Animation Tracks</strong>: <code>Hoppy_Fart_Blast</code> 💨💚, <code>Idle_Breathe</code>, <code>Walk_Cycle</code>, <code>Happy_Bounce</code>, <code>Wave_Paw</code>, and <code>Curious_Head_Tilt</code></li>
+          <li><strong>3-Tone Bunny Plush Palette</strong>: Bright emerald/mint-green plush fleece (<code>#34B857</code>), pastel mint belly/inner-ears/pads (<code>#A7F3D0</code>), and forest-green ear tips &amp; foot bottoms (<code>#1E7E38</code>)</li>
+          <li><strong>Signature Bunny Details</strong>: Tall upright rabbit ears, pink triangular rabbit nose, twin white buck teeth inside wide crescent grin, fluffy round puffball tail &amp; bright yellow Lightning Bolt pendant</li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Center 3D WebGL Viewport -->
+    <main class="viewport-wrap" id="viewport-container">
+      <canvas id="viewport-canvas"></canvas>
+      <div class="hud-badge" id="hud-status">🎥 Drag to Orbit • Scroll to Zoom • Studio Lighting Match (#f4f4f6)</div>
+    </main>
+
+    <!-- Right Sidebar: Camera, Shading, Pose & Rig Controls -->
+    <aside class="sidebar right">
+      <div>
+        <h2 class="section-title">📷 Camera Presets</h2>
+        <div class="btn-grid">
+          <button class="btn active" id="cam-front" onclick="setCameraPreset('front', this)">🎯 1:1 Ref Front</button>
+          <button class="btn" id="cam-34" onclick="setCameraPreset('threequarter', this)">📐 3/4 Studio</button>
+          <button class="btn" id="cam-side" onclick="setCameraPreset('side', this)">👉 Side Profile</button>
+          <button class="btn" id="cam-back" onclick="setCameraPreset('back', this)">🔄 Back &amp; Tail</button>
+          <button class="btn" id="cam-head" onclick="setCameraPreset('closeup', this)">🔍 Face &amp; Bolt</button>
+          <button class="btn" id="cam-spin" onclick="toggleTurntable(this)">🎠 Auto-Turntable</button>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="section-title">🎨 Shading &amp; Inspection Mode</h2>
+        <div class="btn-grid">
+          <button class="btn active" onclick="setShadingMode('pbr', this)">🧸 PBR Plush</button>
+          <button class="btn" onclick="setShadingMode('wireframe', this)">🕸️ Base Wireframe</button>
+          <button class="btn" onclick="setShadingMode('clay', this)">🗿 Clay Sculpt</button>
+          <button class="btn" onclick="setShadingMode('darkbg', this)">🌙 Dark Studio BG</button>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="section-title">🎬 Blender NLA Animation Clips</h2>
+        <div class="btn-grid">
+          <button class="btn primary" id="btn-fart-anim" onclick="setPoseMode('fart', this)" style="grid-column: span 2; background: linear-gradient(135deg, #16a34a, #9333ea); border-color: #4ce629; justify-content: center; font-size: 0.9rem;">💨💚 Hoppy Fart Blast! (With Toot SFX)</button>
+          <button class="btn active" onclick="setPoseMode('ref', this)">🧍 #012 Ref Pose</button>
+          <button class="btn" onclick="setPoseMode('idle', this)">💨 Idle Breathe</button>
+          <button class="btn" onclick="setPoseMode('walk', this)">🚶 Walk Cycle</button>
+          <button class="btn" onclick="setPoseMode('bounce', this)">⭐ Happy Bounce</button>
+          <button class="btn" onclick="setPoseMode('wave', this)">👋 Wave Paw</button>
+          <button class="btn" onclick="setPoseMode('curious', this)">🤔 Curious Tilt</button>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="section-title">🎛️ Rig Joint Articulation</h2>
+        <div class="slider-row">
+          <label><span>Head Tilt (Yaw / Pitch)</span><span id="val-head">0°</span></label>
+          <input type="range" id="sl-head" min="-35" max="35" value="0" />
+        </div>
+        <div class="slider-row">
+          <label><span>Arm Splay Angle</span><span id="val-arms">39°</span></label>
+          <input type="range" id="sl-arms" min="15" max="85" value="39" />
+        </div>
+        <div class="slider-row">
+          <label><span>Bunny Ear Wiggle</span><span id="val-ears">0°</span></label>
+          <input type="range" id="sl-ears" min="-25" max="25" value="0" />
+        </div>
+        <div class="slider-row">
+          <label><span>Lightning Bolt Swing</span><span id="val-skull">0°</span></label>
+          <input type="range" id="sl-skull" min="-35" max="35" value="0" />
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script type="module">
+    import * as THREE from './models/three.module.min.js';
+    import { buildHoppyHopscotchPlushModel } from './models/hoppy_hopscotch_model.js';
+
+    const container = document.getElementById('viewport-container');
+    const canvas = document.getElementById('viewport-canvas');
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.NoToneMapping;
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xf4f4f6);
+
+    const pmremGen = new THREE.PMREMGenerator(renderer);
+    const envScene = new THREE.Scene();
+    envScene.background = new THREE.Color(0xdbe0e8);
+    const softboxTop = new THREE.Mesh(
+      new THREE.PlaneGeometry(10, 10),
+      new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide })
+    );
+    softboxTop.position.set(0, 6, 4);
+    softboxTop.lookAt(0, 1, 0);
+    envScene.add(softboxTop);
+    const softboxLeft = new THREE.Mesh(
+      new THREE.PlaneGeometry(6, 8),
+      new THREE.MeshBasicMaterial({ color: 0xf8fafc, side: THREE.DoubleSide })
+    );
+    softboxLeft.position.set(-5, 2, 5);
+    softboxLeft.lookAt(0, 1, 0);
+    envScene.add(softboxLeft);
+    scene.environment = pmremGen.fromScene(envScene, 0.04).texture;
+
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0xcbd0db, 1.05);
+    hemiLight.position.set(0, 5, 0);
+    scene.add(hemiLight);
+
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.55);
+    keyLight.position.set(1.4, 3.6, 4.4);
+    keyLight.castShadow = true;
+    keyLight.shadow.mapSize.set(2048, 2048);
+    keyLight.shadow.camera.near = 0.5;
+    keyLight.shadow.camera.far = 12;
+    const d = 1.8;
+    keyLight.shadow.camera.left = -d;
+    keyLight.shadow.camera.right = d;
+    keyLight.shadow.camera.top = d;
+    keyLight.shadow.camera.bottom = -d;
+    keyLight.shadow.bias = -0.0005;
+    scene.add(keyLight);
+
+    const fillLight = new THREE.DirectionalLight(0xeef2f6, 0.85);
+    fillLight.position.set(-2.5, 1.8, 3.0);
+    scene.add(fillLight);
+
+    const rimLight = new THREE.DirectionalLight(0xffffff, 0.75);
+    rimLight.position.set(0, 2.8, -3.5);
+    scene.add(rimLight);
+
+    const shadowCanvas = document.createElement('canvas');
+    shadowCanvas.width = 256;
+    shadowCanvas.height = 256;
+    const sctx = shadowCanvas.getContext('2d');
+    const sgrad = sctx.createRadialGradient(128, 128, 18, 128, 128, 120);
+    sgrad.addColorStop(0, 'rgba(20, 22, 28, 0.34)');
+    sgrad.addColorStop(0.55, 'rgba(20, 22, 28, 0.14)');
+    sgrad.addColorStop(1, 'rgba(20, 22, 28, 0.0)');
+    sctx.fillStyle = sgrad;
+    sctx.fillRect(0, 0, 256, 256);
+    const shadowTex = new THREE.CanvasTexture(shadowCanvas);
+    const groundShadow = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.15, 0.72),
+      new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false })
+    );
+    groundShadow.rotation.x = -Math.PI / 2;
+    groundShadow.position.set(0, 0.002, 0.04);
+    scene.add(groundShadow);
+
+    const hoppy = buildHoppyHopscotchPlushModel(THREE);
+    scene.add(hoppy.root);
+
+    const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 50);
+    let camState = {
+      theta: 0.0,
+      phi: 1.52,
+      radius: 4.95,
+      target: new THREE.Vector3(0, 1.12, 0)
+    };
+    let autoTurntable = false;
+    let poseMode = 'ref';
+    let darkBg = false;
+
+    function updateCamera() {
+      const x = camState.target.x + camState.radius * Math.sin(camState.phi) * Math.sin(camState.theta);
+      const y = camState.target.y + camState.radius * Math.cos(camState.phi);
+      const z = camState.target.z + camState.radius * Math.sin(camState.phi) * Math.cos(camState.theta);
+      camera.position.set(x, y, z);
+      camera.lookAt(camState.target);
+    }
+
+    function resize() {
+      const w = container.clientWidth || 800;
+      const h = container.clientHeight || 600;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      updateCamera();
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    let dragging = false;
+    let prevX = 0, prevY = 0;
+    canvas.addEventListener('pointerdown', e => {
+      dragging = true;
+      prevX = e.clientX;
+      prevY = e.clientY;
+      canvas.setPointerCapture(e.pointerId);
+    });
+    canvas.addEventListener('pointermove', e => {
+      if (!dragging) return;
+      const dx = e.clientX - prevX;
+      const dy = e.clientY - prevY;
+      prevX = e.clientX;
+      prevY = e.clientY;
+      camState.theta -= dx * 0.008;
+      camState.phi = Math.max(0.25, Math.min(2.75, camState.phi - dy * 0.008));
+      updateCamera();
+    });
+    canvas.addEventListener('pointerup', () => { dragging = false; });
+    canvas.addEventListener('wheel', e => {
+      e.preventDefault();
+      camState.radius = Math.max(1.8, Math.min(9.0, camState.radius + e.deltaY * 0.0025));
+      updateCamera();
+    }, { passive: false });
+
+    window.setCameraPreset = (preset, btn) => {
+      document.querySelectorAll('#cam-front,#cam-34,#cam-side,#cam-back,#cam-head').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      if (preset === 'front') {
+        camState = { theta: 0.0, phi: 1.52, radius: 4.95, target: new THREE.Vector3(0, 1.12, 0) };
+      } else if (preset === 'threequarter') {
+        camState = { theta: 0.52, phi: 1.38, radius: 4.95, target: new THREE.Vector3(0, 1.12, 0) };
+      } else if (preset === 'side') {
+        camState = { theta: Math.PI / 2, phi: 1.50, radius: 4.95, target: new THREE.Vector3(0, 1.12, 0) };
+      } else if (preset === 'back') {
+        camState = { theta: Math.PI, phi: 1.50, radius: 4.95, target: new THREE.Vector3(0, 1.12, 0) };
+      } else if (preset === 'closeup') {
+        camState = { theta: 0.0, phi: 1.48, radius: 2.85, target: new THREE.Vector3(0, 1.18, 0.1) };
+      }
+      updateCamera();
+    };
+
+    window.toggleTurntable = (btn) => {
+      autoTurntable = !autoTurntable;
+      if (btn) btn.classList.toggle('active', autoTurntable);
+    };
+
+    const clayMat = new THREE.MeshStandardMaterial({
+      color: 0xd6cfc7,
+      roughness: 0.55,
+      metalness: 0.08
+    });
+    const origMats = new Map();
+    hoppy.root.traverse(obj => {
+      if (obj.isMesh) origMats.set(obj, obj.material);
+    });
+
+    window.setShadingMode = (mode, btn) => {
+      if (mode === 'darkbg') {
+        darkBg = !darkBg;
+        scene.background = new THREE.Color(darkBg ? 0x081810 : 0xf4f4f6);
+        if (btn) btn.classList.toggle('active', darkBg);
+        return;
+      }
+      hoppy.root.traverse(obj => {
+        if (!obj.isMesh) return;
+        const baseM = origMats.get(obj);
+        if (mode === 'pbr') {
+          obj.material = baseM;
+          obj.material.wireframe = false;
+        } else if (mode === 'wireframe') {
+          obj.material = baseM;
+          obj.material.wireframe = true;
+        } else if (mode === 'clay') {
+          obj.material = clayMat;
+          obj.material.wireframe = false;
+        }
+      });
+    };
+
+    let fartStartTime = 0;
+    let audioCtx = null;
+    let lastTootCycle = -1;
+
+    function playCartoonFartSound() {
+      try {
+        if (!audioCtx) {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (!AC) return;
+          audioCtx = new AC();
+        }
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const now = audioCtx.currentTime;
+
+        // 1. Bunny tummy strain squeak (0.05s .. 0.35s)
+        const sqOsc = audioCtx.createOscillator();
+        const sqGain = audioCtx.createGain();
+        sqOsc.type = 'triangle';
+        sqOsc.frequency.setValueAtTime(190, now + 0.05);
+        sqOsc.frequency.exponentialRampToValueAtTime(320, now + 0.35);
+        sqGain.gain.setValueAtTime(0.001, now + 0.05);
+        sqGain.gain.linearRampToValueAtTime(0.14, now + 0.20);
+        sqGain.gain.exponentialRampToValueAtTime(0.001, now + 0.36);
+        sqOsc.connect(sqGain).connect(audioCtx.destination);
+        sqOsc.start(now + 0.05);
+        sqOsc.stop(now + 0.37);
+
+        // 2. Big Brassy Cartoon Raspberry TOOT! (0.40s .. 0.95s)
+        const tootOsc = audioCtx.createOscillator();
+        const modOsc = audioCtx.createOscillator();
+        const modGain = audioCtx.createGain();
+        const tootGain = audioCtx.createGain();
+
+        tootOsc.type = 'sawtooth';
+        tootOsc.frequency.setValueAtTime(135, now + 0.40);
+        tootOsc.frequency.exponentialRampToValueAtTime(65, now + 0.78);
+        tootOsc.frequency.exponentialRampToValueAtTime(168, now + 0.94);
+
+        modOsc.type = 'sine';
+        modOsc.frequency.setValueAtTime(32, now + 0.40);
+        modGain.gain.setValueAtTime(38, now + 0.40);
+        modOsc.connect(tootOsc.frequency);
+
+        tootGain.gain.setValueAtTime(0.001, now + 0.40);
+        tootGain.gain.linearRampToValueAtTime(0.32, now + 0.45);
+        tootGain.gain.setValueAtTime(0.28, now + 0.80);
+        tootGain.gain.exponentialRampToValueAtTime(0.001, now + 0.96);
+
+        tootOsc.connect(tootGain).connect(audioCtx.destination);
+        tootOsc.start(now + 0.40);
+        modOsc.start(now + 0.40);
+        tootOsc.stop(now + 0.97);
+        modOsc.stop(now + 0.97);
+
+        // 3. Cute energetic bunny giggle (1.00s, 1.13s, 1.26s)
+        [659.25, 783.99, 987.77].forEach((freq, idx) => {
+          const gOsc = audioCtx.createOscillator();
+          const gGain = audioCtx.createGain();
+          const t0 = now + 1.00 + idx * 0.13;
+          gOsc.type = 'sine';
+          gOsc.frequency.setValueAtTime(freq, t0);
+          gGain.gain.setValueAtTime(0.001, t0);
+          gGain.gain.linearRampToValueAtTime(0.16, t0 + 0.02);
+          gGain.gain.exponentialRampToValueAtTime(0.001, t0 + 0.11);
+          gOsc.connect(gGain).connect(audioCtx.destination);
+          gOsc.start(t0);
+          gOsc.stop(t0 + 0.12);
+        });
+      } catch (e) {}
+    }
+
+    window.setPoseMode = (mode, btn) => {
+      poseMode = mode;
+      if (btn) {
+        btn.parentElement.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      hoppy.bodyRig.position.set(0, 0, 0);
+      hoppy.bodyRig.rotation.set(0, 0, 0);
+      hoppy.headGroup.rotation.set(0, 0, 0);
+      hoppy.jawGroup.position.set(0, 0, 0);
+      hoppy.leftArmGroup.rotation.set(0, 0, -0.68);
+      hoppy.rightArmGroup.rotation.set(0, 0, 0.68);
+      hoppy.leftLegGroup.rotation.set(0, 0, -0.08);
+      hoppy.rightLegGroup.rotation.set(0, 0, 0.08);
+      hoppy.skullPendantGroup.rotation.set(-0.08, 0, 0);
+      if (hoppy.fartCloudGroup) {
+        hoppy.fartCloudGroup.visible = (mode === 'fart');
+      }
+      if (mode === 'fart') {
+        fartStartTime = clock.getElapsedTime();
+        lastTootCycle = 0;
+        camState = { theta: -0.96, phi: 1.44, radius: 4.85, target: new THREE.Vector3(0, 1.05, -0.18) };
+        updateCamera();
+        playCartoonFartSound();
+      }
+    };
+
+    const slHead = document.getElementById('sl-head');
+    const slArms = document.getElementById('sl-arms');
+    const slEars = document.getElementById('sl-ears');
+    const slSkull = document.getElementById('sl-skull');
+
+    slHead.addEventListener('input', () => {
+      const deg = Number(slHead.value);
+      document.getElementById('val-head').textContent = deg + '°';
+      hoppy.headGroup.rotation.y = THREE.MathUtils.degToRad(deg);
+      hoppy.headGroup.rotation.z = THREE.MathUtils.degToRad(deg * 0.25);
+    });
+    slArms.addEventListener('input', () => {
+      const deg = Number(slArms.value);
+      document.getElementById('val-arms').textContent = deg + '°';
+      const rad = THREE.MathUtils.degToRad(deg);
+      hoppy.leftArmGroup.rotation.z = -rad;
+      hoppy.rightArmGroup.rotation.z = rad;
+    });
+    slEars.addEventListener('input', () => {
+      const deg = Number(slEars.value);
+      document.getElementById('val-ears').textContent = deg + '°';
+      const rad = THREE.MathUtils.degToRad(deg);
+      hoppy.leftEarGroup.rotation.z = 0.07 + rad;
+      hoppy.rightEarGroup.rotation.z = -0.32 - rad;
+    });
+    slSkull.addEventListener('input', () => {
+      const deg = Number(slSkull.value);
+      document.getElementById('val-skull').textContent = deg + '°';
+      hoppy.skullPendantGroup.rotation.z = THREE.MathUtils.degToRad(deg);
+    });
+
+    const clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+      const t = clock.getElapsedTime();
+
+      if (autoTurntable) {
+        camState.theta += 0.012;
+        updateCamera();
+      }
+
+      if (poseMode === 'idle') {
+        hoppy.bodyRig.position.y = Math.sin(t * 2.4) * 0.014;
+        hoppy.headGroup.rotation.z = Math.sin(t * 1.6) * 0.04;
+        hoppy.leftEarGroup.rotation.z = 0.07 + Math.sin(t * 3.2) * 0.06;
+        hoppy.rightEarGroup.rotation.z = -0.32 - Math.sin(t * 3.2) * 0.06;
+        hoppy.skullPendantGroup.rotation.z = Math.sin(t * 2.4) * 0.07;
+      } else if (poseMode === 'walk') {
+        const ph = t * 5.8;
+        hoppy.bodyRig.position.y = Math.abs(Math.sin(ph)) * 0.055;
+        hoppy.bodyRig.rotation.z = Math.cos(ph) * 0.05;
+        hoppy.bodyRig.rotation.y = Math.sin(ph) * 0.08;
+        hoppy.leftLegGroup.rotation.x = Math.sin(ph) * 0.36;
+        hoppy.rightLegGroup.rotation.x = -Math.sin(ph) * 0.36;
+        hoppy.leftArmGroup.rotation.x = -Math.sin(ph) * 0.25;
+        hoppy.rightArmGroup.rotation.x = Math.sin(ph) * 0.25;
+        hoppy.skullPendantGroup.rotation.z = Math.sin(ph) * 0.14;
+      } else if (poseMode === 'bounce') {
+        hoppy.bodyRig.position.y = Math.abs(Math.sin(t * 5.4)) * 0.12;
+        hoppy.headGroup.rotation.x = Math.sin(t * 5.4) * 0.09;
+        hoppy.leftArmGroup.rotation.z = -0.68 - Math.sin(t * 5.4) * 0.28;
+        hoppy.rightArmGroup.rotation.z = 0.68 + Math.sin(t * 5.4) * 0.28;
+        hoppy.skullPendantGroup.rotation.x = -Math.abs(Math.cos(t * 5.4)) * 0.22;
+      } else if (poseMode === 'wave') {
+        hoppy.rightArmGroup.rotation.z = 2.15 + Math.sin(t * 7.2) * 0.30;
+        hoppy.headGroup.rotation.z = -0.10 + Math.sin(t * 3.6) * 0.06;
+        hoppy.skullPendantGroup.rotation.z = Math.sin(t * 3.6) * 0.09;
+      } else if (poseMode === 'curious') {
+        hoppy.headGroup.rotation.z = Math.sin(t * 2.4) * 0.18;
+        hoppy.headGroup.rotation.y = Math.cos(t * 2.4) * 0.15;
+        hoppy.leftEarGroup.rotation.z = 0.07 + Math.sin(t * 4.8) * 0.14;
+        hoppy.rightEarGroup.rotation.z = -0.32 - Math.sin(t * 4.8) * 0.14;
+        hoppy.skullPendantGroup.rotation.z = Math.sin(t * 2.4) * 0.10;
+      } else if (poseMode === 'fart') {
+        const elapsed = t - fartStartTime;
+        const cycle = Math.floor(elapsed / 1.5);
+        const u = (elapsed % 1.5);
+        if (cycle > lastTootCycle && cycle < 6) {
+          lastTootCycle = cycle;
+          playCartoonFartSound();
+        }
+        hoppy.fartCloudGroup.visible = true;
+
+        if (u < 0.38) {
+          // Act 1: Deep Bunny Squat & Strain
+          const p = u / 0.38;
+          const tremble = (u > 0.16) ? Math.sin(u * 95.0) * 0.018 : 0;
+          hoppy.bodyRig.position.set(tremble, -0.13 * p, -0.04 * p);
+          hoppy.bodyRig.rotation.set(0.32 * p, 0, tremble * 2.0);
+          hoppy.headGroup.rotation.set(0.24 * p, -0.10 * p, tremble * 3.0);
+          hoppy.leftArmGroup.rotation.set(0.28 * p, 0, -0.38);
+          hoppy.rightArmGroup.rotation.set(0.28 * p, 0, 0.38);
+          hoppy.leftLegGroup.rotation.x = -0.30 * p;
+          hoppy.rightLegGroup.rotation.x = -0.30 * p;
+          hoppy.leftEarGroup.rotation.z = 0.07 - 0.35 * p;
+          hoppy.rightEarGroup.rotation.z = -0.32 + 0.35 * p;
+          hoppy.skullPendantGroup.rotation.set(-0.08 - 0.24 * p, 0, tremble * 4.0);
+          const s1 = (u > 0.32) ? ((u - 0.32) / 0.06) * 0.35 : 0.001;
+          hoppy.fartStage1.scale.setScalar(s1);
+          hoppy.fartStage2.scale.setScalar(0.001);
+          hoppy.fartStage3.scale.setScalar(0.001);
+        } else if (u < 1.00) {
+          // Acts 2 & 3: High-Altitude Bunny Rocket Recoil Jump + Mid-Air Hop & Green Cloud!
+          const p = (u - 0.38) / 0.62;
+          const jumpArc = Math.sin(p * Math.PI);
+          hoppy.bodyRig.position.set(0, 0.22 * jumpArc, 0.08 * jumpArc);
+          hoppy.bodyRig.rotation.set(0.28 * (1 - 0.65 * p), 0, 0);
+          hoppy.headGroup.rotation.set(-0.24 * jumpArc, -0.26 * jumpArc, 0.12 * jumpArc);
+          hoppy.leftArmGroup.rotation.set(-0.24 * jumpArc, 0, -0.68 - 0.52 * jumpArc);
+          hoppy.rightArmGroup.rotation.set(-0.24 * jumpArc, 0, 0.68 + 0.52 * jumpArc);
+          hoppy.leftLegGroup.rotation.x = 0.30 * jumpArc;
+          hoppy.rightLegGroup.rotation.x = 0.30 * jumpArc;
+          hoppy.leftEarGroup.rotation.z = 0.07 + 0.38 * jumpArc;
+          hoppy.rightEarGroup.rotation.z = -0.32 - 0.38 * jumpArc;
+          hoppy.skullPendantGroup.rotation.set(-0.52 * jumpArc, 0, Math.sin(p * 18.0) * 0.16);
+
+          const s1 = Math.max(0.001, Math.sin(Math.min(1, p * 1.3) * Math.PI) * 1.35);
+          const s2 = Math.max(0.001, Math.sin(Math.pow(p, 0.75) * Math.PI * 0.88) * 1.50);
+          const s3 = Math.max(0.001, Math.sin(Math.pow(Math.max(0, p - 0.12) / 0.88, 0.8) * Math.PI * 0.75) * 1.45);
+          hoppy.fartStage1.scale.setScalar(s1);
+          hoppy.fartStage1.position.set(0, 0.56 + 0.10 * p, -0.28 - 0.22 * p);
+          hoppy.fartStage1.rotation.z = p * 2.2;
+
+          hoppy.fartStage2.scale.setScalar(s2);
+          hoppy.fartStage2.position.set(0, 0.60 + 0.22 * p, -0.54 - 0.34 * p);
+          hoppy.fartStage2.rotation.z = -p * 0.8;
+
+          hoppy.fartStage3.scale.setScalar(s3);
+          hoppy.fartStage3.position.set(0, 0.70 + 0.32 * p, -0.86 - 0.42 * p);
+          hoppy.fartStage3.rotation.y = p * 0.6;
+        } else {
+          // Act 4: Turn to Camera, Paw-Fanning Cloud Behind Back & Energetic Bunny Giggle!
+          const p = (u - 1.00) / 0.50;
+          const fanWave = Math.sin(p * Math.PI * 6.0);
+          const fade = Math.max(0.001, 1.0 - p);
+          hoppy.bodyRig.position.set(0, Math.abs(fanWave) * 0.03 * fade, 0);
+          hoppy.bodyRig.rotation.set(0.04 * fade, 0, 0);
+          hoppy.headGroup.rotation.set(-0.08 * Math.abs(fanWave) * fade, -0.28 * fade, 0.16 * fanWave * fade);
+          hoppy.rightArmGroup.rotation.set(0.58 * fade + 0.30 * fanWave * fade, 0, 0.65 + 0.26 * fanWave * fade);
+          hoppy.leftArmGroup.rotation.set(-0.14 * fade, 0, -0.68 - 0.20 * Math.abs(fanWave) * fade);
+          hoppy.leftLegGroup.rotation.x = 0;
+          hoppy.rightLegGroup.rotation.x = 0;
+          hoppy.skullPendantGroup.rotation.set(-0.08 - 0.14 * Math.abs(fanWave) * fade, 0, 0.16 * fanWave * fade);
+
+          hoppy.fartStage1.scale.setScalar(Math.max(0.001, 0.25 * (1.0 - p * 2.0)));
+          hoppy.fartStage2.scale.setScalar(Math.max(0.001, 1.15 * Math.pow(fade, 1.4)));
+          hoppy.fartStage2.position.set(0, 0.82 + 0.26 * p, -0.88 - 0.28 * p);
+          hoppy.fartStage3.scale.setScalar(Math.max(0.001, 1.30 * Math.pow(fade, 1.1)));
+          hoppy.fartStage3.position.set(0, 1.02 + 0.34 * p, -1.28 - 0.32 * p);
+        }
+      }
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    let meshCount = 0, triCount = 0;
+    hoppy.root.traverse(o => {
+      if (o.isMesh && o.geometry) {
+        meshCount++;
+        const idx = o.geometry.index;
+        triCount += idx ? (idx.count / 3) : (o.geometry.attributes.position.count / 3);
+      }
+    });
+
+    window.__hoppyStudio = { scene, camera, renderer, hoppy };
+    window.__HOPPY_3D = { scene, camera, renderer, hoppy, stats: { meshes: meshCount, triangles: Math.round(triCount) } };
+  </script>
+</body>
+</html>

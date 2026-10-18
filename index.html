@@ -30,8 +30,7 @@
       border-bottom: 1px solid rgba(255,255,255,0.12);
       background: rgba(18, 9, 36, 0.85);
       backdrop-filter: blur(12px);
-      position: sticky;
-      top: 0;
+      position: relative;
       z-index: 20;
     }
     h1 { margin: 0 0 8px; font-size: 1.65rem; color: #fff; }
@@ -180,25 +179,239 @@
   <header>
     <h1>🌙✨ Smiling Critters High-Resolution Asset Library (素材库)</h1>
     <p class="subtitle">318 Verified High-Res Character Renders, Cutouts, Plushies, 107 CatNap (100 Pinterest Originals), 105 Baba Chops &amp; Mom's Custom Smiling Critters — Tap any picture to view or save on iPad</p>
-    <div style="margin: 14px auto; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-      <a href="baba-chops-3d.html" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:999px;background:linear-gradient(135deg,#ec4899,#8b5cf6);color:#fff;font-weight:800;font-size:0.92rem;text-decoration:none;box-shadow:0 4px 16px rgba(236,72,153,0.45);border:1px solid rgba(255,255,255,0.3);">🐑💀 Open Baba Chops 3D Studio &amp; Fart Animation (`baba-chops-3d.html`)</a>
-      <a href="animations/baba_chops_fart_animation.mp4" download style="display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:999px;background:linear-gradient(135deg,#16a34a,#7c3aed);color:#fff;font-weight:800;font-size:0.88rem;text-decoration:none;border:1px solid #4ce629;box-shadow:0 4px 14px rgba(76,230,41,0.35);">💨💚 Download Baba Fart Animation (.MP4 + Toot Audio)</a>
-      <a href="models/baba_chops_plush_base_model.blend" download style="display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:999px;background:rgba(249,115,22,0.22);color:#fed7aa;font-weight:700;font-size:0.85rem;text-decoration:none;border:1px solid rgba(249,115,22,0.45);">🟧 Download .BLEND (Blender 4.3 Master + 25-Bone Rig)</a>
-      <a href="models/baba_chops_plush_base_model.glb" download style="display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:999px;background:rgba(255,255,255,0.12);color:#e9d5ff;font-weight:700;font-size:0.85rem;text-decoration:none;border:1px solid rgba(255,255,255,0.2);">⬇️ Download .GLB (Rigged + 6 Clips)</a>
-      <a href="catalog/by_character.json" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:999px;background:rgba(255,255,255,0.12);color:#fde047;font-weight:700;font-size:0.85rem;text-decoration:none;border:1px solid rgba(250,204,21,0.35);">🗂️ Organized Catalog (`catalog/by_character.json`)</a>
-    </div>
-    <div style="max-width:980px;margin:12px auto 14px;padding:14px 18px;border-radius:18px;background:rgba(31,17,60,0.88);border:1px solid rgba(76,230,41,0.45);display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:18px;">
-      <img src="animations/baba_chops_fart_animation.gif" alt="Baba Chops Fart Animation" style="width:150px;height:150px;border-radius:14px;border:2px solid #4ce629;object-fit:cover;" />
-      <img src="animations/baba_chops_fart_storyboard.png" alt="Baba Chops Fart 4-Act Storyboard" style="max-width:520px;width:100%;border-radius:12px;border:1px solid rgba(255,255,255,0.2);" />
-      <div style="text-align:left;max-width:240px;">
-        <div style="font-weight:800;color:#4ce629;font-size:0.95rem;margin-bottom:4px;">💨💚 NEW: Baba Chops Fart Animation!</div>
-        <div style="font-size:0.78rem;color:#cbd5e1;line-height:1.45;margin-bottom:8px;">Rendered in Blender 4.3 Cycles (36 frames @ 24fps): Squat &amp; Strain → Big Green/Purple 3D Fart Cloud Blast → Rocket Jump → Hoof Waft &amp; Giggle!</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <a href="animations/baba_chops_fart_animation.mp4" download class="btn primary" style="background:#16a34a;padding:6px 10px;">🔊 MP4 + Sound</a>
-          <a href="baba-chops-3d.html" class="btn primary" style="padding:6px 10px;">🎮 Interactive 3D</a>
+    <details open style="max-width:1360px;margin:10px auto 14px;background:rgba(15,7,32,0.75);border:1px solid rgba(168,85,247,0.4);border-radius:16px;padding:12px 14px;">
+      <summary style="cursor:pointer;font-weight:800;font-size:0.96rem;color:#fde047;outline:none;">
+        🎮💨 Interactive 3D Plush Base Model Studios &amp; Blender 4.3 Cycles Fart Blast Animations (All 9 Characters — Tap to Collapse/Expand)
+      </summary>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(275px,1fr));gap:10px;margin-top:12px;">
+        
+        <div style="background:rgba(31,17,60,0.92);border:1px solid #a855f7;border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:7px;text-align:left;box-shadow:0 6px 18px rgba(0,0,0,0.35);">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+            <span style="font-weight:800;font-size:0.9rem;color:#fff;">🐑💀 Baba Chops</span>
+            <span style="font-size:0.68rem;padding:2px 7px;border-radius:999px;background:rgba(76,230,41,0.18);color:#86efac;border:1px solid rgba(76,230,41,0.4);">25-Bone 3D + Fart</span>
+          </div>
+          <div style="display:grid;grid-template-columns:92px 1fr;gap:8px;align-items:center;">
+            <a href="baba-chops-3d.html" title="Open Baba Chops 3D Studio">
+              <img src="animations/baba_chops_fart_animation.gif" alt="Baba Chops Fart Blast GIF" style="width:92px;height:92px;border-radius:10px;border:2px solid #4ce629;object-fit:cover;display:block;" loading="lazy" />
+            </a>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <a href="models/baba_chops_3d_preview.png" target="_blank" title="View 4-Panel Turnaround Sheet">
+                <img src="models/baba_chops_3d_preview.png" alt="Baba Chops 3D Preview" style="width:100%;height:52px;object-fit:cover;border-radius:7px;border:1px solid rgba(255,255,255,0.2);display:block;" loading="lazy" />
+              </a>
+              <a href="animations/baba_chops_fart_storyboard.png" target="_blank" title="View 4-Act Fart Storyboard">
+                <img src="animations/baba_chops_fart_storyboard.png" alt="Baba Chops Fart Storyboard" style="width:100%;height:36px;object-fit:cover;border-radius:6px;border:1px solid rgba(76,230,41,0.35);display:block;" loading="lazy" />
+              </a>
+            </div>
+          </div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:2px;">
+            <a href="baba-chops-3d.html" class="btn primary" style="background:linear-gradient(135deg,#ec4899,#7c3aed);padding:5px 8px;font-size:0.74rem;">🎮 3D Studio</a>
+            <a href="animations/baba_chops_fart_animation.mp4" download class="btn primary" style="background:#16a34a;padding:5px 8px;font-size:0.74rem;">🔊 Fart MP4</a>
+            <a href="models/baba_chops_plush_base_model.glb" download class="btn" style="padding:5px 7px;font-size:0.72rem;flex:0 0 auto;">.GLB</a>
+            <a href="models/baba_chops_plush_base_model.blend" download class="btn" style="padding:5px 7px;font-size:0.72rem;flex:0 0 auto;">.BLEND</a>
+          </div>
+        </div>
+        <div style="background:rgba(31,17,60,0.92);border:1px solid #9333ea;border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:7px;text-align:left;box-shadow:0 6px 18px rgba(0,0,0,0.35);">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+            <span style="font-weight:800;font-size:0.9rem;color:#fff;">🐱🌙 CatNap</span>
+            <span style="font-size:0.68rem;padding:2px 7px;border-radius:999px;background:rgba(76,230,41,0.18);color:#86efac;border:1px solid rgba(76,230,41,0.4);">25-Bone 3D + Fart</span>
+          </div>
+          <div style="display:grid;grid-template-columns:92px 1fr;gap:8px;align-items:center;">
+            <a href="catnap-3d.html" title="Open CatNap 3D Studio">
+              <img src="animations/catnap_fart_animation.gif" alt="CatNap Fart Blast GIF" style="width:92px;height:92px;border-radius:10px;border:2px solid #4ce629;object-fit:cover;display:block;" loading="lazy" />
+            </a>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <a href="models/catnap_3d_preview.png" target="_blank" title="View 4-Panel Turnaround Sheet">
+                <img src="models/catnap_3d_preview.png" alt="CatNap 3D Preview" style="width:100%;height:52px;object-fit:cover;border-radius:7px;border:1px solid rgba(255,255,255,0.2);display:block;" loading="lazy" />
+              </a>
+              <a href="animations/catnap_fart_storyboard.png" target="_blank" title="View 4-Act Fart Storyboard">
+                <img src="animations/catnap_fart_storyboard.png" alt="CatNap Fart Storyboard" style="width:100%;height:36px;object-fit:cover;border-radius:6px;border:1px solid rgba(76,230,41,0.35);display:block;" loading="lazy" />
+              </a>
+            </div>
+          </div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:2px;">
+            <a href="catnap-3d.html" class="btn primary" style="background:linear-gradient(135deg,#ec4899,#7c3aed);padding:5px 8px;font-size:0.74rem;">🎮 3D Studio</a>
+            <a href="animations/catnap_fart_animation.mp4" download class="btn primary" style="background:#16a34a;padding:5px 8px;font-size:0.74rem;">🔊 Fart MP4</a>
+            <a href="models/catnap_plush_base_model.glb" download class="btn" style="padding:5px 7px;font-size:0.72rem;flex:0 0 auto;">.GLB</a>
+            <a href="models/catnap_plush_base_model.blend" download class="btn" style="padding:5px 7px;font-size:0.72rem;flex:0 0 auto;">.BLEND</a>
+          </div>
+        </div>
+        <div style="background:rgba(31,17,60,0.92);border:1px solid #f97316;border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:7px;text-align:left;box-shadow:0 6px 18px rgba(0,0,0,0.35);">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+            <span style="font-weight:800;font-size:0.9rem;color:#fff;">🐶☀️ DogDay</span>
+            <span style="font-size:0.68rem;padding:2px 7px;border-radius:999px;background:rgba(76,230,41,0.18);color:#86efac;border:1px solid rgba(76,230,41,0.4);">25-Bone 3D + Fart</span>
+          </div>
+          <div style="display:grid;grid-template-columns:92px 1fr;gap:8px;align-items:center;">
+            <a href="dogday-3d.html" title="Open DogDay 3D Studio">
+              <img src="animations/dogday_fart_animation.gif" alt="DogDay Fart Blast GIF" style="width:92px;height:92px;border-radius:10px;border:2px solid #4ce629;object-fit:cover;display:block;" loading="lazy" />
+            </a>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <a href="models/dogday_3d_preview.png" target="_blank" title="View 4-Panel Turnaround Sheet">
+                <img src="models/dogday_3d_preview.png" alt="DogDay 3D Preview" style="width:100%;height:52px;object-fit:cover;border-radius:7px;border:1px solid rgba(255,255,255,0.2);display:block;" loading="lazy" />
+              </a>
+              <a href="animations/dogday_fart_storyboard.png" target="_blank" title="View 4-Act Fart Storyboard">
+                <img src="animations/dogday_fart_storyboard.png" alt="DogDay Fart Storyboard" style="width:100%;height:36px;object-fit:cover;border-radius:6px;border:1px solid rgba(76,230,41,0.35);display:block;" loading="lazy" />
+              </a>
+            </div>
+          </div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:2px;">
+            <a href="dogday-3d.html" class="btn primary" style="background:linear-gradient(135deg,#ec4899,#7c3aed);padding:5px 8px;font-size:0.74rem;">🎮 3D Studio</a>
+            <a href="animations/dogday_fart_animation.mp4" download class="btn primary" style="background:#16a34a;padding:5px 8px;font-size:0.74rem;">🔊 Fart MP4</a>
+            <a href="models/dogday_plush_base_model.glb" download class="btn" style="padding:5px 7px;font-size:0.72rem;flex:0 0 auto;">.GLB</a>
+            <a href="models/dogday_plush_base_model.blend" download class="btn" style="padding:5px 7px;font-size:0.72rem;flex:0 0 auto;">.BLEND</a>
+          </div>
+        </div>
+        <div style="background:rgba(31,17,60,0.92);border:1px solid #e11d48;border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:7px;text-align:left;box-shadow:0 6px 18px rgba(0,0,0,0.35);">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+            <span style="font-weight:800;font-size:0.9rem;color:#fff;">🐻❤️ Bobby BearHug</span>
+            <span style="font-size:0.68rem;padding:2px 7px;border-radius:999px;background:rgba(76,230,41,0.18);color:#86efac;border:1px solid rgba(76,230,41,0.4);">25-Bone 3D + Fart</span>
+          </div>
+          <div style="display:grid;grid-template-columns:92px 1fr;gap:8px;align-items:center;">
+            <a href="bobby-bearhug-3d.html" title="Open Bobby BearHug 3D Studio">
+              <img src="animations/bobby_bearhug_fart_animation.gif" alt="Bobby BearHug Fart Blast GIF" style="width:92px;height:92px;border-radius:10px;border:2px solid #4ce629;object-fit:cover;display:block;" loading="lazy" />
+            </a>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <a href="models/bobby_bearhug_3d_preview.png" target="_blank" title="View 4-Panel Turnaround Sheet">
+                <img src="models/bobby_bearhug_3d_preview.png" alt="Bobby BearHug 3D Preview" style="width:100%;height:52px;object-fit:cover;border-radius:7px;border:1px solid rgba(255,255,255,0.2);display:block;" loading="lazy" />
+              </a>
+              <a href="animations/bobby_bearhug_fart_storyboard.png" target="_blank" title="View 4-Act Fart Storyboard">
+                <img src="animations/bobby_bearhug_fart_storyboard.png" alt="Bobby BearHug Fart Storyboard" style="width:100%;height:36px;object-fit:cover;border-radius:6px;border:1px solid rgba(76,230,41,0.35);display:block;" loading="lazy" />
+              </a>
+            </div>
+          </div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:2px;">
+            <a href="bobby-bearhug-3d.html" class="btn primary" style="background:linear-gradient(135deg,#ec4899,#7c3aed);padding:5px 8px;font-size:0.74rem;">🎮 3D Studio</a>
+            <a href="animations/bobby_bearhug_fart_animation.mp4" download class="btn primary" style="background:#16a34a;padding:5px 8px;font-size:0.74rem;">🔊 Fart MP4</a>
+            <a href="models/bobby_bearhug_plush_base_model.glb" download class="btn" style="padding:5px 7px;font-size:0.72rem;flex:0 0 auto;">.GLB</a>
+            <a href="models/bobby_bearhug_plush_base_model.blend" download class="btn" style="padding:5px 7px;font-size:0.72rem;flex:0 0 auto;">.BLEND</a>
+          </div>
+        </div>
+        <div style="background:rgba(31,17,60,0.92);border:1px solid #0ea5e9;border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:7px;text-align:left;box-shadow:0 6px 18px rgba(0,0,0,0.35);">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+            <span style="font-weight:800;font-size:0.9rem;color:#fff;">🐘💡 Bubba Bubbaphant</span>
+            <span style="font-size:0.68rem;padding:2px 7px;border-radius:999px;background:rgba(76,230,41,0.18);color:#86efac;border:1px solid rgba(76,230,41,0.4);">25-Bone 3D + Fart</span>
+          </div>
+          <div style="display:grid;grid-template-columns:92px 1fr;gap:8px;align-items:center;">
+            <a href="bubba-bubbaphant-3d.html" title="Open Bubba Bubbaphant 3D Studio">
+              <img src="animations/bubba_bubbaphant_fart_animation.gif" alt="Bubba Bubbaphant Fart Blast GIF" style="width:92px;height:92px;border-radius:10px;border:2px solid #4ce629;object-fit:cover;display:block;" loading="lazy" />
+            </a>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <a href="models/bubba_bubbaphant_3d_preview.png" target="_blank" title="View 4-Panel Turnaround Sheet">
+                <img src="models/bubba_bubbaphant_3d_preview.png" alt="Bubba Bubbaphant 3D Preview" style="width:100%;height:52px;object-fit:cover;border-radius:7px;border:1px solid rgba(255,255,255,0.2);display:block;" loading="lazy" />
+              </a>
+              <a href="animations/bubba_bubbaphant_fart_storyboard.png" target="_blank" title="View 4-Act Fart Storyboard">
+                <img src="animations/bubba_bubbaphant_fart_storyboard.png" alt="Bubba Bubbaphant Fart Storyboard" style="width:100%;height:36px;object-fit:cover;border-radius:6px;border:1px solid rgba(76,230,41,0.35);display:block;" loading="lazy" />
+              </a>
+            </div>
+          </div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:2px;">
+            <a href="bubba-bubbaphant-3d.html" class="btn primary" style="background:linear-gradient(135deg,#ec4899,#7c3aed);padding:5px 8px;font-size:0.74rem;">🎮 3D Studio</a>
+            <a href="animations/bubba_bubbaphant_fart_animation.mp4" download class="btn primary" style="background:#16a34a;padding:5px 8px;font-size:0.74rem;">🔊 Fart MP4</a>
+            <a href="models/bubba_bubbaphant_plush_base_model.glb" download class="btn" style="padding:5px 7px;font-size:0.72rem;flex:0 0 auto;">.GLB</a>
+            <a href="models/bubba_bubbaphant_plush_base_model.blend" download class="btn" style="padding:5px 7px;font-size:0.72rem;flex:0 0 auto;">.BLEND</a>
+          </div>
+        </div>
+        <div style="background:rgba(31,17,60,0.92);border:1px solid #06b6d4;border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:7px;text-align:left;box-shadow:0 6px 18px rgba(0,0,0,0.35);">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+            <span style="font-weight:800;font-size:0.9rem;color:#fff;">🦄🌈 CraftyCorn</span>
+            <span style="font-size:0.68rem;padding:2px 7px;border-radius:999px;background:rgba(76,230,41,0.18);color:#86efac;border:1px solid rgba(76,230,41,0.4);">25-Bone 3D + Fart</span>
+          </div>
+          <div style="display:grid;grid-template-columns:92px 1fr;gap:8px;align-items:center;">
+            <a href="craftycorn-3d.html" title="Open CraftyCorn 3D Studio">
+              <img src="animations/craftycorn_fart_animation.gif" alt="CraftyCorn Fart Blast GIF" style="width:92px;height:92px;border-radius:10px;border:2px solid #4ce629;object-fit:cover;display:block;" loading="lazy" />
+            </a>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <a href="models/craftycorn_3d_preview.png" target="_blank" title="View 4-Panel Turnaround Sheet">
+                <img src="models/craftycorn_3d_preview.png" alt="CraftyCorn 3D Preview" style="width:100%;height:52px;object-fit:cover;border-radius:7px;border:1px solid rgba(255,255,255,0.2);display:block;" loading="lazy" />
+              </a>
+              <a href="animations/craftycorn_fart_storyboard.png" target="_blank" title="View 4-Act Fart Storyboard">
+                <img src="animations/craftycorn_fart_storyboard.png" alt="CraftyCorn Fart Storyboard" style="width:100%;height:36px;object-fit:cover;border-radius:6px;border:1px solid rgba(76,230,41,0.35);display:block;" loading="lazy" />
+              </a>
+            </div>
+          </div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:2px;">
+            <a href="craftycorn-3d.html" class="btn primary" style="background:linear-gradient(135deg,#ec4899,#7c3aed);padding:5px 8px;font-size:0.74rem;">🎮 3D Studio</a>
+            <a href="animations/craftycorn_fart_animation.mp4" download class="btn primary" style="background:#16a34a;padding:5px 8px;font-size:0.74rem;">🔊 Fart MP4</a>
+            <a href="models/craftycorn_plush_base_model.glb" download class="btn" style="padding:5px 7px;font-size:0.72rem;flex:0 0 auto;">.GLB</a>
+            <a href="models/craftycorn_plush_base_model.blend" download class="btn" style="padding:5px 7px;font-size:0.72rem;flex:0 0 auto;">.BLEND</a>
+          </div>
+        </div>
+        <div style="background:rgba(31,17,60,0.92);border:1px solid #22c55e;border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:7px;text-align:left;box-shadow:0 6px 18px rgba(0,0,0,0.35);">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+            <span style="font-weight:800;font-size:0.9rem;color:#fff;">🐰⚡ Hoppy Hopscotch</span>
+            <span style="font-size:0.68rem;padding:2px 7px;border-radius:999px;background:rgba(76,230,41,0.18);color:#86efac;border:1px solid rgba(76,230,41,0.4);">25-Bone 3D + Fart</span>
+          </div>
+          <div style="display:grid;grid-template-columns:92px 1fr;gap:8px;align-items:center;">
+            <a href="hoppy-hopscotch-3d.html" title="Open Hoppy Hopscotch 3D Studio">
+              <img src="animations/hoppy_hopscotch_fart_animation.gif" alt="Hoppy Hopscotch Fart Blast GIF" style="width:92px;height:92px;border-radius:10px;border:2px solid #4ce629;object-fit:cover;display:block;" loading="lazy" />
+            </a>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <a href="models/hoppy_hopscotch_3d_preview.png" target="_blank" title="View 4-Panel Turnaround Sheet">
+                <img src="models/hoppy_hopscotch_3d_preview.png" alt="Hoppy Hopscotch 3D Preview" style="width:100%;height:52px;object-fit:cover;border-radius:7px;border:1px solid rgba(255,255,255,0.2);display:block;" loading="lazy" />
+              </a>
+              <a href="animations/hoppy_hopscotch_fart_storyboard.png" target="_blank" title="View 4-Act Fart Storyboard">
+                <img src="animations/hoppy_hopscotch_fart_storyboard.png" alt="Hoppy Hopscotch Fart Storyboard" style="width:100%;height:36px;object-fit:cover;border-radius:6px;border:1px solid rgba(76,230,41,0.35);display:block;" loading="lazy" />
+              </a>
+            </div>
+          </div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:2px;">
+            <a href="hoppy-hopscotch-3d.html" class="btn primary" style="background:linear-gradient(135deg,#ec4899,#7c3aed);padding:5px 8px;font-size:0.74rem;">🎮 3D Studio</a>
+            <a href="animations/hoppy_hopscotch_fart_animation.mp4" download class="btn primary" style="background:#16a34a;padding:5px 8px;font-size:0.74rem;">🔊 Fart MP4</a>
+            <a href="models/hoppy_hopscotch_plush_base_model.glb" download class="btn" style="padding:5px 7px;font-size:0.72rem;flex:0 0 auto;">.GLB</a>
+            <a href="models/hoppy_hopscotch_plush_base_model.blend" download class="btn" style="padding:5px 7px;font-size:0.72rem;flex:0 0 auto;">.BLEND</a>
+          </div>
+        </div>
+        <div style="background:rgba(31,17,60,0.92);border:1px solid #eab308;border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:7px;text-align:left;box-shadow:0 6px 18px rgba(0,0,0,0.35);">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+            <span style="font-weight:800;font-size:0.9rem;color:#fff;">🐓⭐ KickinChicken</span>
+            <span style="font-size:0.68rem;padding:2px 7px;border-radius:999px;background:rgba(76,230,41,0.18);color:#86efac;border:1px solid rgba(76,230,41,0.4);">25-Bone 3D + Fart</span>
+          </div>
+          <div style="display:grid;grid-template-columns:92px 1fr;gap:8px;align-items:center;">
+            <a href="kickin-chicken-3d.html" title="Open KickinChicken 3D Studio">
+              <img src="animations/kickin_chicken_fart_animation.gif" alt="KickinChicken Fart Blast GIF" style="width:92px;height:92px;border-radius:10px;border:2px solid #4ce629;object-fit:cover;display:block;" loading="lazy" />
+            </a>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <a href="models/kickin_chicken_3d_preview.png" target="_blank" title="View 4-Panel Turnaround Sheet">
+                <img src="models/kickin_chicken_3d_preview.png" alt="KickinChicken 3D Preview" style="width:100%;height:52px;object-fit:cover;border-radius:7px;border:1px solid rgba(255,255,255,0.2);display:block;" loading="lazy" />
+              </a>
+              <a href="animations/kickin_chicken_fart_storyboard.png" target="_blank" title="View 4-Act Fart Storyboard">
+                <img src="animations/kickin_chicken_fart_storyboard.png" alt="KickinChicken Fart Storyboard" style="width:100%;height:36px;object-fit:cover;border-radius:6px;border:1px solid rgba(76,230,41,0.35);display:block;" loading="lazy" />
+              </a>
+            </div>
+          </div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:2px;">
+            <a href="kickin-chicken-3d.html" class="btn primary" style="background:linear-gradient(135deg,#ec4899,#7c3aed);padding:5px 8px;font-size:0.74rem;">🎮 3D Studio</a>
+            <a href="animations/kickin_chicken_fart_animation.mp4" download class="btn primary" style="background:#16a34a;padding:5px 8px;font-size:0.74rem;">🔊 Fart MP4</a>
+            <a href="models/kickin_chicken_plush_base_model.glb" download class="btn" style="padding:5px 7px;font-size:0.72rem;flex:0 0 auto;">.GLB</a>
+            <a href="models/kickin_chicken_plush_base_model.blend" download class="btn" style="padding:5px 7px;font-size:0.72rem;flex:0 0 auto;">.BLEND</a>
+          </div>
+        </div>
+        <div style="background:rgba(31,17,60,0.92);border:1px solid #ec4899;border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:7px;text-align:left;box-shadow:0 6px 18px rgba(0,0,0,0.35);">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+            <span style="font-weight:800;font-size:0.9rem;color:#fff;">🐷🍎 PickyPiggy</span>
+            <span style="font-size:0.68rem;padding:2px 7px;border-radius:999px;background:rgba(76,230,41,0.18);color:#86efac;border:1px solid rgba(76,230,41,0.4);">25-Bone 3D + Fart</span>
+          </div>
+          <div style="display:grid;grid-template-columns:92px 1fr;gap:8px;align-items:center;">
+            <a href="picky-piggy-3d.html" title="Open PickyPiggy 3D Studio">
+              <img src="animations/picky_piggy_fart_animation.gif" alt="PickyPiggy Fart Blast GIF" style="width:92px;height:92px;border-radius:10px;border:2px solid #4ce629;object-fit:cover;display:block;" loading="lazy" />
+            </a>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <a href="models/picky_piggy_3d_preview.png" target="_blank" title="View 4-Panel Turnaround Sheet">
+                <img src="models/picky_piggy_3d_preview.png" alt="PickyPiggy 3D Preview" style="width:100%;height:52px;object-fit:cover;border-radius:7px;border:1px solid rgba(255,255,255,0.2);display:block;" loading="lazy" />
+              </a>
+              <a href="animations/picky_piggy_fart_storyboard.png" target="_blank" title="View 4-Act Fart Storyboard">
+                <img src="animations/picky_piggy_fart_storyboard.png" alt="PickyPiggy Fart Storyboard" style="width:100%;height:36px;object-fit:cover;border-radius:6px;border:1px solid rgba(76,230,41,0.35);display:block;" loading="lazy" />
+              </a>
+            </div>
+          </div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:2px;">
+            <a href="picky-piggy-3d.html" class="btn primary" style="background:linear-gradient(135deg,#ec4899,#7c3aed);padding:5px 8px;font-size:0.74rem;">🎮 3D Studio</a>
+            <a href="animations/picky_piggy_fart_animation.mp4" download class="btn primary" style="background:#16a34a;padding:5px 8px;font-size:0.74rem;">🔊 Fart MP4</a>
+            <a href="models/picky_piggy_plush_base_model.glb" download class="btn" style="padding:5px 7px;font-size:0.72rem;flex:0 0 auto;">.GLB</a>
+            <a href="models/picky_piggy_plush_base_model.blend" download class="btn" style="padding:5px 7px;font-size:0.72rem;flex:0 0 auto;">.BLEND</a>
+          </div>
         </div>
       </div>
-    </div>
+    </details>
     <div class="controls" id="filter-bar">
       <input type="search" id="search-input" class="search-box" placeholder="Search character, cutout, plush, CatNap, PoppyDash, SunnyFox, LunaBat..." />
     </div>
