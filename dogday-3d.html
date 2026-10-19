@@ -221,7 +221,7 @@
         <h2 class="section-title">🎯 #008 Ref vs. Blender 4.3 Cycles</h2>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
           <div class="ref-card" style="padding:6px;">
-            <img src="images/008_DogDay_Plushie.webp" alt="008_DogDay_Plushie Reference" style="max-height:175px;" />
+            <img src="images/323_OfficialToyDogDayRender.png" alt="#323 Official Toy Render Reference" style="max-height:175px;" />
             <div class="ref-caption" style="font-size:0.7rem;">#008 Target Photo</div>
           </div>
           <div class="ref-card" style="padding:6px;">
@@ -229,6 +229,7 @@
             <div class="ref-caption" style="font-size:0.7rem;">Blender Cycles Render</div>
           </div>
         </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:6px;"><a class="btn" href="models/dogday_Front.png" target="_blank" style="padding:3px 4px;font-size:0.68rem;justify-content:center;">Front</a><a class="btn" href="models/dogday_Three-quarter.png" target="_blank" style="padding:3px 4px;font-size:0.68rem;justify-content:center;">3/4</a><a class="btn" href="models/dogday_Back.png" target="_blank" style="padding:3px 4px;font-size:0.68rem;justify-content:center;">Back</a><a class="btn" href="models/dogday_Stitch-detail.png" target="_blank" style="padding:3px 4px;font-size:0.68rem;justify-content:center;">Stitches</a></div>
       </div>
 
       <div>
@@ -501,6 +502,7 @@
       }
       dogday.root.traverse(obj => {
         if (!obj.isMesh) return;
+        if (!origMats.has(obj)) origMats.set(obj, obj.material);
         const baseM = origMats.get(obj);
         if (mode === 'pbr') {
           obj.material = baseM;

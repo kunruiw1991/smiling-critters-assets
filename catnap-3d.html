@@ -220,7 +220,7 @@
         <h2 class="section-title">🎯 #022 Ref vs. Blender 4.3 Cycles</h2>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
           <div class="ref-card" style="padding:6px;">
-            <img src="images/022_CatNap_Plushie.webp" alt="022_CatNap_Plushie Reference" style="max-height:175px;" />
+            <img src="images/319_OfficialToyCatNapRender.png" alt="#319 Official Toy Render Reference" style="max-height:175px;" />
             <div class="ref-caption" style="font-size:0.7rem;">#022 Target Plush</div>
           </div>
           <div class="ref-card" style="padding:6px;">
@@ -228,6 +228,7 @@
             <div class="ref-caption" style="font-size:0.7rem;">Blender Cycles Render</div>
           </div>
         </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:6px;"><a class="btn" href="models/catnap_Front.png" target="_blank" style="padding:3px 4px;font-size:0.68rem;justify-content:center;">Front</a><a class="btn" href="models/catnap_Three-quarter.png" target="_blank" style="padding:3px 4px;font-size:0.68rem;justify-content:center;">3/4</a><a class="btn" href="models/catnap_Back.png" target="_blank" style="padding:3px 4px;font-size:0.68rem;justify-content:center;">Back</a><a class="btn" href="models/catnap_Stitch-detail.png" target="_blank" style="padding:3px 4px;font-size:0.68rem;justify-content:center;">Stitches</a></div>
       </div>
 
       <div>
@@ -499,6 +500,7 @@
       }
       catnap.root.traverse(obj => {
         if (!obj.isMesh) return;
+        if (!origMats.has(obj)) origMats.set(obj, obj.material);
         const baseM = origMats.get(obj);
         if (mode === 'pbr') {
           obj.material = baseM;

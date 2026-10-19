@@ -1,1668 +1,1784 @@
 #!/usr/bin/env python3
 """
-Native Blender 4.3 Builder, Rigging, Animation & Cycles Studio Renderer (v2 Calibrated)
-for Hoppy Hopscotch (#012 Official Plush Base Model - Smiling Critters).
-
-Run headless via:
-  /tmp/blender/blender -b --factory-startup --threads 8 --python-exit-code 1 -P /tmp/smiling-critters-assets/models/build_hoppy_hopscotch_blender.py
+critter-3d (CatNap-Final-v11) Multi-Character Builder for Smiling Critters & Baba Chops.
+Strictly implements the exact multi-stage architecture from https://github.com/kunruiw1991/critter-3d:
+  1. Continuous Catmull-Rom plush lofting (`plush_loft`) for head, torso, arms, legs.
+  2. Sculpted ear shells (`ear_shell` / floppy ears / crest) voxel-unioned into head (`REMESH` VOXEL + `SMOOTH`) with BVHTree material restoration.
+  3. Boolean-carved hollow grin (`BOOLEAN` `DIFFERENCE` `EXACT` + `REMESH` VOXEL + `Mouth cloth rollover` vertex-group `SMOOTH`), recessed black mouth bowl, and Boolean-perforated circular speaker grille (`Mouth • perforated speaker grille` + `Mouth • speaker rim`).
+  4. Skin-fitted solid dark domed button eyes (`fitted_eye`) ray-cast onto `fronty(x, z)` (zero cartoon white anime eye-shine dots).
+  5. Voxel-unioned continuous plush body (`REMESH` VOXEL + `Shoulder transition` & `Tail root transition` Gaussian smooth) with BVHTree cuff & belly-patch material restoration.
+  6. Surface-fitted zipper (`Zipper • surface fitted dark tape` + 27 beveled teeth) and character-specific beveled 3D pendant (`Pendant • ...` + bail + seat).
+  7. Object-coordinate isotropic textile micro-bump (`Scale=235, Strength=0.32, Distance=0.0035`) and ~700-950 surface-projected 7-point 3D cotton stitch arcs (`boundaries()` + `seam()`).
 """
 
-import os
-import math
 import bpy
 import bmesh
-from mathutils import Vector, Matrix, Euler, noise
+import math
+import os
+import sys
+import json
+import shutil
+import subprocess
+from math import sin, cos, pi, sqrt
+from mathutils import Vector
+from mathutils.bvhtree import BVHTree
+from mathutils.geometry import tessellate_polygon
 
-OUT_DIR = "/tmp/smiling-critters-assets/models"
-ANIM_DIR = "/tmp/smiling-critters-assets/animations"
-WORK_DIR = "/tmp/work_hoppy"
-FART_FRAMES_DIR = os.path.join(WORK_DIR, "frames")
-os.makedirs(OUT_DIR, exist_ok=True)
-os.makedirs(ANIM_DIR, exist_ok=True)
-os.makedirs(FART_FRAMES_DIR, exist_ok=True)
+# Parse CLI args after `--`
+argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+CHAR_SLUG = argv[0] if len(argv) >= 1 else "hoppy_hopscotch"
+MODE = argv[1] if len(argv) >= 2 else "full"  # "preview" or "full"
 
-BLEND_PATH = os.path.join(OUT_DIR, "hoppy_hopscotch_plush_base_model.blend")
-GLB_PATH = os.path.join(OUT_DIR, "hoppy_hopscotch_plush_base_model.glb")
-OBJ_PATH = os.path.join(OUT_DIR, "hoppy_hopscotch_plush_base_model.obj")
-RENDER_FRONT_PATH = os.path.join(OUT_DIR, "hoppy_hopscotch_blender_cycles_render.png")
-RENDER_PREVIEW_PATH = os.path.join(OUT_DIR, "hoppy_hopscotch_3d_preview.png")
+OUT_MODELS_DIR = "/tmp/smiling-critters-assets/models"
+OUT_ANIMS_DIR = "/tmp/smiling-critters-assets/animations"
+IMAGES_DIR = "/tmp/smiling-critters-assets/images"
+WORK_DIR = f"/tmp/work_v11_{CHAR_SLUG}"
+os.makedirs(OUT_MODELS_DIR, exist_ok=True)
+os.makedirs(OUT_ANIMS_DIR, exist_ok=True)
+os.makedirs(WORK_DIR, exist_ok=True)
 
-
-# ==============================================================================
-# 1. SCENE RESET & HELPER UTILITIES
-# ==============================================================================
-bpy.ops.wm.read_factory_settings(use_empty=True)
-scene = bpy.context.scene
-scene.unit_settings.system = 'METRIC'
-scene.unit_settings.scale_length = 1.0
-
-main_col = bpy.data.collections.new("HoppyHopscotch_Plush_Rig")
-scene.collection.children.link(main_col)
-
-studio_col = bpy.data.collections.new("Studio_Lighting_And_Stage")
-scene.collection.children.link(studio_col)
-
-
-def set_bsdf_input(bsdf, value, *names):
-    for name in names:
-        if name in bsdf.inputs:
-            bsdf.inputs[name].default_value = value
-            return True
-    return False
-
-
-def srgb_to_linear(c):
-    if c <= 0.04045:
-        return c / 12.92
-    return ((c + 0.055) / 1.055) ** 2.4
-
-
-def hex_to_rgba(hex_val, alpha=1.0):
-    r = srgb_to_linear(((hex_val >> 16) & 0xFF) / 255.0)
-    g = srgb_to_linear(((hex_val >> 8) & 0xFF) / 255.0)
-    b = srgb_to_linear((hex_val & 0xFF) / 255.0)
-    return (r, g, b, alpha)
-
-
-def to_b_vec(x, y_up, z_fwd):
-    return Vector((float(x), float(-z_fwd), float(y_up)))
-
-
-def head_front_z(x, y_up):
-    nx = x / 0.72
-    ny = (y_up - 1.88) / 0.56
-    r2 = min(0.94, nx * nx + ny * ny)
-    return 0.62 * math.sqrt(max(0.06, 1.0 - r2))
-
-
-def upper_smile_y(x):
-    t = max(-1.0, min(1.0, x / 0.52))
-    return 1.765 + 0.110 * (t * t) - 0.020 * (t ** 4)
-
-
-def lower_smile_y(x):
-    t = max(-1.0, min(1.0, x / 0.52))
-    return 1.425 + 0.435 * (t * t)
-
-
-def plush_fleece_displacement(p_world):
-    """Subtle multi-octave 3D plush fleece micro-fuzz displacement."""
-    q1 = Vector((p_world.x * 8.0, p_world.y * 8.0, p_world.z * 8.0))
-    q2 = Vector((p_world.x * 18.0 + 2.3, p_world.y * 18.0 - 1.5, p_world.z * 18.0 + 1.9))
-    n1 = noise.noise(q1)
-    n2 = noise.noise(q2)
-    return 0.010 * n1 + 0.005 * abs(n2)
-
-
-# ==============================================================================
-# 2. PROCEDURAL CYCLES / GLTF PBR MATERIALS (HOPPY HOPSCOTCH PALETTE + FART CLOUD)
-# ==============================================================================
-def create_plush_material(name, hex_color, roughness=0.86, spec_ior=0.10,
-                          sheen=0.22, sheen_tint_mult=1.05,
-                          bump_scale=65.0, bump_strength=0.14,
-                          metallic=0.0, coat=0.0, coat_rough=0.05,
-                          subsurface=0.0, emission_strength=0.0):
-    mat = bpy.data.materials.new(name=name)
-    mat.use_nodes = True
-    nodes = mat.node_tree.nodes
-    links = mat.node_tree.links
-    nodes.clear()
-
-    out = nodes.new(type="ShaderNodeOutputMaterial")
-    out.location = (420, 0)
-
-    bsdf = nodes.new(type="ShaderNodeBsdfPrincipled")
-    bsdf.location = (80, 0)
-    rgba = hex_to_rgba(hex_val=hex_color)
-    set_bsdf_input(bsdf, rgba, "Base Color")
-    set_bsdf_input(bsdf, roughness, "Roughness")
-    set_bsdf_input(bsdf, metallic, "Metallic")
-    set_bsdf_input(bsdf, spec_ior, "Specular IOR Level", "Specular")
-    set_bsdf_input(bsdf, sheen, "Sheen Weight", "Sheen")
-    set_bsdf_input(bsdf, 0.78, "Sheen Roughness")
-    set_bsdf_input(
-        bsdf,
-        (min(1.0, rgba[0] * sheen_tint_mult),
-         min(1.0, rgba[1] * sheen_tint_mult),
-         min(1.0, rgba[2] * sheen_tint_mult), 1.0),
-        "Sheen Tint"
-    )
-    if coat > 0.0:
-        set_bsdf_input(bsdf, coat, "Coat Weight", "Clearcoat")
-        set_bsdf_input(bsdf, coat_rough, "Coat Roughness", "Clearcoat Roughness")
-    if subsurface > 0.0:
-        set_bsdf_input(bsdf, subsurface, "Subsurface Weight", "Subsurface")
-    if emission_strength > 0.0:
-        set_bsdf_input(bsdf, rgba, "Emission Color", "Emission")
-        set_bsdf_input(bsdf, emission_strength, "Emission Strength")
-
-    if bump_strength > 0.0:
-        tex_coord = nodes.new(type="ShaderNodeTexCoord")
-        tex_coord.location = (-650, -180)
-
-        noise_node = nodes.new(type="ShaderNodeTexNoise")
-        noise_node.location = (-420, -180)
-        noise_node.inputs["Scale"].default_value = bump_scale
-        noise_node.inputs["Detail"].default_value = 10.0
-        noise_node.inputs["Roughness"].default_value = 0.74
-
-        bump = nodes.new(type="ShaderNodeBump")
-        bump.location = (-180, -180)
-        bump.inputs["Strength"].default_value = bump_strength
-        bump.inputs["Distance"].default_value = 0.018
-
-        links.new(tex_coord.outputs["Object"], noise_node.inputs["Vector"])
-        links.new(noise_node.outputs["Fac"], bump.inputs["Height"])
-        links.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
-
-    links.new(bsdf.outputs["BSDF"], out.inputs["Surface"])
-    return mat
-
-
-MATS = {
-    # Bright emerald/mint-green plush fleece bunny body (#34B857 calibrated for Cycles AgX)
-    "BodyGreen": create_plush_material(
-        "Hoppy_Plush_Body_Green", 0x24A848, roughness=0.86, spec_ior=0.09,
-        sheen=0.22, sheen_tint_mult=1.08, bump_scale=72.0, bump_strength=0.16, subsurface=0.02
-    ),
-    # Pastel mint-green belly, inner ears & paw pads (#A7F3D0 calibrated for Cycles AgX)
-    "PastelMint": create_plush_material(
-        "Hoppy_Pastel_Mint_Accent", 0x76E4B0, roughness=0.84, spec_ior=0.10,
-        sheen=0.20, sheen_tint_mult=1.04, bump_scale=82.0, bump_strength=0.12, subsurface=0.02
-    ),
-    # Darker forest-green feet bottoms, ear tips, inner ear center & paw cuffs (#1E7E38)
-    "ForestGreen": create_plush_material(
-        "Hoppy_Forest_Green_Dark", 0x126628, roughness=0.88, spec_ior=0.08,
-        sheen=0.18, sheen_tint_mult=1.06, bump_scale=76.0, bump_strength=0.15
-    ),
-    # Cute pink triangular rabbit nose & tongue (#F472B6)
-    "NosePink": create_plush_material(
-        "Hoppy_Rabbit_Nose_Pink", 0xEC4899, roughness=0.72, spec_ior=0.14,
-        sheen=0.20, sheen_tint_mult=1.05, bump_scale=95.0, bump_strength=0.08, subsurface=0.03
-    ),
-    # Stark bright white plush buck teeth (#FFFFFF)
-    "ToothWhite": create_plush_material(
-        "Hoppy_Buck_Teeth_White", 0xFFFFFF, roughness=0.46, spec_ior=0.30,
-        sheen=0.18, sheen_tint_mult=1.0, bump_scale=110.0, bump_strength=0.03,
-        coat=0.12, emission_strength=0.05
-    ),
-    # Iconic Bright Yellow Lightning Bolt Pendant (#FFD60A)
-    "PendantYellow": create_plush_material(
-        "Hoppy_Lightning_Pendant_Yellow", 0xFFB700, roughness=0.30, spec_ior=0.30,
-        sheen=0.15, sheen_tint_mult=1.05, bump_scale=120.0, bump_strength=0.02,
-        coat=0.25, emission_strength=0.06
-    ),
-    # Deep jet-black glossy acrylic dome eyes
-    "EyeGloss": create_plush_material(
-        "Hoppy_Eye_Acrylic_Black", 0x020203, roughness=0.04, spec_ior=0.12,
-        sheen=0.0, bump_strength=0.0, coat=0.30, coat_rough=0.015
-    ),
-    # Studio catchlight highlight on eyes
-    "CatchlightWhite": create_plush_material(
-        "Hoppy_Eye_Catchlight_White", 0xFFFFFF, roughness=0.05, spec_ior=0.5,
-        sheen=0.0, bump_strength=0.0, emission_strength=0.38
-    ),
-    # Pitch-black recessed mouth cavity
-    "MouthVoidBlack": create_plush_material(
-        "Hoppy_Mouth_Cavity_Black", 0x010102, roughness=0.99, spec_ior=0.01,
-        sheen=0.0, bump_strength=0.0
-    ),
-    # Metallic zipper teeth & golden collar clasp
-    "ZipperMetal": create_plush_material(
-        "Hoppy_Zipper_Gold_Metal", 0xD99B06, roughness=0.24, spec_ior=0.45,
-        sheen=0.0, bump_strength=0.0, metallic=0.90, coat=0.25
-    ),
-    # Dark zipper tape backing & pendant outline border
-    "ZipperTrack": create_plush_material(
-        "Hoppy_Zipper_Track_Dark", 0x0B0C0E, roughness=0.88, spec_ior=0.05,
-        sheen=0.08, bump_strength=0.06
-    ),
-    # 3D Cartoon Fart Cloud Materials (Vibrant Toxic Lime, Neon Blast Core, Lavender Swirl)
-    "FartCloudLime": create_plush_material(
-        "Hoppy_Fart_Cloud_Lime", 0x38D61C, roughness=0.68, spec_ior=0.16,
-        sheen=0.40, sheen_tint_mult=1.15, bump_scale=24.0, bump_strength=0.22,
-        subsurface=0.30, emission_strength=0.22
-    ),
-    "FartCloudNeon": create_plush_material(
-        "Hoppy_Fart_Cloud_Neon_YellowGreen", 0xB8FF29, roughness=0.45, spec_ior=0.22,
-        sheen=0.35, sheen_tint_mult=1.1, bump_scale=30.0, bump_strength=0.14,
-        subsurface=0.22, emission_strength=0.42
-    ),
-    "FartCloudPurple": create_plush_material(
-        "Hoppy_Fart_Cloud_Purple", 0x9333EA, roughness=0.62, spec_ior=0.18,
-        sheen=0.38, sheen_tint_mult=1.1, bump_scale=28.0, bump_strength=0.18,
-        subsurface=0.22, emission_strength=0.26
-    ),
+REF_MAP = {
+    "catnap": os.path.join(IMAGES_DIR, "319_OfficialToyCatNapRender.png"),
+    "bobby_bearhug": os.path.join(IMAGES_DIR, "320_OfficialBobbyRender.png"),
+    "bubba_bubbaphant": os.path.join(IMAGES_DIR, "321_OfficialBubbaRender.png"),
+    "craftycorn": os.path.join(IMAGES_DIR, "322_OfficialCraftyCornRender.png"),
+    "dogday": os.path.join(IMAGES_DIR, "323_OfficialToyDogDayRender.png"),
+    "hoppy_hopscotch": os.path.join(IMAGES_DIR, "324_OfficialHoppyRender.png"),
+    "kickin_chicken": os.path.join(IMAGES_DIR, "325_OfficialKickinChickenRender.png"),
+    "picky_piggy": os.path.join(IMAGES_DIR, "326_OfficialPickyPiggyRender.png"),
+    "baba_chops": "/tmp/baba_toy_ref.png",
 }
 
+CHAR_SPECS = {
+    "catnap": {
+        "title": "CatNap",
+        "main_color": (.235, .045, .46),
+        "cuff_color": (.115, .023, .23),
+        "ear_inner_color": (.038, .006, .09),
+        "thread_color": (.52, .48, .57),
+        "groove_color": (.058, .021, .095),
+        "mouth_thread_color": (.17, .15, .20),
+        "pendant_color": (.93, .58, .07),
+    },
+    "dogday": {
+        "title": "DogDay",
+        "main_color": (.52, .135, .012),      # Saturated golden-orange plush (calibrated for 700W/500W/800W AgX)
+        "cuff_color": (.20, .024, .005),      # Deep rust-brown ears, cuffs, left eye patch
+        "belly_color": (.72, .46, .012),      # Rich golden-yellow muzzle band & oval belly patch
+        "ear_inner_color": (.14, .016, .003),
+        "thread_color": (.74, .60, .46),      # Warm cream-tan stitch thread
+        "groove_color": (.16, .03, .005),
+        "mouth_thread_color": (.20, .16, .12),
+        "pendant_color": (.85, .55, .02),     # Gold sun center
+        "pendant_alt_color": (.65, .16, .01), # Orange sun rays
+    },
+    "bobby_bearhug": {
+        "title": "Bobby BearHug",
+        "main_color": (.40, .012, .016),      # Rich crimson-red plush
+        "cuff_color": (.62, .16, .21),        # Warm rose-pink cuffs, inner ears, muzzle & belly
+        "belly_color": (.62, .16, .21),
+        "ear_inner_color": (.52, .12, .16),
+        "thread_color": (.86, .62, .66),      # Soft pink-white cotton thread
+        "groove_color": (.18, .008, .012),
+        "mouth_thread_color": (.20, .12, .14),
+        "pendant_color": (.32, .008, .015),   # Deep ruby-red heart pendant
+    },
+    "bubba_bubbaphant": {
+        "title": "Bubba Bubbaphant",
+        "main_color": (.075, .34, .60),       # Rich cyan-cerulean plush
+        "cuff_color": (.015, .075, .28),      # Deep royal-navy inner ears, cuffs, trunk tip, tail tuft
+        "ear_inner_color": (.012, .060, .24),
+        "thread_color": (.55, .76, .90),      # Sky-blue cotton thread
+        "groove_color": (.010, .06, .18),
+        "mouth_thread_color": (.12, .16, .20),
+        "pendant_color": (.78, .55, .015),    # Golden-yellow lightbulb
+        "pendant_alt_color": (.018, .09, .32),# Royal-blue screw base
+    },
+    "craftycorn": {
+        "title": "CraftyCorn",
+        "main_color": (.74, .76, .79),        # Crisp porcelain cream-white plush
+        "cuff_color": (.022, .42, .48),       # Vibrant turquoise-aqua hooves, mane & tail
+        "ear_inner_color": (.010, .18, .22),  # Deep teal inner equine ears
+        "thread_color": (.54, .58, .62),      # Subtle silver-grey cotton stitch thread
+        "groove_color": (.26, .29, .32),
+        "mouth_thread_color": (.18, .20, .22),
+        "pendant_color": (.82, .58, .015),    # Rich yellow flower center
+    },
+    "hoppy_hopscotch": {
+        "title": "Hoppy Hopscotch",
+        "main_color": (.11, .46, .022),       # Vivid lime-green plush
+        "cuff_color": (.018, .18, .012),      # Rich forest-green cuffs, inner ears & ear tips
+        "ear_inner_color": (.014, .14, .008),
+        "thread_color": (.58, .82, .48),      # Pale mint-green cotton thread
+        "groove_color": (.012, .10, .006),
+        "mouth_thread_color": (.14, .18, .12),
+        "pendant_color": (.82, .58, .015),    # Golden-yellow lightning bolt
+    },
+    "kickin_chicken": {
+        "title": "KickinChicken",
+        "main_color": (.62, .38, .008),       # Vivid sunflower golden-yellow plush
+        "cuff_color": (.56, .11, .008),       # Rich tangerine-orange cuffs & beak
+        "ear_inner_color": (.48, .28, .006),
+        "thread_color": (.85, .72, .32),      # Warm yellow cotton thread
+        "groove_color": (.26, .14, .005),
+        "mouth_thread_color": (.20, .18, .12),
+        "pendant_color": (.42, .012, .012),   # Deep crimson-red star pendant
+    },
+    "picky_piggy": {
+        "title": "PickyPiggy",
+        "main_color": (.54, .15, .28),        # Rich rose-pink plush
+        "cuff_color": (.28, .022, .12),       # Deep magenta-pink cuffs & inner ears
+        "ear_inner_color": (.22, .015, .09),
+        "thread_color": (.86, .58, .70),      # Soft pink cotton thread
+        "groove_color": (.18, .012, .08),
+        "mouth_thread_color": (.20, .12, .16),
+        "pendant_color": (.42, .010, .015),   # Deep glossy crimson apple pendant
+    },
+    "baba_chops": {
+        "title": "Baba Chops",
+        "main_color": (.022, .022, .025),     # Deep charcoal-black body & wool hood
+        "cuff_color": (.64, .65, .67),        # Crisp off-white lamb face, ears, mittens, hooves & buck teeth
+        "ear_inner_color": (.12, .12, .14),   # Recessed dark grey inner sheep ear
+        "thread_color": (.44, .45, .48),      # Light grey cotton stitch thread
+        "groove_color": (.008, .008, .010),
+        "mouth_thread_color": (.18, .18, .20),
+        "pendant_color": (.10, .075, .058),   # Weathered dark bronze/gunmetal skull pendant
+    },
+}
+
+spec = CHAR_SPECS[CHAR_SLUG]
 
 # ==============================================================================
-# 3. HOPPY HOPSCOTCH GEOMETRY BUILDER (BMESH + SKIN WEIGHTS)
+# Helper Functions (Exact critter-3d v07..v11 implementation)
 # ==============================================================================
-master_bm = bmesh.new()
-deform_layer = master_bm.verts.layers.deform.verify()
-
-# 25-Bone Armature (HoppyHopscotch_Armature)
-BONE_NAMES = [
-    "Root",
-    "Pelvis",
-    "Spine",
-    "Chest",
-    "Tail",
-    "Head",
-    "Jaw",
-    "Eyelid.L",
-    "Eyelid.R",
-    "Ear.L",
-    "Ear.R",
-    "SkullPendant",
-    "Shoulder.L",
-    "Arm.L",
-    "HandHoof.L",
-    "Shoulder.R",
-    "Arm.R",
-    "HandHoof.R",
-    "Leg.L",
-    "FootHoof.L",
-    "Leg.R",
-    "FootHoof.R",
-    "FartCloud.1",
-    "FartCloud.2",
-    "FartCloud.3",
-]
-BONE_IDX = {name: i for i, name in enumerate(BONE_NAMES)}
-
-MAT_KEYS = [
-    "BodyGreen",
-    "PastelMint",
-    "ForestGreen",
-    "NosePink",
-    "ToothWhite",
-    "PendantYellow",
-    "EyeGloss",
-    "CatchlightWhite",
-    "MouthVoidBlack",
-    "ZipperMetal",
-    "ZipperTrack",
-    "FartCloudLime",
-    "FartCloudNeon",
-    "FartCloudPurple",
-]
-MAT_LIST = [MATS[k] for k in MAT_KEYS]
-MAT_IDX = {k: i for i, k in enumerate(MAT_KEYS)}
-
-
-def append_bmesh_part(part_bm, mat_key_or_fn, weight_fn):
-    v_map = {}
-    v_orig = {}
-    for v in part_bm.verts:
-        ox, oy, oz = v.co.x, v.co.y, v.co.z
-        nv = master_bm.verts.new(to_b_vec(ox, oy, oz))
-        weights = weight_fn(ox, oy, oz)
-        dvert = nv[deform_layer]
-        for bname, w in weights.items():
-            if w > 1e-4:
-                dvert[BONE_IDX[bname]] = float(w)
-        v_map[v] = nv
-        v_orig[v] = (ox, oy, oz)
-
-    for f in part_bm.faces:
-        try:
-            nf = master_bm.faces.new([v_map[v] for v in f.verts])
-            if callable(mat_key_or_fn):
-                cx = sum(v_orig[v][0] for v in f.verts) / len(f.verts)
-                cy = sum(v_orig[v][1] for v in f.verts) / len(f.verts)
-                cz = sum(v_orig[v][2] for v in f.verts) / len(f.verts)
-                mkey = mat_key_or_fn(cx, cy, cz)
-                nf.material_index = MAT_IDX[mkey]
-            else:
-                nf.material_index = MAT_IDX[mat_key_or_fn]
-            nf.smooth = True
-        except ValueError:
-            pass
-    part_bm.free()
-
-
-def make_uv_sphere_bm(rx, ry, rz, cx=0.0, cy=0.0, cz=0.0,
-                      u_segs=28, v_segs=20, rot_euler=(0.0, 0.0, 0.0),
-                      deform_fn=None, world_deform_fn=None):
-    bm = bmesh.new()
-    bmesh.ops.create_uvsphere(bm, u_segments=u_segs, v_segments=v_segs, radius=1.0)
-    rot_m = Euler(rot_euler, 'XYZ').to_matrix().to_4x4()
-    center = Vector((cx, cy, cz))
-    for v in bm.verts:
-        n_local = v.co.normalized()
-        p = Vector((v.co.x * rx, v.co.y * ry, v.co.z * rz))
-        if deform_fn is not None:
-            p = deform_fn(p)
-        p_world = (rot_m @ p) + center
-        if world_deform_fn is not None:
-            n_world = (rot_m @ n_local).normalized()
-            p_world = world_deform_fn(p_world, n_world)
-        v.co = p_world
-    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-    return bm
-
-
-def make_beveled_box_bm(sx, sy, sz, cx, cy, cz, bevel_frac=0.14):
-    bm = bmesh.new()
-    bmesh.ops.create_cube(bm, size=1.0)
-    for v in bm.verts:
-        v.co = Vector((v.co.x * sx, v.co.y * sy, v.co.z * sz))
-    bmesh.ops.bevel(
-        bm,
-        geom=list(bm.verts) + list(bm.edges) + list(bm.faces),
-        offset=min(sx, sy, sz) * bevel_frac,
-        offset_type='OFFSET',
-        segments=2,
-        profile=0.7,
-        affect='EDGES'
-    )
-    for v in bm.verts:
-        v.co += Vector((cx, cy, cz))
-    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-    return bm
-
-
-def make_torus_tube_bm(curve_pts, radius_fn, radial_segs=14, closed=False):
-    bm = bmesh.new()
-    n_pts = len(curve_pts)
-    rings = []
-    for i, pt in enumerate(curve_pts):
-        p = Vector(pt)
-        if closed:
-            p_prev = Vector(curve_pts[(i - 1) % n_pts])
-            p_next = Vector(curve_pts[(i + 1) % n_pts])
-            tangent = (p_next - p_prev).normalized()
-        else:
-            if i == 0:
-                tangent = (Vector(curve_pts[i + 1]) - p).normalized()
-            elif i == n_pts - 1:
-                tangent = (p - Vector(curve_pts[i - 1])).normalized()
-            else:
-                tangent = (Vector(curve_pts[i + 1]) - Vector(curve_pts[i - 1])).normalized()
-
-        up_ref = Vector((0, 0, 1)) if abs(tangent.z) < 0.85 else Vector((0, 1, 0))
-        normal = tangent.cross(up_ref).normalized()
-        binormal = tangent.cross(normal).normalized()
-
-        t = i / max(1, (n_pts if closed else n_pts - 1))
-        r = radius_fn(t) if callable(radius_fn) else float(radius_fn)
-
-        ring = []
-        for j in range(radial_segs):
-            ang = 2.0 * math.pi * j / radial_segs
-            offset = normal * (math.cos(ang) * r) + binormal * (math.sin(ang) * r)
-            ring.append(bm.verts.new(p + offset))
-        rings.append(ring)
-
-    n_rings = len(rings)
-    limit = n_rings if closed else n_rings - 1
-    for i in range(limit):
-        r1 = rings[i]
-        r2 = rings[(i + 1) % n_rings]
-        for j in range(radial_segs):
-            jn = (j + 1) % radial_segs
-            bm.faces.new([r1[j], r2[j], r2[jn], r1[jn]])
-
-    if not closed:
-        c_start = bm.verts.new(Vector(curve_pts[0]))
-        for j in range(radial_segs):
-            jn = (j + 1) % radial_segs
-            bm.faces.new([c_start, rings[0][jn], rings[0][j]])
-        c_end = bm.verts.new(Vector(curve_pts[-1]))
-        for j in range(radial_segs):
-            jn = (j + 1) % radial_segs
-            bm.faces.new([c_end, rings[-1][j], rings[-1][jn]])
-
-    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-    return bm
-
-
-def make_sharp_extruded_polygon_bm(poly_xy, z_front, depth):
-    """
-    Create a crisp 3D extruded polygon mesh with support vertices near corners
-    so Catmull-Clark SUBSURF preserves sharp zig-zag Lightning Bolt edges!
-    """
-    bm = bmesh.new()
-    dense_xy = []
-    n_corners = len(poly_xy)
-    for i in range(n_corners):
-        p0 = Vector(poly_xy[i])
-        p1 = Vector(poly_xy[(i + 1) % n_corners])
-        # Cluster points near corners (0.0, 0.06, 0.25, 0.50, 0.75, 0.94) so corners stay sharp
-        for t in (0.0, 0.07, 0.30, 0.70, 0.93):
-            pt = p0.lerp(p1, t)
-            dense_xy.append((pt.x, pt.y))
-
-    n = len(dense_xy)
-    front_outer = [bm.verts.new((x, y, z_front + depth * 0.50)) for x, y in dense_xy]
-    front_edge = [bm.verts.new((x, y, z_front + depth * 0.42)) for x, y in dense_xy]
-    back_edge = [bm.verts.new((x, y, z_front - depth * 0.42)) for x, y in dense_xy]
-    back_outer = [bm.verts.new((x, y, z_front - depth * 0.50)) for x, y in dense_xy]
-
-    for i in range(n):
-        inext = (i + 1) % n
-        bm.faces.new([front_outer[i], front_edge[i], front_edge[inext], front_outer[inext]])
-        bm.faces.new([front_edge[i], back_edge[i], back_edge[inext], front_edge[inext]])
-        bm.faces.new([back_edge[i], back_outer[i], back_outer[inext], back_edge[inext]])
-
-    f_front = bm.faces.new(front_outer)
-    f_back = bm.faces.new(list(reversed(back_outer)))
-    bmesh.ops.triangulate(bm, faces=[f_front, f_back])
-    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-    return bm
-
-
-# ------------------------------------------------------------------------------
-# 3.1 WIDE SMILING CRITTERS BUNNY HEAD & CHEEK FUR TUFTS (#012 PLUSH SILHOUETTE)
-# ------------------------------------------------------------------------------
-def head_world_deform(p_w, n_w):
-    # Recess the front of head_core strictly inside the wide smiling mouth opening
-    # so the black mouth cavity sits cleanly inside the head with zero edge clipping!
-    if p_w.z > 0.15 and abs(p_w.x) < 0.49:
-        y_low = lower_smile_y(p_w.x) + 0.015
-        y_high = upper_smile_y(p_w.x) - 0.010
-        if y_low < p_w.y < y_high:
-            p_w.z -= 0.065
-    return p_w + n_w * (plush_fleece_displacement(p_w) * 0.40)
-
-
-head_core_bm = make_uv_sphere_bm(
-    0.72, 0.56, 0.62, cx=0.0, cy=1.88, cz=0.0,
-    u_segs=40, v_segs=30,
-    world_deform_fn=head_world_deform
-)
-append_bmesh_part(head_core_bm, "BodyGreen", lambda x, y, z: {"Head": 1.0})
-
-# Cute bunny cheek fur tufts on left & right sides (from 052_HoppyHopscotch.webp) + top crown tuft
-for side in (-1, 1):
-    for (cy_off, cz_off, sx, sy, sz, rot_z) in [
-        (1.88, 0.10, 0.13, 0.060, 0.08, -side * 0.28),
-        (1.79, 0.12, 0.11, 0.052, 0.07, -side * 0.45),
-    ]:
-        tuft_bm = make_uv_sphere_bm(
-            sx, sy, sz,
-            cx=side * 0.69, cy=cy_off, cz=cz_off,
-            u_segs=16, v_segs=12,
-            rot_euler=(0.0, 0.0, rot_z)
-        )
-        append_bmesh_part(tuft_bm, "BodyGreen", lambda x, y, z: {"Head": 1.0})
-
-top_tuft_bm = make_uv_sphere_bm(
-    0.10, 0.065, 0.08, cx=0.0, cy=2.43, cz=0.06,
-    u_segs=14, v_segs=10, rot_euler=(-0.15, 0.0, 0.0)
-)
-append_bmesh_part(top_tuft_bm, "BodyGreen", lambda x, y, z: {"Head": 1.0})
-
-
-# ------------------------------------------------------------------------------
-# 3.2 TALL UPRIGHT LONG BUNNY RABBIT EARS (`Ear.L`, `Ear.R`) — SEAMLESS 1-PIECE PADDLE
-#     (Bright Green Base + Dipped Forest-Green Top Third + Pastel Mint Inner Ears)
-# ------------------------------------------------------------------------------
-for side in (-1, 1):
-    ear_bone = "Ear.L" if side == 1 else "Ear.R"
-    base_x = side * 0.23
-    base_y = 2.34
-    base_z = -0.02
-    # In #012_Hoppy_Hopscotch_Plushie.webp, viewer-left ear (`Ear.R`, x < 0) stands upright
-    # and viewer-right ear (`Ear.L`, x > 0) tilts jauntily outward!
-    tilt_z = -0.32 if side == 1 else 0.06
-    tilt_x = 0.04
-
-    rot_ear = Euler((tilt_x, 0.0, tilt_z), 'XYZ').to_matrix()
-    rot_ear_inv = rot_ear.inverted()
-    ear_pivot = Vector((base_x, base_y, base_z))
-    ear_center = ear_pivot + (rot_ear @ Vector((0.0, 0.45, 0.0)))
-
-    def ear_weight_fn(x, y, z, eb=ear_bone):
-        if y < 2.42:
-            return {"Head": 0.45, eb: 0.55}
-        return {eb: 0.95, "Head": 0.05}
-
-    # Single seamless long bunny ear paddle (ry = 0.49) with smooth rabbit ear taper
-    def ear_paddle_deform(p):
-        # u in [0, 1] from bottom root (-0.49) to top tip (+0.49)
-        u = max(0.0, min(1.0, (p.y + 0.49) / 0.98))
-        # Taper narrower at root (u=0 -> 0.62), widest at upper-middle (u=0.65 -> 1.06), rounded top
-        width_profile = 0.62 + 0.44 * math.sin(math.pi * (u ** 0.72))
-        p.x *= width_profile
-        if p.z > 0:
-            # Smooth concave scoop on the lower-middle front face for the inner ear
-            r_in = max(0.0, 1.0 - (p.x / 0.16) ** 2 - ((p.y + 0.06) / 0.36) ** 2)
-            p.z *= (1.0 - 0.50 * r_in)
-        return p
-
-    def ear_mat_selector(cx, cy, cz, piv=ear_pivot, r_inv=rot_ear_inv):
-        local_p = r_inv @ (Vector((cx, cy, cz)) - piv)
-        # Top 32% of the long bunny ear is dipped ForestGreen (#1E7E38), lower 68% is BodyGreen (#34B857)
-        if local_p.y > 0.61:
-            return "ForestGreen"
-        return "BodyGreen"
-
-    ear_paddle_bm = make_uv_sphere_bm(
-        0.215, 0.49, 0.092,
-        cx=ear_center.x, cy=ear_center.y, cz=ear_center.z,
-        u_segs=32, v_segs=32,
-        rot_euler=(tilt_x, 0.0, tilt_z),
-        deform_fn=ear_paddle_deform
-    )
-    append_bmesh_part(ear_paddle_bm, ear_mat_selector, ear_weight_fn)
-
-    # Pastel Mint-Green (`PastelMint` #A7F3D0) Inner Ear Cushion Frame
-    ear_mint_center = ear_pivot + (rot_ear @ Vector((0.0, 0.39, 0.046)))
-    ear_mint_bm = make_uv_sphere_bm(
-        0.132, 0.31, 0.035,
-        cx=ear_mint_center.x, cy=ear_mint_center.y, cz=ear_mint_center.z,
-        u_segs=24, v_segs=18,
-        rot_euler=(tilt_x, 0.0, tilt_z)
-    )
-    append_bmesh_part(ear_mint_bm, "PastelMint", ear_weight_fn)
-
-    # Deep Forest-Green (`ForestGreen` #1E7E38) Inner Ear Center Groove
-    ear_core_center = ear_pivot + (rot_ear @ Vector((0.0, 0.39, 0.066)))
-    ear_core_bm = make_uv_sphere_bm(
-        0.092, 0.26, 0.024,
-        cx=ear_core_center.x, cy=ear_core_center.y, cz=ear_core_center.z,
-        u_segs=20, v_segs=16,
-        rot_euler=(tilt_x, 0.0, tilt_z)
-    )
-    append_bmesh_part(ear_core_bm, "ForestGreen", ear_weight_fn)
-
-
-# ------------------------------------------------------------------------------
-# 3.3 GLOSSY BLACK EYES, CATCHLIGHTS, EYELIDS & ARCHED BROWS
-# ------------------------------------------------------------------------------
-for side in (-1, 1):
-    lid_bone = "Eyelid.L" if side == 1 else "Eyelid.R"
-    ex = side * 0.220
-    ey = 1.985
-    ez = 0.530
-
-    eye_bm = make_uv_sphere_bm(
-        0.152, 0.165, 0.116,
-        cx=ex, cy=ey, cz=ez,
-        u_segs=30, v_segs=22,
-        rot_euler=(-0.05, side * 0.15, -side * 0.08)
-    )
-    append_bmesh_part(eye_bm, "EyeGloss", lambda x, y, z: {"Head": 1.0})
-
-    # Primary crisp white oval catchlight
-    hi1_bm = make_uv_sphere_bm(
-        0.034, 0.050, 0.014,
-        cx=ex - side * 0.030, cy=ey + 0.034, cz=ez + 0.108,
-        u_segs=14, v_segs=10,
-        rot_euler=(-0.10, side * 0.12, 0.0)
-    )
-    append_bmesh_part(hi1_bm, "CatchlightWhite", lambda x, y, z: {"Head": 1.0})
-
-    # Secondary tiny lower sparkle catchlight
-    hi2_bm = make_uv_sphere_bm(
-        0.015, 0.017, 0.010,
-        cx=ex + side * 0.036, cy=ey - 0.040, cz=ez + 0.104,
-        u_segs=10, v_segs=8
-    )
-    append_bmesh_part(hi2_bm, "CatchlightWhite", lambda x, y, z: {"Head": 1.0})
-
-    # Upper plush eyelid rim (weighted to Eyelid.L / Eyelid.R for blinking & fart-strain squint)
-    lid_pts = []
-    for k in range(15):
-        t = -1.0 + 2.0 * k / 14.0
-        lx = ex + t * 0.154
-        ly = ey + 0.142 * math.cos(t * 1.15)
-        lz = ez + 0.092 * math.cos(t * 0.9)
-        lid_pts.append((lx, ly, lz))
-    lid_bm = make_torus_tube_bm(
-        lid_pts,
-        lambda t: 0.020 * math.sin(math.pi * (0.08 + 0.84 * t)),
-        radial_segs=10, closed=False
-    )
-    append_bmesh_part(lid_bm, "ForestGreen", lambda x, y, z, b=lid_bone: {b: 0.90, "Head": 0.10})
-
-    # Cute high arched eyebrow (from 052_HoppyHopscotch.webp)
-    brow_pts = []
-    for k in range(13):
-        t = -1.0 + 2.0 * k / 12.0
-        bx = ex + t * 0.135
-        by = ey + 0.230 + 0.036 * (1.0 - t * t) - side * 0.015 * t
-        bz = head_front_z(bx, by) + 0.012
-        brow_pts.append((bx, by, bz))
-    brow_bm = make_torus_tube_bm(
-        brow_pts,
-        lambda t: 0.014 * math.sin(math.pi * (0.1 + 0.8 * t)),
-        radial_segs=8, closed=False
-    )
-    append_bmesh_part(brow_bm, "ZipperTrack", lambda x, y, z: {"Head": 1.0})
-
-
-# ------------------------------------------------------------------------------
-# 3.4 PINK TRIANGULAR RABBIT NOSE, WIDE HAPPY GRIN, BUCK TEETH & PINK TONGUE
-# ------------------------------------------------------------------------------
-def nose_triangle_deform(p):
-    t_y = (p.y + 0.055) / 0.11
-    p.x *= (0.38 + 0.85 * max(0.0, min(1.2, t_y)))
-    return p
-
-
-nose_bm = make_uv_sphere_bm(
-    0.076, 0.052, 0.046,
-    cx=0.0, cy=1.855, cz=0.625,
-    u_segs=22, v_segs=16,
-    rot_euler=(-0.12, 0.0, 0.0),
-    deform_fn=nose_triangle_deform
-)
-append_bmesh_part(nose_bm, "NosePink", lambda x, y, z: {"Head": 1.0})
-
-
-def build_conformed_mouth_cavity_bm():
-    """
-    Build mouth cavity strictly bounded between lower_smile_y(x) and upper_smile_y(x)
-    so zero black vertices ever protrude outside the green smiling lips!
-    """
-    bm = bmesh.new()
-    nx_steps = 36
-    ny_steps = 14
-    grid = []
-    for iy in range(ny_steps + 1):
-        v_frac = iy / ny_steps
-        row = []
-        for ix in range(nx_steps + 1):
-            u_frac = -1.0 + 2.0 * ix / nx_steps
-            ux = u_frac * 0.505
-            y_bot = lower_smile_y(ux) + 0.008
-            y_top = upper_smile_y(ux) - 0.006
-            uy = y_bot + (y_top - y_bot) * v_frac
-            uz = head_front_z(ux, uy) - 0.012
-            row.append(bm.verts.new((ux, uy, uz)))
-        grid.append(row)
-
-    for iy in range(ny_steps):
-        for ix in range(nx_steps):
-            v1 = grid[iy][ix]
-            v2 = grid[iy][ix + 1]
-            v3 = grid[iy + 1][ix + 1]
-            v4 = grid[iy + 1][ix]
-            bm.faces.new([v1, v2, v3, v4])
-    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-    return bm
-
-
-mouth_bm = build_conformed_mouth_cavity_bm()
-append_bmesh_part(
-    mouth_bm, "MouthVoidBlack",
-    lambda x, y, z: {"Jaw": max(0.0, min(1.0, (1.74 - y) * 3.0)),
-                     "Head": 1.0 - max(0.0, min(1.0, (1.74 - y) * 3.0))}
-)
-
-# Cute pink plush tongue inside lower mouth cavity
-tongue_bm = make_uv_sphere_bm(
-    0.155, 0.072, 0.030,
-    cx=0.0, cy=1.515, cz=head_front_z(0.0, 1.515) - 0.002,
-    u_segs=20, v_segs=14,
-    rot_euler=(0.38, 0.0, 0.0)
-)
-append_bmesh_part(tongue_bm, "NosePink", lambda x, y, z: {"Jaw": 0.85, "Head": 0.15})
-
-# Upper and Lower Green Plush Smiling Lip Rims
-upper_lip_pts = []
-for k in range(37):
-    t = -1.0 + 2.0 * k / 36.0
-    lx = t * 0.525
-    ly = upper_smile_y(lx)
-    lz = head_front_z(lx, ly) + 0.024 * (1.0 - 0.32 * t * t)
-    upper_lip_pts.append((lx, ly, lz))
-
-upper_lip_bm = make_torus_tube_bm(
-    upper_lip_pts,
-    lambda t: 0.038 + 0.012 * math.sin(math.pi * t),
-    radial_segs=14, closed=False
-)
-append_bmesh_part(upper_lip_bm, "BodyGreen", lambda x, y, z: {"Head": 0.90, "Jaw": 0.10})
-
-lower_lip_pts = []
-for k in range(41):
-    t = -1.0 + 2.0 * k / 40.0
-    lx = t * 0.525
-    ly = lower_smile_y(lx)
-    lz = head_front_z(lx, ly) + 0.020 * (1.0 - 0.30 * t * t)
-    lower_lip_pts.append((lx, ly, lz))
-
-lower_lip_bm = make_torus_tube_bm(
-    lower_lip_pts,
-    lambda t: 0.034 + 0.010 * math.sin(math.pi * t),
-    radial_segs=14, closed=False
-)
-append_bmesh_part(
-    lower_lip_bm, "BodyGreen",
-    lambda x, y, z: {"Jaw": max(0.0, min(1.0, (1.74 - y) * 2.8)),
-                     "Head": 1.0 - max(0.0, min(1.0, (1.74 - y) * 2.8))}
-)
-
-# Smile corner cheek creases
-for side in (-1, 1):
-    cheek_pts = []
-    for k in range(11):
-        t = k / 10.0
-        cx = side * (0.495 + 0.042 * math.sin(math.pi * t))
-        cy = 1.79 + 0.12 * (1.0 - t)
-        cz = head_front_z(cx, cy) + 0.018
-        cheek_pts.append((cx, cy, cz))
-    cheek_bm = make_torus_tube_bm(cheek_pts, 0.030, radial_segs=10, closed=False)
-    append_bmesh_part(cheek_bm, "BodyGreen", lambda x, y, z: {"Head": 0.92, "Jaw": 0.08})
-
-# Twin White Bunny Buck Teeth inside the wide happy grin!
-for side in (-1, 1):
-    tx = side * 0.060
-    ty = 1.695
-    tz = head_front_z(tx, ty) + 0.002
-
-    def tooth_deform(p, s=side):
-        if p.y < 0:
-            p.x *= (1.0 + 0.16 * min(1.0, (p.y / -0.095) ** 2))
-        if p.y < -0.092:
-            p.y = -0.092 + (p.y + 0.092) * 0.25
-        if s * p.x < -0.056:
-            p.x = -s * (0.056 + (abs(p.x) - 0.056) * 0.08)
-        return p
-
-    tooth_bm = make_uv_sphere_bm(
-        0.064, 0.112, 0.030,
-        cx=tx, cy=ty, cz=tz,
-        u_segs=22, v_segs=16,
-        rot_euler=(-0.26, 0.0, 0.0),
-        deform_fn=tooth_deform
-    )
-    append_bmesh_part(tooth_bm, "ToothWhite", lambda x, y, z: {"Head": 0.95, "Jaw": 0.05})
-
-
-# ------------------------------------------------------------------------------
-# 3.5 PEAR-SHAPED GREEN PLUSH TORSO, PASTEL MINT BELLY, ZIPPER & LIGHTNING PENDANT
-# ------------------------------------------------------------------------------
-def build_torso_bm():
-    bm = bmesh.new()
-    u_segs = 38
+def build_character_scene():
+    if CHAR_SLUG == "catnap":
+        bpy.ops.wm.open_mainfile(filepath="/tmp/critter-3d/unzipped/CatNap-Final-v11.blend")
+        col = bpy.data.collections['CATNAP • shape review v11']
+        studio = bpy.data.collections['STUDIO • cameras and lighting']
+        root = bpy.data.objects['CATNAP_ROOT • unrigged shape draft']
+        if 'Stitch-detail' not in bpy.data.objects:
+            cd = bpy.data.cameras.new('Stitch-detail')
+            cd.type = 'ORTHO'
+            cd.ortho_scale = 2.65
+            co = bpy.data.objects.new('Stitch-detail', cd)
+            co.location = (0, -9, 1.55)
+            co.rotation_euler = (Vector((0, -.25, 1.55)) - co.location).to_track_quat('-Z', 'Y').to_euler()
+            studio.objects.link(co)
+        return col, studio, root, {"total_stitches": 761}
+
+    bpy.ops.object.select_all(action='SELECT')
+    bpy.ops.object.delete(use_global=False)
+
+    col = bpy.data.collections.new(f'{CHAR_SLUG.upper()} • shape review v11')
+    bpy.context.scene.collection.children.link(col)
+    studio = bpy.data.collections.new('STUDIO • cameras and lighting')
+    bpy.context.scene.collection.children.link(studio)
+
+    def move(obj, target_col=col):
+        for c in list(obj.users_collection):
+            c.objects.unlink(obj)
+        target_col.objects.link(obj)
+        return obj
+
+    def mat(name, color, rough=.84, metal=0.0, bump=False, sheen=.28):
+        m = bpy.data.materials.new(name)
+        m.diffuse_color = (*color, 1)
+        m.use_nodes = True
+        nt = m.node_tree
+        n = nt.nodes
+        p = n.get('Principled BSDF')
+        p.inputs['Base Color'].default_value = (*color, 1)
+        p.inputs['Roughness'].default_value = rough
+        p.inputs['Metallic'].default_value = metal
+        if bump:
+            p.inputs['Sheen Weight'].default_value = sheen
+            tex = n.new('ShaderNodeTexNoise')
+            tex.inputs['Scale'].default_value = 235
+            tex.inputs['Detail'].default_value = 2
+            coord = n.new('ShaderNodeTexCoord')
+            nt.links.new(coord.outputs['Object'], tex.inputs['Vector'])
+            b = n.new('ShaderNodeBump')
+            b.inputs['Strength'].default_value = .32
+            b.inputs['Distance'].default_value = .0035
+            nt.links.new(tex.outputs['Fac'], b.inputs['Height'])
+            nt.links.new(b.outputs['Normal'], p.inputs['Normal'])
+        return m
+
+    main_mat = mat(f'01 • {spec["title"]} primary plush', spec['main_color'], .84, bump=True)
+    cuff_mat = mat(f'02 • {spec["title"]} secondary plush', spec['cuff_color'], .84, bump=True)
+    belly_mat = mat(f'02b • {spec["title"]} tertiary plush', spec.get('belly_color', spec['cuff_color']), .84, bump=True)
+    ear_dark = mat(f'11 • {spec["title"]} recessed inner ear', spec['ear_inner_color'], .88, bump=True)
+    black = mat('03 • dark eye buttons', (.006, .004, .011), .38)
+    inside = mat('04 • mouth cavity • matte', (.003, .002, .004), .85)
+    inside.node_tree.nodes.get('Principled BSDF').inputs['Specular IOR Level'].default_value = .18
+    pendant_mat = mat('06 • character pendant', spec['pendant_color'], .27, .65 if CHAR_SLUG in ('catnap', 'dogday', 'bubba_bubbaphant', 'hoppy_hopscotch', 'baba_chops') else .22)
+    pendant_alt = mat('06b • pendant secondary', spec.get('pendant_alt_color', (.95, .75, .05)), .30, .35)
+    zipmat = mat('07 • zipper fabric', (.035, .025, .045), .82)
+    teeth = mat('08 • zipper teeth', (.16, .14, .18), .48, .30)
+    thread = mat('Stitch • primary cotton thread', spec['thread_color'], .87, sheen=.30)
+    groove = mat('Stitch • recessed seam join', spec['groove_color'], .87, sheen=.30)
+    mouththread = mat('Stitch • mouth muted thread', spec['mouth_thread_color'], .87, sheen=.30)
+    nose_black = mat('Nose • soft matte black', (.006, .004, .011), .52)
+    speaker = mat('12 • recessed speaker', (.012, .010, .017), .70)
+
+    def finish(o, m):
+        if m:
+            o.data.materials.append(m)
+        if o.type == 'MESH':
+            for p in o.data.polygons:
+                p.use_smooth = True
+        move(o)
+        return o
+
+    def ell(name, loc, scale, m, seg=48, rings=32):
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=seg, ring_count=rings, location=loc)
+        o = bpy.context.object
+        o.name = name
+        o.scale = scale
+        bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+        return finish(o, m)
+
+    def bezier_curve(name, pts, r, m, radii=None, cyclic=False):
+        cu = bpy.data.curves.new(name, 'CURVE')
+        cu.dimensions = '3D'
+        cu.resolution_u = 16
+        cu.bevel_depth = r
+        cu.bevel_resolution = 5
+        cu.use_fill_caps = True
+        s = cu.splines.new('BEZIER')
+        s.bezier_points.add(len(pts) - 1)
+        for i, (p, co) in enumerate(zip(s.bezier_points, pts)):
+            p.co = co
+            p.handle_left_type = 'AUTO'
+            p.handle_right_type = 'AUTO'
+            p.radius = (radii[i] if radii else 1)
+        s.use_cyclic_u = cyclic
+        o = bpy.data.objects.new(name, cu)
+        col.objects.link(o)
+        cu.materials.append(m)
+        return o
+
+    def polyextrude(name, xz, yfront, yback, m, bevel=0):
+        n = len(xz)
+        v = [(x, yfront, z) for x, z in xz] + [(x, yback, z) for x, z in xz]
+        faces = []
+        vectors = [Vector((x, z, 0)) for x, z in xz]
+        tris = tessellate_polygon([vectors])
+        lookup = {tuple(v): i for i, v in enumerate(vectors)}
+        for t in tris:
+            ids = [p if isinstance(p, int) else lookup[tuple(p)] for p in t]
+            faces.append(tuple(reversed(ids)))
+            faces.append(tuple(i + n for i in ids))
+        faces += [(i, (i + 1) % n, (i + 1) % n + n, i + n) for i in range(n)]
+        me = bpy.data.meshes.new(name)
+        me.from_pydata(v, [], faces)
+        me.update()
+        o = bpy.data.objects.new(name, me)
+        col.objects.link(o)
+        if m:
+            me.materials.append(m)
+        bm = bmesh.new()
+        bm.from_mesh(me)
+        bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
+        bmesh.ops.dissolve_limit(bm, angle_limit=.001, verts=list(bm.verts), edges=list(bm.edges))
+        bm.to_mesh(me)
+        bm.free()
+        if bevel:
+            bpy.ops.object.select_all(action='DESELECT')
+            o.select_set(True)
+            bpy.context.view_layer.objects.active = o
+            b = o.modifiers.new('Rounded cast edges', 'BEVEL')
+            b.width = bevel
+            b.use_clamp_overlap = True
+            b.segments = 4
+            b.limit_method = 'ANGLE'
+            b.angle_limit = .45
+            bpy.ops.object.modifier_apply(modifier=b.name)
+            wn = o.modifiers.new('Weighted face normals', 'WEIGHTED_NORMAL')
+            wn.keep_sharp = True
+            wn.weight = 50
+            bpy.ops.object.modifier_apply(modifier=wn.name)
+        for p in o.data.polygons:
+            p.use_smooth = True
+        return o
+
+    def plush_loft(name, profile, mats, cuff=None, N=96):
+        rows = []
+        for i in range(len(profile) - 1):
+            p0 = Vector(profile[max(0, i - 1)])
+            p1 = Vector(profile[i])
+            p2 = Vector(profile[i + 1])
+            p3 = Vector(profile[min(len(profile) - 1, i + 2)])
+            for j in range(7):
+                t = j / 7
+                rows.append(tuple(.5 * ((2 * p1) + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t * t + (-p0 + 3 * p1 - 3 * p2 + p3) * t * t * t)))
+        rows.append(profile[-1])
+        v = []
+        for z, w, d, cx, cy in rows:
+            for k in range(N):
+                t = k / N * 2 * pi
+                v.append((cx + max(.006, w) * cos(t), cy + max(.006, d) * sin(t), z))
+        faces = []
+        bands = []
+        for r in range(len(rows) - 1):
+            for k in range(N):
+                faces.append((r * N + k, r * N + (k + 1) % N, (r + 1) * N + (k + 1) % N, (r + 1) * N + k))
+                bands.append(1 if cuff is not None and (rows[r][0] + rows[r + 1][0]) * .5 < cuff else 0)
+        faces.extend([tuple(reversed(range(N))), tuple(range((len(rows) - 1) * N, len(rows) * N))])
+        bands.extend([1 if cuff is not None else 0, 0])
+        me = bpy.data.meshes.new(name)
+        me.from_pydata(v, [], faces)
+        me.update()
+        ob = bpy.data.objects.new(name, me)
+        col.objects.link(ob)
+        for m in mats:
+            me.materials.append(m)
+        for p, idx in zip(me.polygons, bands):
+            p.use_smooth = True
+            p.material_index = idx
+        bpy.ops.object.select_all(action='DESELECT')
+        ob.select_set(True)
+        bpy.context.view_layer.objects.active = ob
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.mesh.select_all(action='SELECT')
+        bpy.ops.mesh.normals_make_consistent(inside=False)
+        bpy.ops.object.mode_set(mode='OBJECT')
+        return ob
+
+    def catmull(points, n=8):
+        arr = []
+        for i in range(len(points)):
+            p0 = Vector(points[(i - 1) % len(points)])
+            p1 = Vector(points[i])
+            p2 = Vector(points[(i + 1) % len(points)])
+            p3 = Vector(points[(i + 2) % len(points)])
+            for j in range(n):
+                t = j / n
+                v = .5 * ((2 * p1) + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t * t + (-p0 + 3 * p1 - 3 * p2 + p3) * t * t * t)
+                arr.append(tuple(v))
+        return arr
+
+    def cubic2(a, b, c, d, n=4):
+        return [tuple((1 - t) ** 3 * a[k] + 3 * (1 - t) ** 2 * t * b[k] + 3 * (1 - t) * t * t * c[k] + t ** 3 * d[k] for k in range(2)) for t in [j / n for j in range(n)]]
+
+    # ==========================================================================
+    # 1. HEAD LOFT & CHARACTER EARS / CREST
+    # ==========================================================================
     profile = [
-        (0.00, 0.48), (0.20, 0.50), (0.36, 0.55), (0.46, 0.65),
-        (0.50, 0.78), (0.50, 0.92), (0.47, 1.06), (0.43, 1.20),
-        (0.37, 1.32), (0.31, 1.40), (0.24, 1.45), (0.00, 1.47)
+        (2.73, .015, .10), (2.755, .18, .20), (2.80, .37, .31), (2.90, .55, .40),
+        (2.98, .65, .46), (3.13, .82, .53), (3.32, .97, .59), (3.52, 1.065, .65),
+        (3.71, 1.108, .67), (3.90, 1.095, .65), (4.02, 1.045, .62), (4.12, .89, .56),
+        (4.24, .75, .53), (4.37, .65, .42), (4.48, .50, .30), (4.56, .33, .19),
+        (4.59, .20, .115), (4.605, .02, .025)
     ]
-    rings = []
-    for r_rad, ry in profile:
-        if r_rad < 1e-4:
-            rings.append([bm.verts.new((0.0, ry, 0.0))])
-        else:
-            ring = []
-            for iu in range(u_segs):
-                ang = 2.0 * math.pi * iu / u_segs
-                vx = math.cos(ang) * r_rad
-                vz = math.sin(ang) * r_rad * 0.88
-                ring.append(bm.verts.new((vx, ry, vz)))
-            rings.append(ring)
+    def prof(z):
+        for i in range(len(profile) - 1):
+            a, b = profile[i], profile[i + 1]
+            if z <= b[0]:
+                t = max(0, min(1, (z - a[0]) / (b[0] - a[0])))
+                return a[1] * (1 - t) + b[1] * t, a[2] * (1 - t) + b[2] * t
+        return profile[-1][1:]
 
-    bot_v = rings[0][0]
-    for iu in range(u_segs):
-        iun = (iu + 1) % u_segs
-        bm.faces.new([bot_v, rings[1][iun], rings[1][iu]])
+    ringdata = []
+    for i in range(len(profile) - 1):
+        p0 = Vector(profile[max(0, i - 1)])
+        p1 = Vector(profile[i])
+        p2 = Vector(profile[i + 1])
+        p3 = Vector(profile[min(len(profile) - 1, i + 2)])
+        for j in range(8):
+            t = j / 8
+            p = .5 * ((2 * p1) + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t * t + (-p0 + 3 * p1 - 3 * p2 + p3) * t * t * t)
+            ringdata.append(tuple(p))
+    ringdata.append(profile[-1])
+    verts = []
+    n = 128
+    for z, w, d in ringdata:
+        for j in range(n):
+            a = j / n * 2 * pi
+            verts.append((max(.007, w) * cos(a), max(.015, d) * sin(a) + .035, z))
 
-    for ir in range(1, len(rings) - 2):
-        r1 = rings[ir]
-        r2 = rings[ir + 1]
-        for iu in range(u_segs):
-            iun = (iu + 1) % u_segs
-            bm.faces.new([r1[iu], r2[iu], r2[iun], r1[iun]])
+    def facial_volume(x, z):
+        return (
+            .055 * math.exp(-(((abs(x) - .40) / .38) ** 2 + ((z - 3.965) / .17) ** 2))
+            + .040 * math.exp(-((x / .70) ** 2 + ((z - 2.91) / .16) ** 2))
+            + .092 * math.exp(-((x / .31) ** 2 + ((z - 3.99) / .21) ** 2))
+            + .045 * math.exp(-(((abs(x) - .79) / .24) ** 2 + ((z - 3.98) / .26) ** 2))
+        )
 
-    top_v = rings[-1][0]
-    for iu in range(u_segs):
-        iun = (iu + 1) % u_segs
-        bm.faces.new([top_v, rings[-2][iu], rings[-2][iun]])
+    verts = [(x, y - facial_volume(x, z) * max(0, min(1, (.035 - y) / .18)), z) for x, y, z in verts]
+    faces = []
+    for i in range(len(ringdata) - 1):
+        for j in range(n):
+            faces.append((i * n + j, i * n + (j + 1) % n, (i + 1) * n + (j + 1) % n, (i + 1) * n + j))
+    faces.extend([tuple(reversed(range(n))), tuple(range((len(ringdata) - 1) * n, len(ringdata) * n))])
+    me = bpy.data.meshes.new(f'{spec["title"]} reference silhouette loft')
+    me.from_pydata(verts, [], faces)
+    me.update()
+    head_base_mat = cuff_mat if CHAR_SLUG == "baba_chops" else main_mat
+    head = bpy.data.objects.new('Head • reference traced crown and fused ear roots', me)
+    col.objects.link(head)
+    me.materials.append(head_base_mat)
+    for p in me.polygons:
+        p.use_smooth = True
+    bpy.ops.object.select_all(action='DESELECT')
+    head.select_set(True)
+    bpy.context.view_layer.objects.active = head
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.mesh.select_all(action='SELECT')
+    bpy.ops.mesh.normals_make_consistent(inside=False)
+    bpy.ops.object.mode_set(mode='OBJECT')
 
-    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-    return bm
+    def ear_shell(name, outline, cx, cz, outer_mat, inner_mat=ear_dark, y_shift=0.0):
+        points = catmull(outline, 3)
+        N = len(points)
+        verts = []
+        rings = [(.012, .095 + y_shift), (.30, .08 + y_shift), (.58, .025 + y_shift), (.70, -.045 + y_shift), (.75, -.115 + y_shift), (.86, -.145 + y_shift), (1.0, -.065 + y_shift)]
+        for f, y in rings:
+            for x, z in points:
+                verts.append((cx + (x - cx) * f, y, cz + (z - cz) * f))
+        back_start = len(verts)
+        for f, y in [(1, .035 + y_shift), (.72, .155 + y_shift), (.32, .215 + y_shift), (.012, .23 + y_shift)]:
+            for x, z in points:
+                verts.append((cx + (x - cx) * f, y, cz + (z - cz) * f))
+        faces = []
+        mi = []
+        for r in range(len(rings) - 1):
+            for j in range(N):
+                faces.append((r * N + j, r * N + (j + 1) % N, (r + 1) * N + (j + 1) % N, (r + 1) * N + j))
+                mi.append(1 if r < 3 else 0)
+        faces.append(tuple(reversed(range(N))))
+        mi.append(1)
+        off = (len(rings) - 1) * N
+        for j in range(N):
+            faces.append((off + j, off + (j + 1) % N, back_start + (j + 1) % N, back_start + j))
+            mi.append(0)
+        for r in range(3):
+            for j in range(N):
+                faces.append((back_start + r * N + j, back_start + r * N + (j + 1) % N, back_start + (r + 1) * N + (j + 1) % N, back_start + (r + 1) * N + j))
+                mi.append(0)
+        faces.append(tuple(range(back_start + 3 * N, back_start + 4 * N)))
+        mi.append(0)
+        me = bpy.data.meshes.new(name)
+        me.from_pydata(verts, [], faces)
+        me.update()
+        ob = bpy.data.objects.new(name, me)
+        col.objects.link(ob)
+        me.materials.append(outer_mat)
+        me.materials.append(inner_mat)
+        for p, idx in zip(me.polygons, mi):
+            p.use_smooth = True
+            p.material_index = idx
+        bpy.ops.object.select_all(action='DESELECT')
+        ob.select_set(True)
+        bpy.context.view_layer.objects.active = ob
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.mesh.select_all(action='SELECT')
+        bpy.ops.mesh.normals_make_consistent(inside=False)
+        bpy.ops.object.mode_set(mode='OBJECT')
+        su = ob.modifiers.new('Soft ear subsurf', 'SUBSURF')
+        su.levels = 2
+        bpy.ops.object.modifier_apply(modifier=su.name)
+        return ob
 
+    ears = []
+    if CHAR_SLUG == "bobby_bearhug":
+        # Round C-shaped teddy bear ears
+        ear_outline = []
+        for k in range(16):
+            ang = 2 * pi * k / 16
+            ear_outline.append((.64 + .31 * cos(ang), 4.54 + .30 * sin(ang)))
+        for sg, label in [(-1, 'L'), (1, 'R')]:
+            pts = [(sg * x, z) for x, z in ear_outline]
+            ears.append(ear_shell('Ear.' + label, pts, sg * .64, 4.54, main_mat, cuff_mat))
+    elif CHAR_SLUG == "bubba_bubbaphant":
+        # Large C-shaped curved elephant ears
+        ear_outline = [
+            (.48, 4.46), (.64, 4.86), (.98, 4.94), (1.32, 4.70),
+            (1.42, 4.24), (1.34, 3.70), (1.04, 3.42), (.68, 3.52), (.52, 3.92)
+        ]
+        for sg, label in [(-1, 'L'), (1, 'R')]:
+            pts = [(sg * x, z) for x, z in ear_outline]
+            ears.append(ear_shell('Ear.' + label, pts, sg * .95, 4.18, main_mat, cuff_mat, y_shift=0.06))
+    elif CHAR_SLUG == "craftycorn":
+        # Upright pointed equine unicorn ears
+        ear_outline = []
+        for segment in [
+            ((.34, 4.44), (.42, 4.72), (.64, 4.98), (.80, 5.04)),
+            ((.80, 5.04), (.84, 5.05), (.88, 5.03), (.90, 4.98)),
+            ((.90, 4.98), (.98, 4.78), (.98, 4.38), (.86, 4.12)),
+            ((.86, 4.12), (.64, 4.10), (.44, 4.24), (.34, 4.44)),
+        ]:
+            ear_outline += cubic2(*segment)
+        for sg, label in [(-1, 'L'), (1, 'R')]:
+            pts = [(sg * x, z) for x, z in ear_outline]
+            ears.append(ear_shell('Ear.' + label, pts, sg * .68, 4.52, main_mat, ear_dark))
+    elif CHAR_SLUG == "hoppy_hopscotch":
+        # Long tall upright rabbit ears
+        ear_outline = [
+            (.16, 4.48), (.14, 4.95), (.20, 5.48), (.34, 5.82),
+            (.50, 5.86), (.64, 5.62), (.66, 5.12), (.58, 4.65), (.44, 4.40)
+        ]
+        for sg, label in [(-1, 'L'), (1, 'R')]:
+            pts = [(sg * x, z) for x, z in ear_outline]
+            ears.append(ear_shell('Ear.' + label, pts, sg * .42, 5.10, main_mat, cuff_mat))
+    elif CHAR_SLUG == "picky_piggy":
+        # Wide outward-swept pointed floppy pig ears
+        ear_outline = [
+            (.34, 4.46), (.58, 4.72), (.96, 4.86), (1.26, 4.80),
+            (1.22, 4.52), (1.04, 4.22), (.76, 4.10), (.48, 4.20)
+        ]
+        for sg, label in [(-1, 'L'), (1, 'R')]:
+            pts = [(sg * x, z) for x, z in ear_outline]
+            ears.append(ear_shell('Ear.' + label, pts, sg * .82, 4.48, main_mat, cuff_mat))
+    elif CHAR_SLUG == "baba_chops":
+        # Horizontal outward-pointing off-white sheep ears
+        ear_outline = [
+            (.58, 4.46), (.84, 4.64), (1.18, 4.66), (1.36, 4.50),
+            (1.28, 4.26), (1.02, 4.14), (.74, 4.18)
+        ]
+        for sg, label in [(-1, 'L'), (1, 'R')]:
+            pts = [(sg * x, z) for x, z in ear_outline]
+            ears.append(ear_shell('Ear.' + label, pts, sg * .96, 4.38, cuff_mat, ear_dark))
+    elif CHAR_SLUG == "dogday":
+        # Long floppy rust-brown spaniel ears arching out and down from crown (strictly monotonic z for clean loft!)
+        for sg, label in [(-1, 'L'), (1, 'R')]:
+            flop_prof = [
+                (3.62, .03, .03, sg * 1.62, -.04),
+                (3.70, .18, .09, sg * 1.55, -.03),
+                (3.88, .27, .12, sg * 1.38, -.01),
+                (4.10, .30, .13, sg * 1.16, .01),
+                (4.30, .28, .13, sg * .92, .02),
+                (4.44, .25, .13, sg * .66, .03),
+                (4.52, .20, .12, sg * .44, .03),
+                (4.56, .08, .08, sg * .30, .03),
+            ]
+            ob = plush_loft('Ear.' + label, flop_prof, [main_mat, cuff_mat])
+            for f in ob.data.polygons:
+                f.material_index = 1
+            ears.append(ob)
+    elif CHAR_SLUG == "kickin_chicken":
+        # 3-lobed puffy golden-yellow chicken comb / feather crest on top of head (strictly monotonic z!)
+        comb_lobes = [
+            # Left sweeping feather lobe over brow
+            [
+                (4.16, .04, .05, -1.04, -.08),
+                (4.24, .16, .15, -.96, -.07),
+                (4.38, .23, .20, -.76, -.05),
+                (4.50, .25, .22, -.48, -.03),
+                (4.58, .22, .20, -.24, -.01),
+                (4.62, .07, .09, -.08, .01),
+            ],
+            # Center crown feather lobe
+            [
+                (4.40, .05, .08, .04, .01),
+                (4.54, .18, .18, .06, -.01),
+                (4.78, .24, .21, .08, -.03),
+                (4.98, .21, .19, .09, -.04),
+                (5.06, .06, .07, .09, -.04),
+            ],
+            # Right crown feather lobe
+            [
+                (4.35, .05, .08, .28, .02),
+                (4.50, .17, .17, .36, .00),
+                (4.74, .23, .20, .44, -.02),
+                (4.92, .19, .18, .48, -.03),
+                (4.99, .05, .07, .50, -.03),
+            ],
+        ]
+        for idx, cprof in enumerate(comb_lobes):
+            ob = plush_loft(f'Crest.{idx}', cprof, [main_mat, main_mat])
+            ears.append(ob)
 
-def torso_weights(x, y, z):
-    if y < 0.76:
-        t = max(0.0, min(1.0, (y - 0.48) / 0.28))
-        return {"Pelvis": 1.0 - 0.5 * t, "Spine": 0.5 * t}
-    elif y < 1.10:
-        t = (y - 0.76) / 0.34
-        return {"Pelvis": max(0.0, 0.5 - t), "Spine": 1.0 - abs(t - 0.5), "Chest": max(0.0, t - 0.3)}
+    ear_surfaces = []
+    for ob in ears:
+        ear_surfaces.append((
+            BVHTree.FromPolygons([v.co for v in ob.data.vertices], [list(f.vertices) for f in ob.data.polygons]),
+            [f.material_index for f in ob.data.polygons]
+        ))
+
+    bpy.ops.object.select_all(action='DESELECT')
+    for ob in [head] + ears:
+        ob.select_set(True)
+    bpy.context.view_layer.objects.active = head
+    bpy.ops.object.join()
+    mo = head.modifiers.new('Continuous plush ear roots', 'REMESH')
+    mo.mode = 'VOXEL'
+    mo.voxel_size = .012
+    mo.use_smooth_shade = True
+    bpy.ops.object.modifier_apply(modifier=mo.name)
+    mo = head.modifiers.new('Soft root transition', 'SMOOTH')
+    mo.factor = .65
+    mo.iterations = 7
+    bpy.ops.object.modifier_apply(modifier=mo.name)
+
+    # ==========================================================================
+    # 2. BOOLEAN-CARVED HOLLOW GRIN & ROLLED CLOTH LIP
+    # ==========================================================================
+    pixels = [
+        (525, 266), (550, 268), (585, 288), (625, 307), (665, 317), (700, 317),
+        (730, 309), (750, 302), (770, 309), (800, 317), (835, 317), (875, 307),
+        (915, 288), (950, 268), (975, 266), (999, 285), (1010, 320), (1012, 355),
+        (1000, 395), (978, 441), (950, 477), (915, 515), (875, 542), (835, 562),
+        (790, 572), (750, 575), (710, 572), (665, 562), (625, 542), (585, 515),
+        (550, 477), (522, 441), (500, 395), (488, 355), (490, 320), (501, 285)
+    ]
+    ctrl = [((x - 750) / 258, 2.76 + (595 - y) / 258) for x, y in pixels]
+    outline = catmull(ctrl)
+    cutter = polyextrude('TEMP • mouth subtraction', outline, -1.1, -.005, None)
+    bpy.context.view_layer.objects.active = head
+    mod = head.modifiers.new('True hollow grin', 'BOOLEAN')
+    mod.operation = 'DIFFERENCE'
+    mod.solver = 'EXACT'
+    mod.object = cutter
+    bpy.ops.object.modifier_apply(modifier=mod.name)
+    bpy.data.objects.remove(cutter, do_unlink=True)
+
+    mo = head.modifiers.new('Continuous rounded mouth opening', 'REMESH')
+    mo.mode = 'VOXEL'
+    mo.voxel_size = .009
+    mo.use_smooth_shade = True
+    bpy.ops.object.modifier_apply(modifier=mo.name)
+
+    vg = head.vertex_groups.new(name='Mouth cloth rollover')
+    for v in head.data.vertices:
+        x, y, z = v.co
+        if z < 4.10 and y < .08:
+            vg.add([v.index], 1.0, 'REPLACE')
+    mo = head.modifiers.new('Broad soft cloth transition', 'SMOOTH')
+    mo.vertex_group = vg.name
+    mo.factor = .72
+    mo.iterations = 48
+    bpy.ops.object.modifier_apply(modifier=mo.name)
+
+    # Set up head materials:
+    # slot 0: head base (main_mat, or cuff_mat for Baba Chops)
+    # slot 1: inner ear / secondary head patch (ear_dark or cuff_mat)
+    # slot 2: tertiary head zone (belly_mat for DogDay yellow muzzle / Bobby pink muzzle / Hoppy ear tips)
+    # slot 3: inside (mouth cavity black)
+    head.data.materials.clear()
+    head.data.materials.append(head_base_mat)
+    head.data.materials.append(cuff_mat if CHAR_SLUG in ("dogday", "bobby_bearhug", "bubba_bubbaphant", "hoppy_hopscotch", "picky_piggy") else ear_dark)
+    head.data.materials.append(belly_mat if CHAR_SLUG in ("dogday", "bobby_bearhug") else cuff_mat)
+    head.data.materials.append(inside)
+
+    def in_mouth(x, z):
+        inside_poly = False
+        for i, (ax, az) in enumerate(outline):
+            bx, bz = outline[(i + 1) % len(outline)]
+            if (az > z) != (bz > z) and x < (bx - ax) * (z - az) / (bz - az) + ax:
+                inside_poly = not inside_poly
+        return inside_poly
+
+    def dist_to_mouth_outline(x, z):
+        return min(sqrt((x - mx) ** 2 + (z - mz) ** 2) for mx, mz in outline[::2])
+
+    for face in head.data.polygons:
+        face.use_smooth = True
+        c = face.center
+        face.material_index = 0
+        for tree, indices in ear_surfaces:
+            co, no, idx, dist = tree.find_nearest(c)
+            if idx is not None and dist < .04 and indices[idx] == 1:
+                face.material_index = 1
+        if CHAR_SLUG == "dogday":
+            # Dark rust-brown patch over DogDay's left eye (viewer's right: x > 0.0)
+            if c.x > 0.0 and c.z > 3.92 and c.y < 0.12 and face.material_index == 0:
+                face.material_index = 1
+            # Bright yellow muzzle & mouth rollover band around the grin
+            if c.y < -0.14 and (dist_to_mouth_outline(c.x, c.z) < 0.145 or (abs(c.x) < 0.42 and 3.82 < c.z < 4.08)):
+                face.material_index = 2
+        elif CHAR_SLUG == "bobby_bearhug":
+            # Pastel pink upper muzzle band beneath eyes and around nose
+            if c.y < -0.32 and ((c.x / 0.46) ** 2 + ((c.z - 3.99) / 0.13) ** 2 < 1.0):
+                face.material_index = 2
+        elif CHAR_SLUG == "hoppy_hopscotch":
+            # Asymmetrical forest-green patchwork ear tips
+            if (c.x < -0.05 and c.z > 5.34) or (c.x > 0.05 and c.z > 5.20):
+                face.material_index = 2
+        if -.025 < c.y < .02 and face.normal.y < -.65 and in_mouth(c.x, c.z):
+            face.material_index = 3
+
+    head_tree = BVHTree.FromPolygons([v.co for v in head.data.vertices], [list(f.vertices) for f in head.data.polygons])
+    def analyticfront(x, z):
+        w, d = prof(z)
+        return .035 - d * sqrt(max(.025, 1 - (x / max(.01, w)) ** 2)) - facial_volume(x, z)
+
+    def fronty(x, z):
+        loc, normal, idx, dist = head_tree.ray_cast(Vector((x, -2, z)), Vector((0, 1, 0)), 4)
+        return loc.y if loc is not None else analyticfront(x, z)
+
+    # Smooth recessed mouth bowl
+    verts = []
+    N = len(outline)
+    fractions = [.995, .975, .93, .85, .72, .56, .38, .20, .06]
+    for f in fractions:
+        for x, z in outline:
+            xx = x * f
+            zz = 3.40 + (z - 3.40) * f
+            edge = analyticfront(x, z)
+            blend = max(0, min(1, (f - .60) / .40))
+            blend = blend * blend * (3 - 2 * blend)
+            yy = (-.012 - .26 * f * f) * (1 - blend) + (edge * (f * f) + (-.012) * (1 - f * f) + .065 * f ** 6) * blend
+            verts.append((xx, yy, zz))
+    faces = []
+    for r in range(len(fractions) - 1):
+        for i in range(N):
+            faces.append((r * N + i, r * N + (i + 1) % N, (r + 1) * N + (i + 1) % N, (r + 1) * N + i))
+    verts.append((0, -.012, 3.40))
+    ci = len(verts) - 1
+    for i in range(N):
+        faces.append(((len(fractions) - 1) * N + i, (len(fractions) - 1) * N + (i + 1) % N, ci))
+    me = bpy.data.meshes.new('Continuous curved mouth bowl')
+    me.from_pydata(verts, [], faces)
+    me.update()
+    lining = bpy.data.objects.new('Mouth • smoothly recessed lining', me)
+    col.objects.link(lining)
+    me.materials.append(inside)
+    for p in me.polygons:
+        p.use_smooth = True
+    sub = lining.modifiers.new('Smooth cavity surface', 'SUBSURF')
+    sub.levels = 1
+    bpy.context.view_layer.objects.active = lining
+    bpy.ops.object.modifier_apply(modifier=sub.name)
+
+    # ==========================================================================
+    # 3. SKIN-FITTED DOMED BUTTON EYES & CHARACTER NOSE / SNOUT / TRUNK / BEAK / MANE
+    # ==========================================================================
+    def fitted_eye(sg, label):
+        cx = sg * .338
+        cz = 4.205
+        N = 96
+        vs = []
+        rs = [.015, .15, .30, .45, .60, .72, .82, .90, .96, 1.0]
+        for r in rs:
+            for j in range(N):
+                a = j / N * 2 * pi
+                x = cx + .225 * r * cos(a)
+                z = cz + .222 * r * sin(a)
+                base = fronty(cx, cz)
+                dx = (fronty(cx + .01, cz) - fronty(cx - .01, cz)) / .02
+                dz = (fronty(cx, cz + .01) - fronty(cx, cz - .01)) / .02
+                tangent = base + dx * (x - cx) + dz * (z - cz)
+                blend = max(0, min(1, (r - .80) / .20))
+                blend = blend * blend * (3 - 2 * blend)
+                y = tangent * (1 - blend) + fronty(x, z) * blend - .003 - .155 * sqrt(max(0, 1 - r * r))
+                vs.append((x, y, z))
+        fs = []
+        for k in range(len(rs) - 1):
+            for j in range(N):
+                fs.append((k * N + j, k * N + (j + 1) % N, (k + 1) * N + (j + 1) % N, (k + 1) * N + j))
+        fs.append(tuple(reversed(range(N))))
+        off = len(vs)
+        for j in range(N):
+            x, y, z = vs[(len(rs) - 1) * N + j]
+            vs.append((x, y + .025, z))
+        for j in range(N):
+            fs.append(((len(rs) - 1) * N + j, (len(rs) - 1) * N + (j + 1) % N, off + (j + 1) % N, off + j))
+        fs.append(tuple(range(off, off + N)))
+        me = bpy.data.meshes.new('Fitted eye dome')
+        me.from_pydata(vs, [], fs)
+        me.update()
+        ob = bpy.data.objects.new('Eye.' + label + ' • skin-fitted dome', me)
+        col.objects.link(ob)
+        me.materials.append(black)
+        for f in me.polygons:
+            f.use_smooth = True
+        bpy.ops.object.select_all(action='DESELECT')
+        ob.select_set(True)
+        bpy.context.view_layer.objects.active = ob
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.mesh.select_all(action='SELECT')
+        bpy.ops.mesh.normals_make_consistent(inside=False)
+        bpy.ops.object.mode_set(mode='OBJECT')
+
+    for sg, label in [(-1, 'L'), (1, 'R')]:
+        fitted_eye(sg, label)
+
+    def build_seated_nose(pts_ctrl, nose_mat, z_center=3.989, depth=.045):
+        nose_outline = catmull(pts_ctrl, 8)
+        vs = []
+        N = len(nose_outline)
+        rs = [.015, .20, .40, .60, .78, .90, .97, 1.0]
+        for r in rs:
+            for x, z in nose_outline:
+                xx = x * r
+                zz = z_center + (z - z_center) * r
+                base = analyticfront(0, z_center) + .30 * (zz - z_center)
+                yy = base * (1 - r ** 6) + analyticfront(xx, zz) * r ** 6 - .003 - depth * sqrt(max(0, 1 - r * r))
+                vs.append((xx, yy, zz))
+        fs = [tuple(reversed(range(N)))]
+        for k in range(len(rs) - 1):
+            for j in range(N):
+                fs.append((k * N + j, k * N + (j + 1) % N, (k + 1) * N + (j + 1) % N, (k + 1) * N + j))
+        off = len(vs)
+        for x, y, z in vs[(len(rs) - 1) * N:]:
+            vs.append((x, y + .045, z))
+        for j in range(N):
+            fs.append(((len(rs) - 1) * N + j, (len(rs) - 1) * N + (j + 1) % N, off + (j + 1) % N, off + j))
+        fs.append(tuple(range(off, off + N)))
+        me = bpy.data.meshes.new('Soft nose volume')
+        me.from_pydata(vs, [], fs)
+        me.update()
+        nose = bpy.data.objects.new('Nose • flush seated padded nose', me)
+        col.objects.link(nose)
+        me.materials.append(nose_mat)
+        for f in me.polygons:
+            f.use_smooth = True
+        bpy.ops.object.select_all(action='DESELECT')
+        nose.select_set(True)
+        bpy.context.view_layer.objects.active = nose
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.mesh.select_all(action='SELECT')
+        bpy.ops.mesh.normals_make_consistent(inside=False)
+        bpy.ops.object.mode_set(mode='OBJECT')
+        return nose
+
+    if CHAR_SLUG in ("dogday", "bobby_bearhug"):
+        # Broad rounded dog/bear black nose
+        build_seated_nose([(-.17, 4.035), (0, 4.055), (.17, 4.035), (.12, 3.965), (0, 3.885), (-.12, 3.965)], nose_black, depth=.062)
+    elif CHAR_SLUG == "hoppy_hopscotch":
+        build_seated_nose([(-.13, 4.031), (0, 4.044), (.13, 4.031), (.09, 3.980), (0, 3.901), (-.09, 3.980)], nose_black, depth=.048)
+    elif CHAR_SLUG == "picky_piggy":
+        # Prominent oval pink pig snout with two recessed dark nostrils
+        snout_mat = mat('Snout • pig snout pink', (.45, .10, .22), .82, bump=True)
+        snout = build_seated_nose([
+            (-.22, 4.02), (-.12, 4.10), (.12, 4.10), (.22, 4.02),
+            (.20, 3.91), (.10, 3.87), (-.10, 3.87), (-.20, 3.91)
+        ], snout_mat, z_center=3.99, depth=.115)
+        for sg in (-1, 1):
+            ell(f'Nose • nostril {sg}', (sg * .082, analyticfront(sg * .082, 3.99) - .095, 3.99), (.036, .028, .048), inside, 24, 16)
+    elif CHAR_SLUG == "kickin_chicken":
+        # 3D projecting curved orange upper beak over the top of the grin
+        beak_outline = [(-.26, 3.96), (-.14, 4.08), (0, 4.12), (.14, 4.08), (.26, 3.96), (.16, 3.86), (0, 3.81), (-.16, 3.86)]
+        build_seated_nose(beak_outline, cuff_mat, z_center=3.97, depth=.145)
+    elif CHAR_SLUG == "bubba_bubbaphant":
+        # Long curved plush elephant trunk arching down from between the eyes over the grin
+        trunk_prof = [
+            (3.26, .02, .02, 0.0, -.76),
+            (3.28, .155, .145, 0.0, -.76),
+            (3.42, .165, .155, 0.0, -.74),
+            (3.62, .180, .170, 0.0, -.71),
+            (3.84, .195, .185, 0.0, -.67),
+            (4.02, .205, .195, 0.0, -.60),
+            (4.14, .175, .175, 0.0, -.52),
+            (4.20, .06, .08, 0.0, -.46),
+        ]
+        trunk = plush_loft('Nose • elephant trunk', trunk_prof, [main_mat, cuff_mat], cuff=3.34)
+    elif CHAR_SLUG == "craftycorn":
+        # 3-lobed aqua-turquoise forelock bang + spiraled metallic silver-white unicorn horn
+        forelock_blobs = [
+            (-.26, -.52, 4.48, (.22, .18, .17)),
+            (0.00, -.56, 4.44, (.24, .20, .19)),
+            (0.26, -.52, 4.48, (.22, .18, .17)),
+            (-.14, -.46, 4.58, (.22, .19, .16)),
+            (0.14, -.46, 4.58, (.22, .19, .16)),
+        ]
+        f_objs = [ell(f'Mane.f.{i}', (x, y, z), sc, cuff_mat, 32, 24) for i, (x, y, z, sc) in enumerate(forelock_blobs)]
+        bpy.ops.object.select_all(action='DESELECT')
+        for o in f_objs:
+            o.select_set(True)
+        bpy.context.view_layer.objects.active = f_objs[0]
+        bpy.ops.object.join()
+        f_objs[0].name = 'Nose • aqua forelock mane'
+        rm = f_objs[0].modifiers.new('Forelock remesh', 'REMESH')
+        rm.mode = 'VOXEL'
+        rm.voxel_size = .014
+        rm.use_smooth_shade = True
+        bpy.ops.object.modifier_apply(modifier=rm.name)
+        sm = f_objs[0].modifiers.new('Forelock smooth', 'SMOOTH')
+        sm.factor = .6
+        sm.iterations = 6
+        bpy.ops.object.modifier_apply(modifier=sm.name)
+
+        # Spiraled metallic silver-white unicorn horn
+        horn_mat = mat('Horn • pearlescent silver', (.88, .86, .92), .24, .38)
+        N_h = 48
+        R_h = 40
+        h_verts = []
+        for r in range(R_h):
+            u = r / (R_h - 1)
+            z = 4.54 + u * .72
+            y_c = -.44 - u * .10
+            rad_base = .155 * (1 - u * .92)
+            for j in range(N_h):
+                ang = 2 * pi * j / N_h
+                rib = 1.0 + .08 * sin(ang * 2 + u * 5 * 2 * pi) * (1 - u)
+                rad = max(.003, rad_base * rib)
+                h_verts.append((rad * cos(ang), y_c + rad * sin(ang), z))
+        h_faces = []
+        for r in range(R_h - 1):
+            for j in range(N_h):
+                h_faces.append((r * N_h + j, r * N_h + (j + 1) % N_h, (r + 1) * N_h + (j + 1) % N_h, (r + 1) * N_h + j))
+        h_faces.extend([tuple(reversed(range(N_h))), tuple(range((R_h - 1) * N_h, R_h * N_h))])
+        hme = bpy.data.meshes.new('Unicorn horn')
+        hme.from_pydata(h_verts, [], h_faces)
+        hme.update()
+        horn = bpy.data.objects.new('Nose • spiraled unicorn horn', hme)
+        finish(horn, horn_mat)
+    elif CHAR_SLUG == "baba_chops":
+        # Padded off-white sheep snout, heavy half-lidded eyelids, two big white buck teeth, and black wool hood!
+        build_seated_nose([(-.15, 4.04), (0, 4.07), (.15, 4.04), (.12, 3.96), (0, 3.91), (-.12, 3.96)], cuff_mat, depth=.055)
+        # Half-lidded brooding upper eyelids over the domed eyes
+        for sg, label in [(-1, 'L'), (1, 'R')]:
+            lid_pts = [
+                (sg * .12, 4.21), (sg * .22, 4.36), (sg * .35, 4.42),
+                (sg * .49, 4.36), (sg * .55, 4.22), (sg * .34, 4.23)
+            ]
+            if sg < 0:
+                lid_pts = list(reversed(lid_pts))
+            polyextrude(f'Nose • eyelid {label}', catmull(lid_pts, 4), fronty(sg * .338, 4.28) - .155, fronty(sg * .338, 4.28) - .04, cuff_mat, .012)
+        # Two big rounded-rectangular off-white buck teeth hanging from top of grin
+        for sg, label in [(-1, 'L'), (1, 'R')]:
+            cx = sg * .115
+            tooth_pts = [
+                (cx - .105, 3.92), (cx + .105, 3.92),
+                (cx + .098, 3.58), (cx + .05, 3.53),
+                (cx - .05, 3.53), (cx - .098, 3.58)
+            ]
+            polyextrude(f'Nose • buck tooth {label}', catmull(tooth_pts, 4), -.60, -.46, cuff_mat, .016)
+        # Sculpted charcoal-black sheep wool hood surrounding the crown, temples, cheeks & neck collar
+        # (Side & lower puffs sit at y >= +0.10 behind the white smile rim so the white jaw rim is 100% unbroken!)
+        wool_puffs = [
+            # Forehead & crown wool bangs hanging above eyes
+            (0.00, -.44, 4.58, .30), (-.28, -.42, 4.56, .29), (.28, -.42, 4.56, .29),
+            (-.54, -.34, 4.50, .28), (.54, -.34, 4.50, .28),
+            (0.00, -.20, 4.82, .36), (-.36, -.18, 4.78, .34), (.36, -.18, 4.78, .34),
+            (-.68, -.08, 4.60, .32), (.68, -.08, 4.60, .32),
+            (0.00, -.02, 5.00, .34), (-.32, -.02, 4.94, .32), (.32, -.02, 4.94, .32),
+            # Side & cheek wool framing BEHIND the pale face (y = +0.10..+0.16)
+            (-.96, .10, 4.20, .32), (.96, .10, 4.20, .32),
+            (-1.06, .12, 3.80, .34), (1.06, .12, 3.80, .34),
+            (-.96, .14, 3.40, .30), (.96, .14, 3.40, .30),
+            (-.74, .14, 3.06, .27), (.74, .14, 3.06, .27),
+            # Neck wool collar below/behind chin (y = +0.06..+0.10 so chin rim stays clean in front)
+            (-.36, .06, 2.74, .22), (0.00, .06, 2.70, .22), (.36, .06, 2.74, .22),
+            # Back of head wool
+            (0.00, .28, 4.52, .44), (-.48, .24, 4.38, .40), (.48, .24, 4.38, .40),
+            (0.00, .42, 3.92, .48), (-.56, .34, 3.82, .42), (.56, .34, 3.82, .42),
+            (0.00, .34, 3.28, .40),
+        ]
+        w_objs = [ell(f'Wool.{i}', (x, y, z), (r, r * .92, r * .95), main_mat, 28, 20) for i, (x, y, z, r) in enumerate(wool_puffs)]
+        bpy.ops.object.select_all(action='DESELECT')
+        for o in w_objs:
+            o.select_set(True)
+        bpy.context.view_layer.objects.active = w_objs[0]
+        bpy.ops.object.join()
+        wool_ob = w_objs[0]
+        wool_ob.name = 'Wool • sculpted dark fleece hood'
+        rm = wool_ob.modifiers.new('Wool remesh', 'REMESH')
+        rm.mode = 'VOXEL'
+        rm.voxel_size = .018
+        rm.use_smooth_shade = True
+        bpy.ops.object.modifier_apply(modifier=rm.name)
+        sm = wool_ob.modifiers.new('Wool smooth', 'SMOOTH')
+        sm.factor = .55
+        sm.iterations = 5
+        bpy.ops.object.modifier_apply(modifier=sm.name)
+
+    # ==========================================================================
+    # 4. RECESSED PERFORATED SPEAKER GRILLE IN SMILE CAVITY
+    # ==========================================================================
+    bpy.ops.mesh.primitive_cylinder_add(vertices=96, radius=.213, depth=.042, location=(0, -.130, 3.29), rotation=(pi / 2, 0, 0))
+    plate = finish(bpy.context.object, speaker)
+    plate.name = 'Mouth • perforated speaker grille'
+    holes = []
+    for row in range(-4, 5):
+        for col_i in range(-4, 5):
+            x = (col_i + .5 * (row % 2)) * .043
+            z = row * .038
+            if x * x + z * z < .18 ** 2:
+                bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=.012, depth=.12, location=(x, -.130, 3.29 + z), rotation=(pi / 2, 0, 0))
+                holes.append(bpy.context.object)
+    bpy.ops.object.select_all(action='DESELECT')
+    for ob in holes:
+        ob.select_set(True)
+    bpy.context.view_layer.objects.active = holes[0]
+    bpy.ops.object.join()
+    cut = holes[0]
+    bpy.context.view_layer.objects.active = plate
+    mo = plate.modifiers.new('Actual speaker perforations', 'BOOLEAN')
+    mo.operation = 'DIFFERENCE'
+    mo.object = cut
+    bpy.ops.object.modifier_apply(modifier=mo.name)
+    bpy.data.objects.remove(cut, do_unlink=True)
+    for face in plate.data.polygons:
+        face.use_smooth = False
+    bpy.ops.mesh.primitive_torus_add(major_segments=96, minor_segments=12, major_radius=.214, minor_radius=.009, location=(0, -.153, 3.29), rotation=(pi / 2, 0, 0))
+    finish(bpy.context.object, speaker).name = 'Mouth • speaker rim'
+
+    # ==========================================================================
+    # 5. CONTINUOUS VOXEL-UNIONED BODY, ARMS, LEGS & CHARACTER TAIL (v09 recipe)
+    # ==========================================================================
+    parts = []
+    body_profile = [
+        (1.37, .08, .11), (1.405, .37, .25), (1.48, .51, .35), (1.68, .58, .41),
+        (1.90, .60, .43), (2.10, .565, .415), (2.32, .48, .36), (2.50, .44, .31),
+        (2.63, .35, .275), (2.73, .26, .24), (2.82, .16, .20), (2.85, .06, .12)
+    ]
+    body = plush_loft('Body • continuous plush shell', [(z, w, d, 0, 0) for z, w, d in body_profile], [main_mat, cuff_mat, belly_mat])
+    parts.append(body)
+
+    for sg, label in [(-1, 'L'), (1, 'R')]:
+        legp = [
+            (.275, .045, .07, sg * .44, -.07), (.29, .10, .115, sg * .44, -.07),
+            (.34, .225, .22, sg * .44, -.05), (.45, .33, .28, sg * .44, -.02),
+            (.65, .355, .295, sg * .445, .005), (.88, .32, .28, sg * .41, .02),
+            (1.10, .285, .26, sg * .375, .025), (1.31, .25, .245, sg * .34, .025),
+            (1.49, .23, .235, sg * .32, .025), (1.61, .15, .18, sg * .30, .025),
+            (1.67, .035, .06, sg * .29, .025)
+        ]
+        ob = plush_loft('Leg.' + label + ' • softly rounded sole and smooth inner line', legp, [main_mat, cuff_mat])
+        parts.append(ob)
+        for f in ob.data.polygons:
+            c = f.center
+            if c.z < .55 + .08 * ((abs(c.x) - .44) / .35) ** 2:
+                f.material_index = 1
+
+        armp = [
+            (1.375, .04, .06, sg * .97, -.065), (1.40, .12, .125, sg * .98, -.065),
+            (1.47, .195, .175, sg * .99, -.065), (1.58, .225, .20, sg * .965, -.055),
+            (1.74, .205, .195, sg * .87, -.035), (1.96, .18, .185, sg * .735, -.005),
+            (2.18, .175, .18, sg * .60, .015), (2.39, .19, .185, sg * .46, .025),
+            (2.55, .18, .185, sg * .35, .025), (2.68, .125, .14, sg * .26, .025),
+            (2.75, .025, .045, sg * .20, .025)
+        ]
+        ob = plush_loft('Arm.' + label + ' • curved mitten and seated shoulder', armp, [main_mat, cuff_mat])
+        parts.append(ob)
+        for f in ob.data.polygons:
+            c = f.center
+            if CHAR_SLUG != "kickin_chicken" and c.z - .60 * (abs(c.x) - .90) < 1.74:
+                f.material_index = 1
+
+    # Character-Specific Tail
+    tail_centers = []
+    if CHAR_SLUG in ("bobby_bearhug", "hoppy_hopscotch", "baba_chops"):
+        # Round puffy stub tail on lower back
+        t_ob = ell('Tail • round plush puff', (0.0, .42, 1.56), (.22, .20, .22), main_mat, 32, 24)
+        parts.append(t_ob)
+    elif CHAR_SLUG == "dogday":
+        # Wagging upward-swept orange dog tail visible on side/back
+        tail_prof = [
+            (1.52, .05, .05, .10, .32),
+            (1.58, .14, .14, .28, .38),
+            (1.72, .17, .16, .52, .42),
+            (1.92, .16, .15, .68, .40),
+            (2.14, .12, .12, .72, .35),
+            (2.28, .03, .03, .66, .30),
+        ]
+        t_ob = plush_loft('Tail • wagging dog tail', tail_prof, [main_mat, cuff_mat])
+        parts.append(t_ob)
+        tail_centers = [Vector((cx, cy, z)) for z, _, _, cx, cy in tail_prof]
+    elif CHAR_SLUG == "bubba_bubbaphant":
+        # Slender curved elephant tail sweeping out to the left with royal-blue teardrop tuft (strictly monotonic z!)
+        tail_prof = [
+            (1.42, .06, .06, -.22, .26),
+            (1.46, .090, .090, -.55, .20),
+            (1.52, .085, .085, -.88, .12),
+            (1.60, .080, .080, -1.16, .04),
+            (1.70, .080, .080, -1.34, -.02),
+            (1.82, .135, .095, -1.42, -.05),
+            (1.96, .120, .085, -1.45, -.06),
+            (2.06, .030, .030, -1.46, -.06),
+        ]
+        t_ob = plush_loft('Tail • elephant tail with tuft', tail_prof, [main_mat, cuff_mat])
+        for f in t_ob.data.polygons:
+            if f.center.z > 1.74 and f.center.x < -1.30:
+                f.material_index = 1
+        parts.append(t_ob)
+        tail_centers = [Vector((cx, cy, z)) for z, _, _, cx, cy in tail_prof]
+    elif CHAR_SLUG == "craftycorn":
+        # Fluffy aqua-turquoise unicorn tail + neck mane
+        tail_prof = [
+            (1.05, .04, .04, .34, .34),
+            (1.18, .22, .20, .38, .42),
+            (1.42, .26, .24, .32, .46),
+            (1.65, .18, .18, .16, .38),
+            (1.72, .06, .06, .05, .30),
+        ]
+        t_ob = plush_loft('Tail • aqua unicorn tail', tail_prof, [main_mat, cuff_mat])
+        for f in t_ob.data.polygons:
+            f.material_index = 1
+        parts.append(t_ob)
+    elif CHAR_SLUG == "kickin_chicken":
+        # Upward-projecting yellow tail feather tuft
+        tail_prof = [
+            (1.54, .06, .06, -.12, .32),
+            (1.66, .18, .15, -.32, .38),
+            (1.86, .21, .16, -.44, .40),
+            (2.08, .14, .12, -.46, .36),
+            (2.18, .03, .03, -.44, .32),
+        ]
+        t_ob = plush_loft('Tail • chicken tail feathers', tail_prof, [main_mat, cuff_mat])
+        parts.append(t_ob)
+    elif CHAR_SLUG == "picky_piggy":
+        # Coiled 3D corkscrew pig tail peeking out on the left-back hip
+        cork_pts = []
+        for i in range(44):
+            u = i / 43
+            ang = u * 3.4 * pi
+            cx = -.36 - u * .68 + .13 * cos(ang)
+            cy = .24 - u * .20 + .09 * sin(ang)
+            cz = 1.54 + u * .52 + .13 * sin(ang)
+            cork_pts.append((cx, cy, cz))
+        cork_ob = bezier_curve('Tail • corkscrew pig tail', cork_pts, .046, main_mat)
+        bpy.ops.object.select_all(action='DESELECT')
+        cork_ob.select_set(True)
+        bpy.context.view_layer.objects.active = cork_ob
+        bpy.ops.object.convert(target='MESH')
+        parts.append(cork_ob)
+
+    source_surfaces = []
+    for ob in parts:
+        source_surfaces.append((
+            BVHTree.FromPolygons([v.co for v in ob.data.vertices], [list(f.vertices) for f in ob.data.polygons]),
+            [f.material_index for f in ob.data.polygons]
+        ))
+
+    bpy.ops.object.select_all(action='DESELECT')
+    for ob in parts:
+        ob.select_set(True)
+    bpy.context.view_layer.objects.active = body
+    bpy.ops.object.join()
+    mo = body.modifiers.new('Joined shoulders hips and tail base', 'REMESH')
+    mo.mode = 'VOXEL'
+    mo.voxel_size = .008
+    mo.use_smooth_shade = True
+    bpy.ops.object.modifier_apply(modifier=mo.name)
+    mo = body.modifiers.new('Soft cloth transitions', 'SMOOTH')
+    mo.factor = .62
+    mo.iterations = 10
+    bpy.ops.object.modifier_apply(modifier=mo.name)
+
+    vg = body.vertex_groups.new(name='Shoulder transition')
+    for v in body.data.vertices:
+        x, y, z = v.co
+        w = math.exp(-(((abs(x) - .37) / .26) ** 2 + ((z - 2.53) / .23) ** 2))
+        if w > .01:
+            vg.add([v.index], w, 'REPLACE')
+    mo = body.modifiers.new('Rounded shoulder insertion', 'SMOOTH')
+    mo.vertex_group = vg.name
+    mo.factor = .65
+    mo.iterations = 36
+    bpy.ops.object.modifier_apply(modifier=mo.name)
+
+    body.data.materials.clear()
+    body.data.materials.append(main_mat)
+    body.data.materials.append(cuff_mat)
+    body.data.materials.append(belly_mat)
+
+    for f in body.data.polygons:
+        f.use_smooth = True
+        c = f.center
+        best = (100, 0, 0)
+        for part_index, (tree, indices) in enumerate(source_surfaces):
+            co, no, idx, dist = tree.find_nearest(c)
+            if idx is not None and dist < best[0]:
+                best = (dist, part_index, indices[idx])
+        f.material_index = 0
+        # Arm mittens (skip for KickinChicken who has solid yellow feather wings)
+        if CHAR_SLUG != "kickin_chicken" and best[1] in (2, 4) and c.z - .60 * (abs(c.x) - .90) < 1.74:
+            f.material_index = 1
+        # Leg / foot cuffs
+        if best[1] in (1, 3) and c.z < .55 + .08 * ((abs(c.x) - .44) / .35) ** 2:
+            f.material_index = 1
+        # Tail secondary color (Bubba tuft or CraftyCorn aqua tail)
+        if best[1] == 5 and best[2] == 1:
+            f.material_index = 1
+        # Oval belly patch on DogDay (yellow) and Bobby BearHug (pastel pink)
+        if CHAR_SLUG in ("dogday", "bobby_bearhug") and best[1] == 0:
+            if c.y < -.12 and ((c.x / .38) ** 2 + ((c.z - 1.94) / .49) ** 2 < 1.0):
+                f.material_index = 2
+
+    # ==========================================================================
+    # 6. SURFACE-FITTED ZIPPER & CHARACTER PENDANT (v10-final recipe)
+    # ==========================================================================
+    btree = BVHTree.FromPolygons([v.co for v in body.data.vertices], [list(f.vertices) for f in body.data.polygons])
+    def torso_y(z):
+        hit, no, idx, dist = btree.ray_cast(Vector((0, -2, z)), Vector((0, 1, 0)), 4)
+        return hit.y if hit else -.35
+
+    bezier_curve('Zipper • surface fitted dark tape', [(0, torso_y(z) - .015, z) for z in [2.62, 2.45, 2.25, 2.00, 1.75, 1.51, 1.46]], .025, zipmat)
+    for i in range(27):
+        z = 1.49 + i * .039
+        yy = torso_y(z) - .043
+        bpy.ops.mesh.primitive_cube_add(size=1, location=((-.012 if i % 2 else .012), yy, z))
+        ob = bpy.context.object
+        ob.name = 'Zipper tooth %02d' % i
+        ob.scale = (.019, .014, .012)
+        bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+        finish(ob, teeth)
+        be = ob.modifiers.new('rounded tooth', 'BEVEL')
+        be.width = .004
+        be.segments = 2
+        bpy.ops.object.modifier_apply(modifier=be.name)
+
+    # Character-Specific Beveled 3D Pendant (all top edges meet the bail at z=2.57!)
+    if CHAR_SLUG == "dogday":
+        # 8-ray orange sunburst outer medallion + golden circular center disc
+        sun_rays = []
+        for k in range(16):
+            ang = 2 * pi * k / 16
+            r = .285 if k % 2 == 0 else .215
+            sun_rays.append((r * cos(ang), 2.30 + r * sin(ang)))
+        polyextrude('Pendant • orange sun rays', catmull(sun_rays, 3), -.53, -.45, pendant_alt, .010)
+        disc_pts = [(.165 * cos(2 * pi * k / 32), 2.30 + .165 * sin(2 * pi * k / 32)) for k in range(32)]
+        polyextrude('Pendant • golden sun center', disc_pts, -.565, -.48, pendant_mat, .010)
+    elif CHAR_SLUG == "bobby_bearhug":
+        # Beveled ruby-red 3D heart pendant
+        heart_pts = []
+        for k in range(64):
+            t = 2 * pi * k / 64
+            hx = .0165 * (16 * sin(t) ** 3)
+            hz = 2.38 + .0165 * (13 * cos(t) - 5 * cos(2 * t) - 2 * cos(3 * t) - cos(4 * t))
+            heart_pts.append((hx, hz))
+        polyextrude('Pendant • ruby red heart', heart_pts, -.55, -.45, pendant_mat, .012)
+    elif CHAR_SLUG == "bubba_bubbaphant":
+        # Yellow lightbulb globe + royal-blue screw base
+        bulb_pts = [
+            (0.0, 2.55), (.14, 2.52), (.23, 2.42), (.24, 2.29),
+            (.16, 2.17), (.11, 2.08), (-.11, 2.08), (-.16, 2.17),
+            (-.24, 2.29), (-.23, 2.42), (-.14, 2.52)
+        ]
+        polyextrude('Pendant • yellow lightbulb globe', catmull(bulb_pts, 5), -.55, -.45, pendant_mat, .012)
+        base_pts = [(-.11, 2.10), (.11, 2.10), (.095, 1.96), (-.095, 1.96)]
+        polyextrude('Pendant • blue screw base', catmull(base_pts, 4), -.56, -.44, pendant_alt, .010)
+    elif CHAR_SLUG == "craftycorn":
+        # 5-petal rainbow flower pendant + yellow center disc
+        petal_colors = [
+            (.55, .015, .025), # Red
+            (.65, .18, .010),  # Orange
+            (.04, .45, .025),  # Green
+            (.02, .18, .62),   # Blue
+            (.28, .03, .52),   # Purple
+        ]
+        for idx, pcol in enumerate(petal_colors):
+            pm = mat(f'06p • flower petal {idx}', pcol, .25, .15)
+            ang = pi / 2 + idx * 2 * pi / 5
+            px = .175 * cos(ang)
+            pz = 2.28 + .175 * sin(ang)
+            p_pts = [(px + .115 * cos(2 * pi * k / 24), pz + .115 * sin(2 * pi * k / 24)) for k in range(24)]
+            polyextrude(f'Pendant • petal {idx}', p_pts, -.54, -.45, pm, .010)
+        c_pts = [(.125 * cos(2 * pi * k / 32), 2.28 + .125 * sin(2 * pi * k / 32)) for k in range(32)]
+        polyextrude('Pendant • flower center', c_pts, -.57, -.47, pendant_mat, .010)
+    elif CHAR_SLUG == "hoppy_hopscotch":
+        # Sharp beveled yellow lightning bolt pendant
+        bolt_pts = [
+            (.04, 2.57), (-.20, 2.28), (-.03, 2.26),
+            (-.14, 1.97), (.21, 2.29), (.03, 2.31)
+        ]
+        polyextrude('Pendant • yellow lightning bolt', bolt_pts, -.55, -.45, pendant_mat, .008)
+    elif CHAR_SLUG == "kickin_chicken":
+        # 5-pointed ruby-red star pendant
+        star_pts = []
+        for k in range(10):
+            ang = pi / 2 + k * pi / 5
+            r = .28 if k % 2 == 0 else .125
+            star_pts.append((r * cos(ang), 2.30 + r * sin(ang)))
+        polyextrude('Pendant • ruby star', star_pts, -.55, -.45, pendant_mat, .009)
+    elif CHAR_SLUG == "picky_piggy":
+        # Glossy crimson-red apple pendant + green leaf
+        apple_pts = [
+            (0.0, 2.50), (.12, 2.55), (.24, 2.47), (.26, 2.31),
+            (.20, 2.13), (.08, 2.05), (0.0, 2.09), (-.08, 2.05),
+            (-.20, 2.13), (-.26, 2.31), (-.24, 2.47), (-.12, 2.55)
+        ]
+        polyextrude('Pendant • red apple', catmull(apple_pts, 5), -.55, -.45, pendant_mat, .012)
+        leaf_mat = mat('Pendant • apple leaf green', (.06, .48, .02), .30)
+        leaf_pts = [(.02, 2.52), (.14, 2.60), (.18, 2.55), (.08, 2.49)]
+        polyextrude('Pendant • apple leaf', catmull(leaf_pts, 4), -.54, -.46, leaf_mat, .006)
+    elif CHAR_SLUG == "baba_chops":
+        # Weathered dark bronze/gunmetal Skull pendant with recessed eye sockets & nose
+        skull_pts = [
+            (0.0, 2.56), (.16, 2.53), (.25, 2.41), (.24, 2.25),
+            (.15, 2.16), (.14, 2.01), (.05, 2.01), (.05, 2.07),
+            (-.05, 2.07), (-.05, 2.01), (-.14, 2.01), (-.15, 2.16),
+            (-.24, 2.25), (-.25, 2.41), (-.16, 2.53)
+        ]
+        polyextrude('Pendant • weathered skull', catmull(skull_pts, 4), -.55, -.45, pendant_mat, .010)
+        for sg in (-1, 1):
+            ell(f'Pendant • skull eye {sg}', (sg * .095, -.552, 2.33), (.065, .022, .065), inside, 24, 16)
+        ell('Pendant • skull nasal', (0.0, -.552, 2.20), (.035, .020, .045), inside, 20, 14)
+
+    bpy.ops.mesh.primitive_torus_add(major_segments=48, minor_segments=16, location=(0, -.46, 2.58), rotation=(pi / 2, 0, 0), major_radius=.041, minor_radius=.012)
+    b = finish(bpy.context.object, pendant_mat)
+    b.name = 'Pendant • bail'
+    ell('Pendant • rounded attachment seat', (0, -.491, 2.55), (.052, .036, .032), pendant_mat, 32, 20)
+
+    # ==========================================================================
+    # 7. SURFACE-PROJECTED 3D COTTON STITCH ARCS (v11 recipe)
+    # ==========================================================================
+    root = bpy.data.objects.new(f'{CHAR_SLUG.upper()}_ROOT • unrigged shape draft', None)
+    col.objects.link(root)
+    for o in list(col.objects):
+        if o != root:
+            o.parent = root
+
+    def make_tree(o):
+        return BVHTree.FromPolygons([v.co for v in o.data.vertices], [list(p.vertices) for p in o.data.polygons])
+
+    bt, ht, mt = make_tree(body), make_tree(head), make_tree(lining)
+
+    def poly_curve(name, paths, r, m):
+        cu = bpy.data.curves.new(name, 'CURVE')
+        cu.dimensions = '3D'
+        cu.resolution_u = 2
+        cu.bevel_depth = r
+        cu.bevel_resolution = 3
+        cu.use_fill_caps = True
+        for pts in paths:
+            sp = cu.splines.new('POLY')
+            sp.points.add(len(pts) - 1)
+            for p, co in zip(sp.points, pts):
+                p.co = (*co, 1)
+        o = bpy.data.objects.new(name, cu)
+        col.objects.link(o)
+        o.parent = root
+        cu.materials.append(m)
+        return o
+
+    counts = {}
+    def seam(name, points, bvh, closed=False, spacing=.032, m=thread):
+        pts = [Vector(p) for p in points]
+        if len(pts) < 2:
+            return
+        if closed:
+            pts.append(pts[0])
+        samples = []
+        walk = 0
+        nextd = 0
+        for a, b in zip(pts, pts[1:]):
+            le = (b - a).length
+            if le < 1e-8:
+                continue
+            while nextd <= walk + le:
+                p = a + (b - a) * ((nextd - walk) / le)
+                q, n, _, _ = bvh.find_nearest(p)
+                if q is not None:
+                    samples.append((q, n))
+                nextd += spacing
+            walk += le
+        if len(samples) < 3:
+            return
+        seampts = [p + n * .0003 for p, n in samples]
+        if closed:
+            seampts.append(seampts[0])
+        poly_curve('Seam • ' + name, [seampts], .0018, groove)
+        paths = []
+        for i, (p, n) in enumerate(samples):
+            t_vec = (samples[min(i + 1, len(samples) - 1)][0] - samples[max(0, i - 1)][0]).normalized()
+            side = n.cross(t_vec).normalized()
+            s_pts = []
+            for j in range(7):
+                u = j / 6
+                co = p + t_vec * ((u - .5) * .014) + side * ((u - .5) * .010)
+                q, nn, _, _ = bvh.find_nearest(co)
+                if q is not None:
+                    s_pts.append(q + nn * (-.0006 + .0038 * math.sin(math.pi * u)))
+            if len(s_pts) >= 2:
+                paths.append(s_pts)
+        poly_curve('Stitches • ' + name, paths, .0022, m)
+        counts[name] = len(paths)
+
+    def frontpoints(xz, bvh):
+        arr = []
+        for x, z in xz:
+            q, n, _, _ = bvh.ray_cast(Vector((x, -3, z)), Vector((0, 1, 0)), 6)
+            if q is not None:
+                arr.append(q)
+        return arr
+
+    def boundaries(ob, bvh, label, max_loops=12, skip_slots=(3,)):
+        bm = bmesh.new()
+        bm.from_mesh(ob.data)
+        bm.verts.ensure_lookup_table()
+        adj = {}
+        for e in bm.edges:
+            if len(e.link_faces) == 2:
+                m0, m1 = e.link_faces[0].material_index, e.link_faces[1].material_index
+                if m0 != m1 and not any(s in (m0, m1) for s in skip_slots):
+                    a, b = [v.index for v in e.verts]
+                    adj.setdefault(a, []).append(b)
+                    adj.setdefault(b, []).append(a)
+        seen = set()
+        num = 0
+        for start in adj:
+            if start in seen:
+                continue
+            path = []
+            cur = start
+            prev = -1
+            while cur not in seen:
+                seen.add(cur)
+                path.append(bm.verts[cur].co.copy())
+                nxt = [x for x in adj[cur] if x != prev and x not in seen]
+                if not nxt:
+                    break
+                prev, cur = cur, nxt[0]
+            if len(path) < 35:
+                continue
+            for _ in range(6):
+                path = [(path[i - 1] + 2 * p + path[(i + 1) % len(path)]) / 4 for i, p in enumerate(path)]
+            num += 1
+            closed_loop = (path[0] - path[-1]).length < 0.12
+            seam(label + str(num), path, bvh, closed=closed_loop)
+            if num >= max_loops:
+                break
+        bm.free()
+
+    boundaries(body, bt, 'Cuff ')
+    head_skip = (2, 3) if CHAR_SLUG == "hoppy_hopscotch" else (3,)
+    boundaries(head, ht, 'Ear panel ', skip_slots=head_skip)
+
+    if CHAR_SLUG == "bubba_bubbaphant":
+        # Forehead seam above trunk root only (since trunk covers upper lip)
+        seam('Forehead', frontpoints([(0, 4.59 - i * .008) for i in range(48)], ht), ht, spacing=.029)
+    elif CHAR_SLUG != "craftycorn":
+        seam('Forehead', frontpoints([(0, 4.59 - i * .008) for i in range(66)], ht), ht, spacing=.029)
     else:
-        t = min(1.0, (y - 1.10) / 0.35)
-        return {"Spine": max(0.0, 0.5 * (1.0 - t)), "Chest": 0.5 + 0.5 * t}
+        # CraftyCorn has two subtle stitched nostrils on the cream muzzle
+        for sg in (-1, 1):
+            seam(f'Nostril {sg}', frontpoints([(sg * (.07 + .02 * sin(i / 8 * pi)), 3.96 + i * .009) for i in range(9)], ht), ht, spacing=.018)
+
+    seam('Chin', frontpoints([(0, 2.76 + i * .004) for i in range(19)], ht), ht, spacing=.028)
+    for lo, hi in [(2.86, 3.055), (3.52, 3.94)]:
+        seam('Mouth lining ' + str(lo), frontpoints([(0, lo + i * (hi - lo) / 80) for i in range(81)], mt), mt, spacing=.033, m=mouththread)
+
+    if CHAR_SLUG == "dogday":
+        # Long stitched ridge along each floppy spaniel ear
+        for sg in (-1, 1):
+            seam(f'Floppy ear {sg}', frontpoints([(sg * (.48 + i * .028), 4.52 - i * .021) for i in range(38)], ht), ht, spacing=.034)
+
+    for sg in (-1, 1):
+        seam('Inner leg ' + str(sg), frontpoints([(sg * (.17 + .045 * math.sin(i / 60 * math.pi)), .48 + i * .014) for i in range(61)], bt), bt, spacing=.039)
+        seam('Shoulder ' + str(sg), frontpoints([(sg * (.29 + i * .0035), 2.69 - i * .006) for i in range(38)], bt), bt, spacing=.037, m=mouththread)
+
+    arr = []
+    for i in range(100):
+        z = 1.46 + i * .011
+        q, n, _, _ = bt.ray_cast(Vector((0, 3, z)), Vector((0, -1, 0)), 6)
+        if q is not None:
+            arr.append(q)
+    seam('Back body', arr, bt, spacing=.036, m=mouththread)
+
+    # ==========================================================================
+    # 8. STUDIO CAMERAS & LIGHTING (Exact critter-3d v07/v11 setup)
+    # ==========================================================================
+    floor = mat('Studio neutral floor', (.19, .205, .23), .85)
+    bpy.ops.mesh.primitive_plane_add(size=200, location=(0, 0, .20))
+    o = bpy.context.object
+    o.name = 'Studio floor'
+    move(o, studio)
+    o.data.materials.append(floor)
+    o.hide_render = True
+
+    def aim(o, point):
+        o.rotation_euler = (Vector(point) - o.location).to_track_quat('-Z', 'Y').to_euler()
+
+    def area(name, loc, power, size, color):
+        da = bpy.data.lights.new(name, 'AREA')
+        da.energy = power
+        da.shape = 'DISK'
+        da.size = size
+        da.color = color
+        o = bpy.data.objects.new(name, da)
+        studio.objects.link(o)
+        o.location = loc
+        aim(o, (0, 0, 2.6))
+
+    area('Key • large neutral softbox', (-3.8, -5, 7), 700, 5, (1, .94, .88))
+    area('Fill • frontal', (4, -4, 4.6), 500, 4, (.90, .94, 1))
+    area('Separation', (2, 3, 6), 800, 4, (1, 1, 1))
+
+    world = bpy.data.worlds.new('Neutral studio') if not bpy.data.worlds else bpy.data.worlds[0]
+    bpy.context.scene.world = world
+    world.use_nodes = True
+    world.node_tree.nodes.get('Background').inputs[0].default_value = (.16, .18, .22, 1)
+    world.node_tree.nodes.get('Background').inputs[1].default_value = .4
+
+    sc = bpy.context.scene
+    sc.render.engine = 'CYCLES'
+    sc.cycles.device = 'CPU'
+    sc.cycles.use_denoising = True
+    sc.view_settings.view_transform = 'AgX'
+    sc.render.image_settings.file_format = 'PNG'
+    sc.render.film_transparent = True
+    sc.render.image_settings.color_mode = 'RGBA'
+
+    ortho_scale = 6.8 if CHAR_SLUG == "hoppy_hopscotch" else 6.5
+    z_center = 2.45 if CHAR_SLUG == "hoppy_hopscotch" else 2.25
+    for name, loc, scale in [
+        ('Front', (0, -12, z_center), ortho_scale),
+        ('Three-quarter', (6, -12, z_center + 1.0), ortho_scale + 0.1),
+        ('Side', (12, 0, z_center), ortho_scale),
+        ('Back', (0, 12, z_center), ortho_scale),
+    ]:
+        da = bpy.data.cameras.new(name)
+        da.type = 'ORTHO'
+        da.ortho_scale = scale
+        o = bpy.data.objects.new(name, da)
+        studio.objects.link(o)
+        o.location = loc
+        aim(o, (0, 0, z_center))
+
+    da = bpy.data.cameras.new('Stitch-detail')
+    da.type = 'ORTHO'
+    da.ortho_scale = 2.5
+    close = bpy.data.objects.new('Stitch-detail', da)
+    studio.objects.link(close)
+    close.location = (0, -12, 1.85)
+    aim(close, (0, 0, 1.85))
+
+    return col, studio, root, {"stitch_counts": counts, "total_stitches": sum(counts.values())}
 
 
-def torso_mat_selector(cx, cy, cz):
-    # Pastel Mint-Green Belly Patch (#A7F3D0) integrated directly onto the front tummy surface
-    # so the black collar zipper sits cleanly ON TOP OF the belly without ever being occluded!
-    if cz > 0.18:
-        nx = cx / 0.27
-        ny = (cy - 0.90) / 0.31
-        if nx * nx + ny * ny <= 1.0:
-            return "PastelMint"
-    return "BodyGreen"
+col, studio, root, stitch_info = build_character_scene()
+sc = bpy.context.scene
 
-
-torso_bm = build_torso_bm()
-append_bmesh_part(torso_bm, torso_mat_selector, torso_weights)
-
-
-def torso_front_z(y, x=0.0):
-    t = max(0.0, min(1.0, (y - 0.52) / (1.42 - 0.52)))
-    r = 0.34 + 0.16 * math.sin(math.pi * (t ** 0.72)) - 0.08 * t
-    x_ratio = min(0.92, abs(x) / max(0.10, r))
-    return r * 0.88 * math.sqrt(max(0.05, 1.0 - x_ratio * x_ratio))
-
-
-# Fluffy Round Puffball Bunny Tail (`Tail` bone on back of lower pelvis)
-tail_puffs = [
-    (0.00, 0.68, -0.45, 0.18, 0.17, 0.18, "BodyGreen"),
-    (-0.10, 0.72, -0.48, 0.11, 0.11, 0.11, "BodyGreen"),
-    (0.10, 0.72, -0.48, 0.11, 0.11, 0.11, "BodyGreen"),
-    (0.00, 0.78, -0.47, 0.12, 0.11, 0.11, "PastelMint"),
-    (0.00, 0.60, -0.47, 0.11, 0.10, 0.11, "ForestGreen"),
-    (0.00, 0.69, -0.55, 0.13, 0.13, 0.12, "PastelMint"),
-]
-for tx, ty, tz, rx, ry, rz, mkey in tail_puffs:
-    tp_bm = make_uv_sphere_bm(rx, ry, rz, cx=tx, cy=ty, cz=tz, u_segs=16, v_segs=12)
-    append_bmesh_part(tp_bm, mkey, lambda x, y, z: {"Tail": 0.90, "Pelvis": 0.10})
-
-# Black Collar Zipper Track & Metallic Zipper Hardware (prominently visible on front chest & belly!)
-zip_pts = [(0.0, 0.54 + (1.38 - 0.54) * k / 24.0, torso_front_z(0.54 + (1.38 - 0.54) * k / 24.0) + 0.012)
-           for k in range(25)]
-zip_track_bm = make_torus_tube_bm(zip_pts, 0.028, radial_segs=10, closed=False)
-append_bmesh_part(zip_track_bm, "ZipperTrack", torso_weights)
-
-for i in range(32):
-    zy = 0.56 + (1.36 - 0.56) * (i / 31.0)
-    zz = torso_front_z(zy) + 0.026
-    zx = (0.010 if (i % 2 == 0) else -0.010)
-    t_bm = make_beveled_box_bm(0.032, 0.012, 0.018, zx, zy, zz)
-    append_bmesh_part(t_bm, "ZipperMetal", torso_weights)
-
-slider_bm = make_beveled_box_bm(0.064, 0.076, 0.042, 0.0, 1.325, 0.415)
-append_bmesh_part(slider_bm, "ZipperMetal", lambda x, y, z: {"Chest": 0.7, "SkullPendant": 0.3})
-
-clasp_bm = make_beveled_box_bm(0.042, 0.062, 0.036, 0.0, 1.268, 0.435)
-append_bmesh_part(clasp_bm, "ZipperMetal", lambda x, y, z: {"SkullPendant": 1.0})
-
-# Iconic Crisp Zig-Zag Bright Yellow Lightning Bolt Pendant (`SkullPendant` bone)
-bolt_poly_outer = [
-    (0.045, 1.265),
-    (-0.165, 1.035),
-    (-0.028, 1.035),
-    (-0.115, 0.795),
-    (0.168, 1.078),
-    (0.028, 1.078),
-]
-bolt_border_bm = make_sharp_extruded_polygon_bm(bolt_poly_outer, z_front=0.462, depth=0.028)
-append_bmesh_part(bolt_border_bm, "ZipperTrack", lambda x, y, z: {"SkullPendant": 1.0})
-
-bolt_poly_inner = [
-    (0.036, 1.242),
-    (-0.140, 1.046),
-    (-0.012, 1.046),
-    (-0.094, 0.828),
-    (0.142, 1.066),
-    (0.014, 1.066),
-]
-bolt_yellow_bm = make_sharp_extruded_polygon_bm(bolt_poly_inner, z_front=0.474, depth=0.032)
-append_bmesh_part(bolt_yellow_bm, "PendantYellow", lambda x, y, z: {"SkullPendant": 1.0})
-
-
-# ------------------------------------------------------------------------------
-# 3.6 SPLAYED PLUSH BUNNY ARMS, DARK GREEN HAND PAWS & PASTEL MINT PAW PADS
-# ------------------------------------------------------------------------------
-for side in (-1, 1):
-    sh_bone = "Shoulder.L" if side == 1 else "Shoulder.R"
-    arm_bone = "Arm.L" if side == 1 else "Arm.R"
-    paw_bone = "HandHoof.L" if side == 1 else "HandHoof.R"
-
-    arm_pts = []
-    for k in range(13):
-        t = k / 12.0
-        ax = side * (0.29 + 0.36 * t)
-        ay = 1.28 - 0.34 * t + 0.02 * math.sin(math.pi * t)
-        az = 0.04 + 0.05 * t
-        arm_pts.append((ax, ay, az))
-
-    arm_bm = make_torus_tube_bm(
-        arm_pts,
-        lambda t: 0.132 * (1.0 + 0.05 * t),
-        radial_segs=18, closed=False
-    )
-
-    def arm_weight_fn(x, y, z, sb=sh_bone, ab=arm_bone, pb=paw_bone):
-        dist = max(0.0, min(1.0, (abs(x) - 0.29) / 0.42))
-        if dist < 0.35:
-            return {"Chest": 0.35 * (1.0 - dist / 0.35), sb: 0.65, ab: 0.35 * (dist / 0.35)}
-        elif dist < 0.85:
-            return {ab: 0.85, sb: 0.15}
-        else:
-            return {ab: 0.50, pb: 0.50}
-
-    append_bmesh_part(arm_bm, "BodyGreen", arm_weight_fn)
-
-    # Darker Emerald-Green Hand Paw Cuff (`ForestGreen` #1E7E38)
-    paw_pts = []
-    for k in range(11):
-        t = k / 10.0
-        px = side * (0.63 + 0.20 * t)
-        py = 0.96 - 0.20 * t
-        pz = 0.09 + 0.03 * t
-        paw_pts.append((px, py, pz))
-
-    def paw_radius(t):
-        if t < 0.15:
-            return 0.136 + 0.014 * (t / 0.15)
-        elif t < 0.72:
-            return 0.150 + 0.008 * math.sin(math.pi * (t - 0.15) / 0.57)
-        else:
-            u = (t - 0.72) / 0.28
-            return 0.150 * math.sqrt(max(0.02, 1.0 - u * u))
-
-    paw_bm = make_torus_tube_bm(paw_pts, paw_radius, radial_segs=18, closed=False)
-    append_bmesh_part(
-        paw_bm, "ForestGreen",
-        lambda x, y, z, pb=paw_bone, ab=arm_bone: {pb: 0.90, ab: 0.10}
-    )
-
-    # Pastel Mint-Green Palm Paw Pad (`PastelMint` #A7F3D0)
-    pad_bm = make_uv_sphere_bm(
-        0.075, 0.088, 0.035,
-        cx=side * 0.73, cy=0.85, cz=0.225,
-        u_segs=14, v_segs=10,
-        rot_euler=(0.0, side * 0.25, -side * 0.65)
-    )
-    append_bmesh_part(pad_bm, "PastelMint", lambda x, y, z, pb=paw_bone: {pb: 1.0})
-
-
-# ------------------------------------------------------------------------------
-# 3.7 PLUMP BUNNY LEGS, ROUNDED FOREST-GREEN FEET BOTTOMS & PASTEL PAW PADS
-# ------------------------------------------------------------------------------
-for side in (-1, 1):
-    leg_bone = "Leg.L" if side == 1 else "Leg.R"
-    foot_bone = "FootHoof.L" if side == 1 else "FootHoof.R"
-
-    leg_pts = []
-    for k in range(13):
-        t = k / 12.0
-        lx = side * (0.23 + 0.06 * t)
-        ly = 0.62 - 0.38 * t
-        lz = 0.02 + 0.06 * t
-        leg_pts.append((lx, ly, lz))
-
-    leg_bm = make_torus_tube_bm(
-        leg_pts,
-        lambda t: 0.172 * (1.0 - 0.04 * t),
-        radial_segs=18, closed=False
-    )
-
-    def leg_weight_fn(x, y, z, lb=leg_bone, fb=foot_bone):
-        if y > 0.48:
-            return {"Pelvis": 0.45, lb: 0.55}
-        elif y > 0.24:
-            return {lb: 0.90, fb: 0.10}
-        else:
-            return {lb: 0.25, fb: 0.75}
-
-    append_bmesh_part(leg_bm, "BodyGreen", leg_weight_fn)
-
-    fx = side * 0.30
-    fy = 0.165
-    fz = 0.145
-
-    def foot_deform(p):
-        if p.y < -0.04:
-            p.y = -0.145 + (p.y + 0.145) * 0.22
-        return p
-
-    foot_bm = make_uv_sphere_bm(
-        0.215, 0.175, 0.225,
-        cx=fx, cy=fy, cz=fz,
-        u_segs=24, v_segs=16,
-        rot_euler=(0.08, side * 0.12, 0.0),
-        deform_fn=foot_deform
-    )
-    append_bmesh_part(
-        foot_bm, "ForestGreen",
-        lambda x, y, z, fb=foot_bone, lb=leg_bone: {fb: 0.92, lb: 0.08}
-    )
-
-    fpad_bm = make_uv_sphere_bm(
-        0.135, 0.110, 0.045,
-        cx=fx + side * 0.015, cy=fy - 0.005, cz=fz + 0.195,
-        u_segs=18, v_segs=12,
-        rot_euler=(0.12, side * 0.12, 0.0)
-    )
-    append_bmesh_part(fpad_bm, "PastelMint", lambda x, y, z, fb=foot_bone: {fb: 1.0})
-
-    fseam_pts = []
-    for k in range(13):
-        t = -1.0 + 2.0 * k / 12.0
-        sx = fx + t * 0.205
-        sy = fy - 0.015 - 0.025 * (1.0 - t * t)
-        sz = fz + 0.220 * math.sqrt(max(0.05, 1.0 - 0.75 * t * t))
-        fseam_pts.append((sx, sy, sz))
-    fseam_bm = make_torus_tube_bm(fseam_pts, 0.009, radial_segs=8, closed=False)
-    append_bmesh_part(fseam_bm, "ZipperTrack", lambda x, y, z, fb=foot_bone: {fb: 1.0})
-
-
-# ------------------------------------------------------------------------------
-# 3.8 3D SCULPTED CARTOON FART CLOUD CLUSTER (WEIGHTED TO FartCloud.1 / .2 / .3)
-# ------------------------------------------------------------------------------
-fart_stage1_puffs = [
-    (0.00, 0.68, -0.52, 0.12, 0.11, 0.14, "FartCloudNeon"),
-    (0.00, 0.69, -0.66, 0.18, 0.16, 0.18, "FartCloudLime"),
-    (-0.10, 0.72, -0.70, 0.14, 0.13, 0.14, "FartCloudLime"),
-    (0.10, 0.66, -0.70, 0.14, 0.13, 0.14, "FartCloudLime"),
-]
-for idx, (fx, fy, fz, rx, ry, rz, mkey) in enumerate(fart_stage1_puffs):
-    def fc1_disp(p_w, n_w, s=idx):
-        return p_w + n_w * (plush_fleece_displacement(p_w + Vector((s * 1.1, 0.0, s * 0.7))) * 2.2)
-    bm_p = make_uv_sphere_bm(rx, ry, rz, cx=fx, cy=fy, cz=fz, u_segs=16, v_segs=12, world_deform_fn=fc1_disp)
-    append_bmesh_part(bm_p, mkey, lambda x, y, z: {"FartCloud.1": 1.0})
-
-ring_pts = []
-for k in range(24):
-    ang = 2.0 * math.pi * k / 24.0
-    ring_pts.append((0.25 * math.cos(ang), 0.69 + 0.25 * math.sin(ang), -0.64))
-shock_ring_bm = make_torus_tube_bm(ring_pts, 0.038, radial_segs=10, closed=True)
-append_bmesh_part(shock_ring_bm, "FartCloudNeon", lambda x, y, z: {"FartCloud.1": 1.0})
-
-fart_stage2_puffs = [
-    (0.00, 0.76, -0.94, 0.28, 0.26, 0.28, "FartCloudLime"),
-    (-0.20, 0.82, -0.98, 0.23, 0.22, 0.22, "FartCloudLime"),
-    (0.20, 0.80, -0.98, 0.23, 0.22, 0.22, "FartCloudLime"),
-    (0.00, 0.94, -1.04, 0.25, 0.24, 0.24, "FartCloudNeon"),
-    (-0.16, 0.64, -0.92, 0.20, 0.18, 0.20, "FartCloudLime"),
-    (0.16, 0.64, -0.92, 0.20, 0.18, 0.20, "FartCloudLime"),
-    (0.00, 0.78, -1.18, 0.30, 0.28, 0.28, "FartCloudLime"),
-    (-0.24, 0.88, -1.16, 0.22, 0.22, 0.22, "FartCloudNeon"),
-    (0.24, 0.86, -1.16, 0.22, 0.22, 0.22, "FartCloudPurple"),
-    (-0.14, 0.98, -1.20, 0.21, 0.20, 0.21, "FartCloudLime"),
-    (0.14, 0.98, -1.20, 0.21, 0.20, 0.21, "FartCloudLime"),
-]
-for idx, (fx, fy, fz, rx, ry, rz, mkey) in enumerate(fart_stage2_puffs):
-    def fc2_disp(p_w, n_w, s=idx):
-        return p_w + n_w * (plush_fleece_displacement(p_w + Vector((s * 1.7, s * 0.9, 0.0))) * 2.6)
-    bm_p = make_uv_sphere_bm(rx, ry, rz, cx=fx, cy=fy, cz=fz, u_segs=18, v_segs=14, world_deform_fn=fc2_disp)
-    append_bmesh_part(bm_p, mkey, lambda x, y, z: {"FartCloud.2": 1.0})
-
-fart_stage3_puffs = [
-    (0.00, 0.92, -1.44, 0.32, 0.30, 0.30, "FartCloudLime"),
-    (-0.28, 1.02, -1.40, 0.24, 0.23, 0.24, "FartCloudNeon"),
-    (0.28, 1.00, -1.40, 0.24, 0.23, 0.24, "FartCloudLime"),
-    (0.00, 1.14, -1.48, 0.26, 0.25, 0.25, "FartCloudPurple"),
-    (-0.20, 0.76, -1.38, 0.22, 0.20, 0.22, "FartCloudLime"),
-    (0.20, 0.76, -1.38, 0.22, 0.20, 0.22, "FartCloudPurple"),
-    (-0.36, 0.88, -1.54, 0.18, 0.18, 0.18, "FartCloudNeon"),
-    (0.36, 0.90, -1.54, 0.18, 0.18, 0.18, "FartCloudLime"),
-    (0.00, 1.02, -1.68, 0.22, 0.22, 0.22, "FartCloudNeon"),
-]
-for idx, (fx, fy, fz, rx, ry, rz, mkey) in enumerate(fart_stage3_puffs):
-    def fc3_disp(p_w, n_w, s=idx):
-        return p_w + n_w * (plush_fleece_displacement(p_w + Vector((0.0, s * 1.4, s * 2.1))) * 2.8)
-    bm_p = make_uv_sphere_bm(rx, ry, rz, cx=fx, cy=fy, cz=fz, u_segs=16, v_segs=12, world_deform_fn=fc3_disp)
-    append_bmesh_part(bm_p, mkey, lambda x, y, z: {"FartCloud.3": 1.0})
-
-for s_idx, (sx_off, sz_off, mkey) in enumerate([
-    (-0.18, -1.16, "FartCloudNeon"),
-    (0.02, -1.40, "FartCloudPurple"),
-    (0.20, -1.26, "FartCloudNeon"),
-]):
-    swirl_pts = []
-    for k in range(15):
-        t = k / 14.0
-        wx = sx_off + 0.07 * math.sin(t * 2.5 * math.pi + s_idx)
-        wy = 1.08 + 0.48 * t
-        wz = sz_off - 0.18 * t + 0.06 * math.cos(t * 2.5 * math.pi + s_idx)
-        swirl_pts.append((wx, wy, wz))
-    swirl_bm = make_torus_tube_bm(
-        swirl_pts,
-        lambda t: 0.026 * math.sin(math.pi * (0.08 + 0.84 * t)),
-        radial_segs=8, closed=False
-    )
-    append_bmesh_part(swirl_bm, mkey, lambda x, y, z: {"FartCloud.3": 1.0})
-
+if MODE == "preview":
+    sc.cycles.samples = 24
+    for cam_name in ['Front', 'Three-quarter']:
+        cam = bpy.data.objects[cam_name]
+        sc.camera = cam
+        sc.render.resolution_x = 900
+        sc.render.resolution_y = 1125
+        sc.render.filepath = os.path.join(WORK_DIR, f"{CHAR_SLUG}_{cam_name}.png")
+        bpy.ops.render.render(write_still=True)
+    print("PREVIEW_RENDER_COMPLETE:", CHAR_SLUG, stitch_info)
+    sys.exit(0)
 
 # ==============================================================================
-# 4. CREATE BLENDER MESH OBJECT + SUBSURF MODIFIER
+# 9. FULL PRODUCTION PIPELINE:
+#    (A) Render Front, Three-quarter, Back, Stitch-detail on 100% full-res mesh
+#    (B) Generate <slug>_blender_cycles_render.png & <slug>_3d_preview.png
+#    (C) Decimate voxel shells (ratio=0.10) & export .blend, .glb, .obj/.mtl
+#    (D) Render 36-frame 3D Fart Blast Animation (.mp4, .gif, .webp, _storyboard.png)
 # ==============================================================================
-mesh_data = bpy.data.meshes.new("HoppyHopscotch_Plush_MeshData")
-for m in MAT_LIST:
-    mesh_data.materials.append(m)
+sc.cycles.samples = 32
+view_files = {}
+for cam_name, (rx, ry) in [
+    ('Front', (1080, 1350)),
+    ('Three-quarter', (1080, 1350)),
+    ('Back', (1080, 1350)),
+    ('Stitch-detail', (1080, 1080)),
+]:
+    out_png = os.path.join(OUT_MODELS_DIR, f"{CHAR_SLUG}_{cam_name}.png")
+    view_files[cam_name] = out_png
+    if os.path.exists(out_png) and os.path.getmtime(out_png) > 1760844800:
+        print("Reusing fresh studio render:", out_png)
+        continue
+    cam = bpy.data.objects[cam_name]
+    sc.camera = cam
+    sc.render.resolution_x = rx
+    sc.render.resolution_y = ry
+    sc.render.filepath = out_png
+    bpy.ops.render.render(write_still=True)
 
-master_bm.to_mesh(mesh_data)
-master_bm.free()
-mesh_data.update()
+# Copy Front render to <slug>_blender_cycles_render.png
+hero_render_path = os.path.join(OUT_MODELS_DIR, f"{CHAR_SLUG}_blender_cycles_render.png")
+shutil.copyfile(view_files['Front'], hero_render_path)
 
-mesh_obj = bpy.data.objects.new("HoppyHopscotch_Plush_Mesh", mesh_data)
-main_col.objects.link(mesh_obj)
+# Build 4-panel comparison sheet (<slug>_3d_preview.png) via ffmpeg hstack (zero PIL dependency!)
+preview_sheet_path = os.path.join(OUT_MODELS_DIR, f"{CHAR_SLUG}_3d_preview.png")
+ref_img_path = REF_MAP[CHAR_SLUG]
+subprocess.run([
+    "ffmpeg", "-y",
+    "-i", ref_img_path,
+    "-i", view_files['Front'],
+    "-i", view_files['Three-quarter'],
+    "-i", view_files['Stitch-detail'],
+    "-filter_complex",
+    "[0:v]scale=480:600:force_original_aspect_ratio=decrease,pad=480:600:(ow-iw)/2:(oh-ih)/2:color=#1e293b[v0];"
+    "[1:v]scale=480:600:force_original_aspect_ratio=decrease,pad=480:600:(ow-iw)/2:(oh-ih)/2:color=#1e293b[v1];"
+    "[2:v]scale=480:600:force_original_aspect_ratio=decrease,pad=480:600:(ow-iw)/2:(oh-ih)/2:color=#1e293b[v2];"
+    "[3:v]scale=480:600:force_original_aspect_ratio=decrease,pad=480:600:(ow-iw)/2:(oh-ih)/2:color=#1e293b[v3];"
+    "[v0][v1][v2][v3]hstack=inputs=4[out]",
+    "-map", "[out]", "-frames:v", "1", preview_sheet_path
+], check=True)
 
-for bname in BONE_NAMES:
-    mesh_obj.vertex_groups.new(name=bname)
+# Decimate dense voxel shells AFTER high-res studio renders so .blend & .glb are ~4.5 MB
+for obj in list(col.objects):
+    if obj.type == 'MESH' and any(k in obj.name for k in ('Head •', 'Body •', 'Wool •', 'Nose • aqua forelock')):
+        bpy.ops.object.select_all(action='DESELECT')
+        obj.select_set(True)
+        bpy.context.view_layer.objects.active = obj
+        dec = obj.modifiers.new('Export decimate', 'DECIMATE')
+        dec.ratio = 0.10 if 'Wool' not in obj.name else 0.20
+        bpy.ops.object.modifier_apply(modifier=dec.name)
 
+blend_path = os.path.join(OUT_MODELS_DIR, f"{CHAR_SLUG}_plush_base_model.blend")
+glb_path = os.path.join(OUT_MODELS_DIR, f"{CHAR_SLUG}_plush_base_model.glb")
+obj_path = os.path.join(OUT_MODELS_DIR, f"{CHAR_SLUG}_plush_base_model.obj")
 
-# ==============================================================================
-# 5. CREATE SKELETAL ARMATURE RIG (25 BONES) & BIND SKINNING
-# ==============================================================================
-arm_data = bpy.data.armatures.new("HoppyHopscotch_ArmatureData")
-arm_data.display_type = 'OCTAHEDRAL'
-arm_obj = bpy.data.objects.new("HoppyHopscotch_Armature", arm_data)
-arm_obj.show_in_front = True
-main_col.objects.link(arm_obj)
+if os.path.exists(blend_path):
+    os.remove(blend_path)
+bpy.ops.wm.save_as_mainfile(filepath=blend_path, compress=True)
 
-bpy.context.view_layer.objects.active = arm_obj
-bpy.ops.object.mode_set(mode='EDIT')
-ebones = arm_data.edit_bones
-
-
-def add_ebone(name, head_3js, tail_3js, parent_name=None, connected=False):
-    b = ebones.new(name)
-    b.head = to_b_vec(*head_3js)
-    b.tail = to_b_vec(*tail_3js)
-    if parent_name and parent_name in ebones:
-        b.parent = ebones[parent_name]
-        b.use_connect = connected
-    return b
-
-
-add_ebone("Root", (0.0, 0.0, 0.0), (0.0, 0.42, 0.0))
-add_ebone("Pelvis", (0.0, 0.48, 0.0), (0.0, 0.80, 0.0), "Root", False)
-add_ebone("Spine", (0.0, 0.80, 0.0), (0.0, 1.12, 0.0), "Pelvis", True)
-add_ebone("Chest", (0.0, 1.12, 0.0), (0.0, 1.46, 0.0), "Spine", True)
-add_ebone("Tail", (0.0, 0.68, -0.32), (0.0, 0.72, -0.58), "Pelvis", False)
-add_ebone("Head", (0.0, 1.46, 0.0), (0.0, 2.34, 0.0), "Chest", True)
-
-add_ebone("Jaw", (0.0, 1.66, 0.44), (0.0, 1.44, 0.68), "Head", False)
-add_ebone("Eyelid.L", (0.220, 1.985, 0.530), (0.220, 2.12, 0.68), "Head", False)
-add_ebone("Eyelid.R", (-0.220, 1.985, 0.530), (-0.220, 2.12, 0.68), "Head", False)
-add_ebone("Ear.L", (0.23, 2.34, -0.02), (0.52, 3.22, -0.02), "Head", False)
-add_ebone("Ear.R", (-0.23, 2.34, -0.02), (-0.29, 3.26, -0.02), "Head", False)
-
-add_ebone("SkullPendant", (0.0, 1.26, 0.45), (0.0, 0.84, 0.49), "Chest", False)
-
-add_ebone("Shoulder.L", (0.26, 1.28, 0.04), (0.42, 1.18, 0.05), "Chest", False)
-add_ebone("Arm.L", (0.42, 1.18, 0.05), (0.65, 0.94, 0.09), "Shoulder.L", True)
-add_ebone("HandHoof.L", (0.65, 0.94, 0.09), (0.83, 0.76, 0.12), "Arm.L", True)
-
-add_ebone("Shoulder.R", (-0.26, 1.28, 0.04), (-0.42, 1.18, 0.05), "Chest", False)
-add_ebone("Arm.R", (-0.42, 1.18, 0.05), (-0.65, 0.94, 0.09), "Shoulder.R", True)
-add_ebone("HandHoof.R", (-0.65, 0.94, 0.09), (-0.83, 0.76, 0.12), "Arm.R", True)
-
-add_ebone("Leg.L", (0.23, 0.62, 0.02), (0.29, 0.24, 0.08), "Pelvis", False)
-add_ebone("FootHoof.L", (0.29, 0.24, 0.08), (0.31, 0.08, 0.30), "Leg.L", True)
-
-add_ebone("Leg.R", (-0.23, 0.62, 0.02), (-0.29, 0.24, 0.08), "Pelvis", False)
-add_ebone("FootHoof.R", (-0.29, 0.24, 0.08), (-0.31, 0.08, 0.30), "Leg.R", True)
-
-# 3 Fart Cloud Bones with heads tucked inside the opaque Pelvis (z_fwd = -0.22)
-add_ebone("FartCloud.1", (0.0, 0.68, -0.22), (0.0, 0.68, -0.66), "Root", False)
-add_ebone("FartCloud.2", (0.0, 0.74, -0.22), (0.0, 0.78, -0.96), "Root", False)
-add_ebone("FartCloud.3", (0.0, 0.80, -0.22), (0.0, 0.92, -1.36), "Root", False)
-
-bpy.ops.object.mode_set(mode='OBJECT')
-
-mesh_obj.parent = arm_obj
-arm_mod = mesh_obj.modifiers.new(name="Armature", type='ARMATURE')
-arm_mod.object = arm_obj
-arm_mod.use_vertex_groups = True
-
-subsurf_mod = mesh_obj.modifiers.new(name="Subdivision", type='SUBSURF')
-subsurf_mod.levels = 1
-subsurf_mod.render_levels = 2
-subsurf_mod.quality = 3
-
-
-# ==============================================================================
-# 6. AUTHOR 6 NLA / ACTION ANIMATION CLIPS ON THE ARMATURE (INCLUDING Hoppy_Fart_Blast)
-# ==============================================================================
-bpy.context.view_layer.objects.active = arm_obj
-bpy.ops.object.mode_set(mode='POSE')
-
-for pb in arm_obj.pose.bones:
-    pb.rotation_mode = 'XYZ'
-
-
-def reset_pose(hide_fart_cloud=True):
-    for pb in arm_obj.pose.bones:
-        pb.location = (0.0, 0.0, 0.0)
-        pb.rotation_euler = (0.0, 0.0, 0.0)
-        if hide_fart_cloud and pb.name.startswith("FartCloud."):
-            pb.scale = (0.0001, 0.0001, 0.0001)
-        else:
-            pb.scale = (1.0, 1.0, 1.0)
-
-
-def key_char_bone(action_frame, bone_name, pitch_x=0.0, yaw_y=0.0, roll_z=0.0,
-                  dx=0.0, dy_up=0.0, dz_fwd=0.0, scale=None):
-    """Pose and keyframe `bone_name` using character-space conjugation."""
-    pb = arm_obj.pose.bones[bone_name]
-    rest_rot = pb.bone.matrix_local.to_3x3()
-    rest_inv = rest_rot.inverted()
-
-    t_arm = Vector((float(dx), float(-dz_fwd), float(dy_up)))
-    pb.location = rest_inv @ t_arm
-    pb.keyframe_insert(data_path="location", frame=action_frame)
-
-    r_arm = Euler((float(pitch_x), float(roll_z), float(yaw_y)), 'XYZ').to_matrix()
-    r_local = rest_inv @ r_arm @ rest_rot
-    pb.rotation_euler = r_local.to_euler('XYZ')
-    pb.keyframe_insert(data_path="rotation_euler", frame=action_frame)
-
-    if scale is not None:
-        if isinstance(scale, (int, float)):
-            pb.scale = (float(scale), float(scale), float(scale))
-        else:
-            pb.scale = Vector(scale)
-        pb.keyframe_insert(data_path="scale", frame=action_frame)
-
-
-def hide_fart_clouds_for_standard_clip(frames):
-    for f in frames:
-        for fc_name in ("FartCloud.1", "FartCloud.2", "FartCloud.3"):
-            key_char_bone(f, fc_name, scale=0.0001)
-
-
-def bake_action_to_nla(name, frame_end, keyframe_builder):
-    if not arm_obj.animation_data:
-        arm_obj.animation_data_create()
-    act = bpy.data.actions.new(name=name)
-    act.use_fake_user = True
-    arm_obj.animation_data.action = act
-    reset_pose(hide_fart_cloud=True)
-    keyframe_builder(act)
-    track = arm_obj.animation_data.nla_tracks.new()
-    track.name = name
-    strip = track.strips.new(name=name, start=1, action=act)
-    strip.action_frame_start = 1
-    strip.action_frame_end = frame_end
-    track.mute = True
-    arm_obj.animation_data.action = None
-    reset_pose(hide_fart_cloud=True)
-    return act, track
-
-
-def build_hoppy_fart_blast(act):
-    """
-    36-Frame (1.5s @ 24fps) 4-Act Cartoon Animation: `Hoppy_Fart_Blast`
-      - Act 1 (Frames 1..9):   Deep bunny squat, tummy clench, ears pinned back & high-frequency strain!
-      - Act 2 (Frames 10..14): High-altitude bunny rocket recoil jump + 3-stage green/lime/purple 3D fart cloud + shockwave ring + stink ribbons!
-      - Act 3 (Frames 15..26): Mid-air bunny hop & cushioned landing on big rabbit feet!
-      - Act 4 (Frames 27..36): Turn to camera, paw-fanning cloud behind back & energetic bunny giggle!
-    """
-    body_keys = [
-        (1,   0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.000,  0.00),
-        (4,  -0.11, -0.03,  0.26,  0.16,  0.18, -0.06,  0.00,  0.05,  0.24, -0.25,  0.24,  0.30,  0.24, -0.30, -0.26,  0.20,  0.000, -0.18),
-        (6,  -0.15, -0.05,  0.34,  0.22,  0.24, -0.10,  0.05,  0.08,  0.34, -0.34,  0.32,  0.38,  0.32, -0.38, -0.32,  0.28,  0.022, -0.28),
-        (8,  -0.16, -0.05,  0.36,  0.24,  0.26, -0.08, -0.05,  0.08,  0.36, -0.38,  0.34,  0.40,  0.34, -0.40, -0.34,  0.30, -0.022, -0.32),
-        (9,  -0.17, -0.06,  0.38,  0.26,  0.28, -0.12,  0.05,  0.09,  0.38, -0.40,  0.36,  0.42,  0.36, -0.42, -0.36,  0.32,  0.020, -0.35),
-        (11,  0.22,  0.08,  0.30, -0.18, -0.24,  0.18, -0.10, -0.28, -0.14,  0.32, -0.24, -0.52, -0.24,  0.52,  0.32, -0.48,  0.000,  0.38),
-        (14,  0.28,  0.10,  0.24, -0.20, -0.26,  0.26, -0.14, -0.32, -0.16,  0.38, -0.28, -0.58, -0.28,  0.58,  0.36, -0.54,  0.000,  0.44),
-        (19,  0.16,  0.06,  0.15, -0.12, -0.15,  0.28, -0.12, -0.22, -0.08,  0.24, -0.14, -0.40, -0.16,  0.42,  0.22, -0.34,  0.000,  0.26),
-        (25, -0.06,  0.01,  0.10,  0.05,  0.06,  0.30, -0.12, -0.10,  0.06, -0.14,  0.40, -0.18, -0.12,  0.26, -0.12,  0.14,  0.000, -0.12),
-        (28,  0.04,  0.00,  0.04, -0.05, -0.10,  0.34, -0.18, -0.28,  0.10,  0.22,  0.65, -0.34, -0.20,  0.34,  0.04, -0.18,  0.000,  0.25),
-        (30, -0.02,  0.00,  0.05,  0.03,  0.03,  0.28, -0.10, -0.08,  0.14, -0.10,  0.44,  0.14, -0.10,  0.20,  0.00,  0.12,  0.000, -0.18),
-        (33,  0.03,  0.00,  0.02, -0.04, -0.08,  0.22, -0.15, -0.24,  0.08,  0.18,  0.60, -0.30, -0.15,  0.28,  0.02, -0.12,  0.000,  0.20),
-        (36,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.000,  0.00),
-    ]
-
-    for (f, p_dy, p_dz, p_pitch, c_pitch, h_pitch, h_yaw, h_roll,
-         j_pitch, l_pitch, e_roll, al_p, al_r, ar_p, ar_r, lg_p, sk_p, p_dx, tail_w) in body_keys:
-        key_char_bone(f, "Pelvis", pitch_x=p_pitch, dx=p_dx, dy_up=p_dy, dz_fwd=p_dz)
-        key_char_bone(f, "Spine", pitch_x=c_pitch * 0.5)
-        key_char_bone(f, "Chest", pitch_x=c_pitch, yaw_y=h_yaw * 0.3)
-        key_char_bone(f, "Tail", pitch_x=tail_w, yaw_y=tail_w * 0.7)
-        key_char_bone(f, "Head", pitch_x=h_pitch, yaw_y=h_yaw, roll_z=h_roll)
-        key_char_bone(f, "Jaw", pitch_x=j_pitch)
-        key_char_bone(f, "Eyelid.L", pitch_x=l_pitch)
-        key_char_bone(f, "Eyelid.R", pitch_x=l_pitch)
-        key_char_bone(f, "Ear.L", pitch_x=-e_roll * 0.6, roll_z=-e_roll * 0.5)
-        key_char_bone(f, "Ear.R", pitch_x=-e_roll * 0.6, roll_z=e_roll * 0.5)
-        key_char_bone(f, "Arm.L", pitch_x=al_p, roll_z=al_r)
-        key_char_bone(f, "HandHoof.L", pitch_x=al_p * 0.6, roll_z=al_r * 0.5)
-        key_char_bone(f, "Arm.R", pitch_x=ar_p, roll_z=ar_r)
-        key_char_bone(f, "HandHoof.R", pitch_x=ar_p * 0.5, roll_z=ar_r * 0.4)
-        key_char_bone(f, "Leg.L", pitch_x=lg_p)
-        key_char_bone(f, "Leg.R", pitch_x=lg_p)
-        key_char_bone(f, "FootHoof.L", pitch_x=-lg_p * 0.7)
-        key_char_bone(f, "FootHoof.R", pitch_x=-lg_p * 0.7)
-        key_char_bone(f, "SkullPendant", pitch_x=sk_p, roll_z=p_dx * 3.0)
-
-    fc1_keys = [
-        (1,  0.0001, 0.0,  0.00,  0.00, 0.00),
-        (9,  0.0001, 0.0,  0.00,  0.00, 0.00),
-        (10, 0.45,   0.0, -0.06, -0.02, 0.00),
-        (12, 1.15,   0.0, -0.02, -0.06, 0.30),
-        (15, 1.35,   0.0,  0.05, -0.16, 0.70),
-        (20, 1.12,   0.0,  0.12, -0.26, 1.15),
-        (25, 0.65,   0.0,  0.18, -0.36, 1.60),
-        (30, 0.22,   0.0,  0.24, -0.44, 2.00),
-        (33, 0.0001, 0.0,  0.00,  0.00, 0.00),
-        (36, 0.0001, 0.0,  0.00,  0.00, 0.00),
-    ]
-    for f, sc, dx, dy, dz, r_z in fc1_keys:
-        key_char_bone(f, "FartCloud.1", roll_z=r_z, dx=dx, dy_up=dy, dz_fwd=dz, scale=sc)
-
-    fc2_keys = [
-        (1,  0.0001,  0.00,  0.00,  0.00,  0.00),
-        (9,  0.0001,  0.00,  0.00,  0.00,  0.00),
-        (11, 0.72,    0.00, -0.02, -0.04,  0.00),
-        (14, 1.28,   -0.02,  0.06, -0.14, -0.18),
-        (20, 1.50,   -0.04,  0.16, -0.28, -0.38),
-        (25, 1.38,   -0.06,  0.28, -0.42, -0.60),
-        (30, 0.92,   -0.08,  0.42, -0.56, -0.85),
-        (34, 0.32,   -0.10,  0.54, -0.68, -1.05),
-        (35, 0.0001,  0.00,  0.00,  0.00,  0.00),
-        (36, 0.0001,  0.00,  0.00,  0.00,  0.00),
-    ]
-    for f, sc, dx, dy, dz, r_z in fc2_keys:
-        key_char_bone(f, "FartCloud.2", roll_z=r_z, dx=dx, dy_up=dy, dz_fwd=dz, scale=sc)
-
-    fc3_keys = [
-        (1,  0.0001,  0.00,  0.00,  0.00,  0.00),
-        (11, 0.0001,  0.00,  0.00,  0.00,  0.00),
-        (13, 0.68,    0.00,  0.02, -0.05,  0.00),
-        (18, 1.24,    0.03,  0.12, -0.18,  0.15),
-        (24, 1.48,    0.05,  0.26, -0.34,  0.32),
-        (29, 1.32,    0.08,  0.42, -0.50,  0.52),
-        (33, 0.75,    0.10,  0.58, -0.64,  0.70),
-        (35, 0.20,    0.12,  0.70, -0.74,  0.85),
-        (36, 0.0001,  0.00,  0.00,  0.00,  0.00),
-    ]
-    for f, sc, dx, dy, dz, r_z in fc3_keys:
-        key_char_bone(f, "FartCloud.3", roll_z=r_z, dx=dx, dy_up=dy, dz_fwd=dz, scale=sc)
-
-
-def build_idle_breathe(act):
-    frames = [1, 15, 30, 45, 60]
-    hide_fart_clouds_for_standard_clip(frames)
-    for f, ph in [(1, 0.0), (15, 0.5 * math.pi), (30, math.pi), (45, 1.5 * math.pi), (60, 2.0 * math.pi)]:
-        s = math.sin(ph)
-        c = math.cos(ph)
-        key_char_bone(f, "Pelvis", pitch_x=0.02 * s, dy_up=0.018 * s)
-        key_char_bone(f, "Chest", pitch_x=0.03 * s, roll_z=0.015 * c)
-        key_char_bone(f, "Tail", pitch_x=0.10 * c, yaw_y=0.12 * s)
-        key_char_bone(f, "Head", pitch_x=0.035 * s, yaw_y=0.04 * c, roll_z=0.025 * s)
-        key_char_bone(f, "Ear.L", roll_z=0.08 * s, pitch_x=0.04 * c)
-        key_char_bone(f, "Ear.R", roll_z=-0.08 * s, pitch_x=-0.04 * c)
-        key_char_bone(f, "Arm.L", pitch_x=0.04 * s, roll_z=0.05 * c)
-        key_char_bone(f, "Arm.R", pitch_x=-0.04 * s, roll_z=-0.05 * c)
-        key_char_bone(f, "SkullPendant", pitch_x=0.06 * c, yaw_y=0.04 * s)
-        blink = 0.22 if f == 30 else 0.0
-        key_char_bone(f, "Eyelid.L", pitch_x=blink)
-        key_char_bone(f, "Eyelid.R", pitch_x=blink)
-
-
-def build_walk_cycle(act):
-    frames = [1, 12, 24, 36, 48]
-    hide_fart_clouds_for_standard_clip(frames)
-    for f, ph in [(1, 0.0), (12, 0.5 * math.pi), (24, math.pi), (36, 1.5 * math.pi), (48, 2.0 * math.pi)]:
-        s = math.sin(ph)
-        c = math.cos(ph)
-        s2 = math.sin(2.0 * ph)
-        key_char_bone(f, "Pelvis", pitch_x=0.04 * s2, yaw_y=0.10 * s, roll_z=0.06 * c, dx=0.03 * s, dy_up=0.055 * abs(s))
-        key_char_bone(f, "Chest", pitch_x=0.05 * s2, yaw_y=-0.08 * s, roll_z=-0.05 * c)
-        key_char_bone(f, "Tail", pitch_x=0.16 * s2, yaw_y=0.18 * c)
-        key_char_bone(f, "Head", pitch_x=-0.04 * s2, yaw_y=0.06 * s, roll_z=0.05 * c)
-        key_char_bone(f, "Leg.L", pitch_x=0.38 * s)
-        key_char_bone(f, "Leg.R", pitch_x=-0.38 * s)
-        key_char_bone(f, "FootHoof.L", pitch_x=-0.18 * c)
-        key_char_bone(f, "FootHoof.R", pitch_x=0.18 * c)
-        key_char_bone(f, "Arm.L", pitch_x=-0.28 * s, roll_z=0.06 * c)
-        key_char_bone(f, "Arm.R", pitch_x=0.28 * s, roll_z=-0.06 * c)
-        key_char_bone(f, "Ear.L", pitch_x=0.08 * s2, roll_z=0.10 * c)
-        key_char_bone(f, "Ear.R", pitch_x=0.08 * s2, roll_z=-0.10 * c)
-        key_char_bone(f, "SkullPendant", pitch_x=0.14 * s2, yaw_y=0.12 * s)
-
-
-def build_happy_bounce(act):
-    frames = [1, 10, 20, 30, 40]
-    hide_fart_clouds_for_standard_clip(frames)
-    for f, ph in [(1, 0.0), (10, 0.5 * math.pi), (20, math.pi), (30, 1.5 * math.pi), (40, 2.0 * math.pi)]:
-        s = math.sin(ph)
-        c = math.cos(ph)
-        jump = max(0.0, s) * 0.16
-        key_char_bone(f, "Pelvis", pitch_x=-0.08 * s, dy_up=jump)
-        key_char_bone(f, "Chest", pitch_x=-0.08 * s)
-        key_char_bone(f, "Tail", pitch_x=0.25 * s)
-        key_char_bone(f, "Head", pitch_x=-0.10 * s, yaw_y=0.06 * c)
-        key_char_bone(f, "Ear.L", roll_z=0.22 * s, pitch_x=-0.14 * c)
-        key_char_bone(f, "Ear.R", roll_z=-0.22 * s, pitch_x=-0.14 * c)
-        key_char_bone(f, "Arm.L", roll_z=-0.28 * s)
-        key_char_bone(f, "Arm.R", roll_z=0.28 * s)
-        key_char_bone(f, "SkullPendant", pitch_x=-0.24 * c)
-        key_char_bone(f, "Jaw", pitch_x=-0.14 * max(0.0, s))
-
-
-def build_wave_paw(act):
-    frames = [1, 15, 30, 45, 60]
-    hide_fart_clouds_for_standard_clip(frames)
-    for f, ph in [(1, 0.0), (15, 0.5 * math.pi), (30, math.pi), (45, 1.5 * math.pi), (60, 2.0 * math.pi)]:
-        s = math.sin(ph)
-        w = math.sin(3.0 * ph)
-        lift = math.sin(0.5 * ph)
-        key_char_bone(f, "Shoulder.R", roll_z=0.45 * lift)
-        key_char_bone(f, "Arm.R", pitch_x=-0.35 * lift, yaw_y=0.20 * w * lift, roll_z=0.55 * lift)
-        key_char_bone(f, "HandHoof.R", roll_z=0.30 * w * lift)
-        key_char_bone(f, "Head", pitch_x=0.04 * s, yaw_y=-0.12 * lift, roll_z=0.14 * lift)
-        key_char_bone(f, "Ear.L", roll_z=0.14 * lift)
-        key_char_bone(f, "Ear.R", roll_z=-0.10 * lift)
-        key_char_bone(f, "Tail", yaw_y=0.20 * w * lift)
-        key_char_bone(f, "SkullPendant", pitch_x=0.08 * s, yaw_y=0.08 * lift)
-
-
-def build_curious_tilt(act):
-    frames = [1, 15, 30, 45, 60]
-    hide_fart_clouds_for_standard_clip(frames)
-    for f, ph in [(1, 0.0), (15, 0.5 * math.pi), (30, math.pi), (45, 1.5 * math.pi), (60, 2.0 * math.pi)]:
-        s = math.sin(ph)
-        c = math.cos(ph)
-        talk = abs(math.sin(2.0 * ph))
-        key_char_bone(f, "Head", pitch_x=0.06 * c, yaw_y=0.18 * s, roll_z=-0.16 * s)
-        key_char_bone(f, "Jaw", pitch_x=-0.14 * talk)
-        key_char_bone(f, "Eyelid.L", pitch_x=0.12 * max(0.0, s))
-        key_char_bone(f, "Eyelid.R", pitch_x=0.12 * max(0.0, -s))
-        key_char_bone(f, "Ear.L", roll_z=-0.18 * s)
-        key_char_bone(f, "Ear.R", roll_z=-0.18 * s)
-        key_char_bone(f, "Chest", yaw_y=0.06 * s, roll_z=-0.04 * s)
-
-
-fart_act, fart_track = bake_action_to_nla("Hoppy_Fart_Blast", 36, build_hoppy_fart_blast)
-idle_act, idle_track = bake_action_to_nla("Idle_Breathe", 60, build_idle_breathe)
-walk_act, walk_track = bake_action_to_nla("Walk_Cycle", 48, build_walk_cycle)
-bounce_act, bounce_track = bake_action_to_nla("Happy_Bounce", 40, build_happy_bounce)
-wave_act, wave_track = bake_action_to_nla("Wave_Paw", 60, build_wave_paw)
-curious_act, curious_track = bake_action_to_nla("Curious_Head_Tilt", 60, build_curious_tilt)
-
-for trk in arm_obj.animation_data.nla_tracks:
-    trk.mute = False
-
-bpy.ops.object.mode_set(mode='OBJECT')
-scene.frame_start = 1
-scene.frame_end = 36
-scene.frame_set(1)
-
-
-# ==============================================================================
-# 7. EXPORT GLTF 2.0 (.GLB) AND WAVEFRONT (.OBJ) BEFORE ADDING STUDIO LIGHTS
-# ==============================================================================
+# Select character collection objects for GLB and OBJ export
 bpy.ops.object.select_all(action='DESELECT')
-arm_obj.select_set(True)
-mesh_obj.select_set(True)
-bpy.context.view_layer.objects.active = arm_obj
+for o in col.objects:
+    o.select_set(True)
 
 bpy.ops.export_scene.gltf(
-    filepath=GLB_PATH,
-    export_format='GLB',
+    filepath=glb_path,
     use_selection=True,
-    export_yup=True,
-    export_apply=False,
-    export_skins=True,
-    export_animations=True,
-    export_animation_mode='NLA_TRACKS',
-    export_lights=False,
-    export_cameras=False,
+    export_format='GLB',
+    export_apply=True,
+    export_materials='EXPORT',
 )
-
-# For static .OBJ export, mute tracks, reset pose so FartCloud is collapsed inside torso,
-# set subsurf_mod.levels = 1 for viewport and export base cage so .obj stays under 5MB!
-for trk in arm_obj.animation_data.nla_tracks:
-    trk.mute = True
-bpy.context.view_layer.objects.active = arm_obj
-bpy.ops.object.mode_set(mode='POSE')
-reset_pose(hide_fart_cloud=True)
-bpy.ops.object.mode_set(mode='OBJECT')
-subsurf_mod.levels = 1
-subsurf_mod.show_viewport = False
-bpy.context.view_layer.update()
-
 bpy.ops.wm.obj_export(
-    filepath=OBJ_PATH,
+    filepath=obj_path,
     export_selected_objects=True,
     export_materials=True,
 )
-subsurf_mod.show_viewport = True
-
 
 # ==============================================================================
-# 8. BRIGHT STUDIO CYCLORAMA (#F4F4F6) & HIGH-CONTRAST CYCLES LIGHTING
+# 10. 36-FRAME 3D FART BLAST ANIMATION ON THE NEW CRITTER-3D v11 MODEL
 # ==============================================================================
-bpy.ops.mesh.primitive_plane_add(size=24.0, location=(0.0, 0.0, 0.0))
-ground_obj = bpy.context.active_object
-ground_obj.name = "Studio_Cyclorama_Floor"
-studio_col.objects.link(ground_obj)
-scene.collection.objects.unlink(ground_obj)
-ground_mat = create_plush_material(
-    "Studio_Cyc_WhiteGrey", 0xF5F6F8, roughness=0.90, spec_ior=0.1,
-    sheen=0.0, bump_strength=0.0, emission_strength=0.16
-)
-ground_obj.data.materials.append(ground_mat)
+anim_frames_dir = os.path.join(WORK_DIR, "fart_frames")
+os.makedirs(anim_frames_dir, exist_ok=True)
 
+# Create toxic green volumetric plush fart cloud puffs behind the tail
+fart_mat = bpy.data.materials.new('FartCloud • toxic green')
+fart_mat.use_nodes = True
+fnodes = fart_mat.node_tree.nodes
+fbsdf = fnodes.get('Principled BSDF')
+fbsdf.inputs['Base Color'].default_value = (.12, .68, .04, 1)
+fbsdf.inputs['Roughness'].default_value = .65
+fbsdf.inputs['Emission Color'].default_value = (.18, .85, .06, 1)
+fbsdf.inputs['Emission Strength'].default_value = .45
 
-def add_area_light(name, loc, target, energy, size, color_rgb=(1.0, 1.0, 1.0)):
-    ld = bpy.data.lights.new(name=name, type='AREA')
-    ld.energy = energy
-    ld.size = size
-    ld.color = color_rgb
-    lo = bpy.data.objects.new(name=name, object_data=ld)
-    studio_col.objects.link(lo)
-    lo.location = Vector(loc)
-    direction = Vector(target) - Vector(loc)
-    lo.rotation_euler = direction.to_track_quat('-Z', 'Y').to_euler()
-    return lo
+puff_specs = [
+    (0.0,  0.65, 1.45, 0.28),
+    (-0.22, 0.92, 1.52, 0.36),
+    (0.24,  0.88, 1.40, 0.34),
+    (0.0,  1.22, 1.58, 0.46),
+    (-0.34, 1.38, 1.68, 0.42),
+    (0.32,  1.34, 1.48, 0.40),
+    (0.0,  1.65, 1.75, 0.55),
+]
+puff_objs = []
+for idx, (px, py, pz, pr) in enumerate(puff_specs):
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=24, ring_count=16, radius=pr, location=(px, py, pz))
+    po = bpy.context.object
+    po.name = f'FartPuff.{idx}'
+    po.data.materials.append(fart_mat)
+    for p in po.data.polygons:
+        p.use_smooth = True
+    puff_objs.append((po, Vector((px, py, pz)), pr))
 
+# Set up perspective animation camera looking at 3/4 side-back view during blast
+anim_cam_da = bpy.data.cameras.new('FartAnimCam')
+anim_cam_da.type = 'ORTHO'
+anim_cam_da.ortho_scale = 6.8 if CHAR_SLUG == "hoppy_hopscotch" else 6.4
+anim_cam = bpy.data.objects.new('FartAnimCam', anim_cam_da)
+studio.objects.link(anim_cam)
+sc.camera = anim_cam
+sc.cycles.samples = 8
+sc.render.resolution_x = 480
+sc.render.resolution_y = 480
+sc.render.film_transparent = False
+sc.world.node_tree.nodes.get('Background').inputs[0].default_value = (.08, .10, .15, 1)
+sc.world.node_tree.nodes.get('Background').inputs[1].default_value = 1.0
 
-add_area_light("Key_Softbox", (-2.6, -4.0, 3.6), (0.0, 0.0, 1.65), energy=200.0, size=3.2, color_rgb=(1.0, 0.99, 0.98))
-add_area_light("Fill_Softbox", (2.8, -3.5, 2.6), (0.0, 0.0, 1.55), energy=135.0, size=3.6, color_rgb=(0.97, 0.98, 1.0))
-add_area_light("Top_Softbox", (0.0, -0.9, 4.6), (0.0, 0.0, 1.95), energy=145.0, size=3.4, color_rgb=(1.0, 1.0, 1.0))
-add_area_light("Rim_Backlight", (0.0, 3.2, 3.3), (0.0, 0.0, 1.70), energy=130.0, size=2.8, color_rgb=(0.98, 0.98, 1.0))
+z_target = 2.40 if CHAR_SLUG == "hoppy_hopscotch" else 2.25
+N_FRAMES = 24
+for f_idx in range(N_FRAMES):
+    u = f_idx / (N_FRAMES - 1)
+    # Phase 1 (0..0.28): Turn from front to 3/4 back-side
+    # Phase 2 (0.28..0.50): Deep squat & build pressure
+    # Phase 3 (0.50..0.82): Explosive green fart blast + recoil hop!
+    # Phase 4 (0.82..1.00): Return to cheerful idle
+    if u < 0.28:
+        t = u / 0.28
+        yaw = t * (pi * 0.68)
+        pitch = 0.0
+        z_off = 0.0
+        sz = 1.0
+    elif u < 0.50:
+        t = (u - 0.28) / 0.22
+        yaw = pi * 0.68 + 0.08 * sin(t * 4 * pi)
+        pitch = 0.22 * t
+        z_off = -0.22 * t
+        sz = 1.0 - 0.10 * t
+    elif u < 0.82:
+        t = (u - 0.50) / 0.32
+        yaw = pi * 0.68
+        pitch = 0.22 - 0.34 * sin(t * pi)
+        z_off = -0.22 + 0.45 * sin(t * pi)
+        sz = 0.90 + 0.16 * sin(t * pi)
+    else:
+        t = (u - 0.82) / 0.18
+        yaw = (1 - t) * (pi * 0.68)
+        pitch = 0.0
+        z_off = 0.0
+        sz = 1.0
 
-world = bpy.data.worlds.new("HoppyStudioWorld")
-scene.world = world
-world.use_nodes = True
-bg_node = world.node_tree.nodes.get("Background")
-if bg_node:
-    bg_node.inputs[0].default_value = hex_to_rgba(0xF5F6F8)
-    bg_node.inputs[1].default_value = 1.02
+    root.rotation_euler = (pitch, 0.0, yaw)
+    root.location = (0.0, 0.0, z_off)
+    root.scale = (1.0 / sqrt(sz), 1.0 / sqrt(sz), sz)
 
-for look_name in ('AgX - High Contrast', 'High Contrast'):
-    try:
-        scene.view_settings.look = look_name
-        break
-    except Exception:
-        pass
+    # Animate fart puffs during Phase 3 (0.48 <= u <= 0.92)
+    for p_i, (po, base_loc, pr) in enumerate(puff_objs):
+        delay = p_i * 0.035
+        pu = (u - (0.48 + delay)) / 0.36
+        if 0.0 < pu < 1.0:
+            po.hide_render = False
+            scale_f = sin(pu * pi) * (0.6 + 0.8 * pu)
+            po.scale = (scale_f, scale_f, scale_f)
+            # Blast outward along -Y/X in world space behind the rotated character
+            blast_dir = Vector((-sin(yaw), -cos(yaw), 0.18)).normalized()
+            po.location = Vector((0, 0, 1.45 + z_off)) + blast_dir * (0.45 + 1.55 * pu + p_i * 0.14)
+        else:
+            po.hide_render = True
 
-cam_data = bpy.data.cameras.new("Studio_Camera")
-cam_data.lens = 54.0
-cam_obj = bpy.data.objects.new("Studio_Camera", cam_data)
-studio_col.objects.link(cam_obj)
-scene.camera = cam_obj
-
-
-def aim_camera(loc, target=(0.0, 0.0, 1.62), lens=54.0):
-    cam_data.lens = lens
-    cam_obj.location = Vector(loc)
-    direction = Vector(target) - Vector(loc)
-    cam_obj.rotation_euler = direction.to_track_quat('-Z', 'Y').to_euler()
-
-
-# ==============================================================================
-# 9. RENDER STUDIO HERO & TURNAROUND VIEWS (FRONT 1080x1350, 3/4, SIDE)
-# ==============================================================================
-scene.render.engine = 'CYCLES'
-scene.cycles.device = 'CPU'
-scene.cycles.use_denoising = True
-if hasattr(scene.cycles, "denoiser"):
-    for d_opt in ('OPENIMAGEDENOISE', 'OPTIX'):
-        try:
-            scene.cycles.denoiser = d_opt
-            break
-        except Exception:
-            pass
-
-scene.render.resolution_percentage = 100
-scene.render.fps = 24
-scene.render.image_settings.file_format = 'PNG'
-scene.render.image_settings.color_mode = 'RGBA'
-
-for trk in arm_obj.animation_data.nla_tracks:
-    trk.mute = True
-bpy.context.view_layer.objects.active = arm_obj
-bpy.ops.object.mode_set(mode='POSE')
-reset_pose(hide_fart_cloud=True)
-bpy.ops.object.mode_set(mode='OBJECT')
-scene.frame_set(1)
-
-# 1. Hero Front Render (1080x1350)
-subsurf_mod.render_levels = 2
-scene.cycles.samples = 32
-scene.render.resolution_x = 1080
-scene.render.resolution_y = 1350
-aim_camera((0.0, -6.20, 1.66), target=(0.0, 0.0, 1.62), lens=54.0)
-scene.render.filepath = RENDER_FRONT_PATH
-bpy.ops.render.render(write_still=True)
-
-# 2. Turnaround 3/4 & Side Renders (800x1000)
-scene.cycles.samples = 24
-scene.render.resolution_x = 800
-scene.render.resolution_y = 1000
-
-aim_camera((-4.35, -4.45, 1.72), target=(0.0, 0.0, 1.62), lens=54.0)
-scene.render.filepath = os.path.join(WORK_DIR, "cycles_3q.png")
-bpy.ops.render.render(write_still=True)
-
-aim_camera((-6.20, 0.0, 1.66), target=(0.0, -0.06, 1.62), lens=54.0)
-scene.render.filepath = os.path.join(WORK_DIR, "cycles_side.png")
-bpy.ops.render.render(write_still=True)
-
-
-# ==============================================================================
-# 10. RENDER THE 36-FRAME `Hoppy_Fart_Blast` CYCLES ANIMATION SEQUENCE!
-# ==============================================================================
-for trk in arm_obj.animation_data.nla_tracks:
-    trk.mute = (trk.name != "Hoppy_Fart_Blast")
-
-aim_camera((5.55, -4.05, 1.75), target=(-0.05, 0.36, 1.48), lens=50.0)
-
-scene.frame_start = 1
-scene.frame_end = 36
-scene.frame_set(14)
-bpy.ops.wm.save_as_mainfile(filepath=BLEND_PATH, compress=True)
-
-subsurf_mod.render_levels = 1
-scene.cycles.samples = 14
-scene.render.resolution_x = 640
-scene.render.resolution_y = 640
-
-for f in range(1, 37):
-    scene.frame_set(f)
-    scene.render.filepath = os.path.join(FART_FRAMES_DIR, f"frame_{f:03d}.png")
+    anim_cam.location = (3.5, -11.5, z_target + 0.6)
+    anim_cam.rotation_euler = (Vector((0, 0, z_target)) - anim_cam.location).to_track_quat('-Z', 'Y').to_euler()
+    sc.render.filepath = os.path.join(anim_frames_dir, f"frame_{f_idx:03d}.png")
     bpy.ops.render.render(write_still=True)
 
-print("SUCCESS v2: Built Hoppy Hopscotch .blend, .glb, .obj, studio renders & 36 Cycles frames!")
-print(f"  BLEND: {BLEND_PATH} ({os.path.getsize(BLEND_PATH)} bytes)")
-print(f"  GLB:   {GLB_PATH} ({os.path.getsize(GLB_PATH)} bytes)")
-print(f"  OBJ:   {OBJ_PATH} ({os.path.getsize(OBJ_PATH)} bytes)")
-print(f"  FRONT: {RENDER_FRONT_PATH} ({os.path.getsize(RENDER_FRONT_PATH)} bytes)")
+# Compile MP4, GIF, WEBP, and 4-panel Storyboard via ffmpeg (zero PIL dependency!)
+mp4_path = os.path.join(OUT_ANIMS_DIR, f"{CHAR_SLUG}_fart_animation.mp4")
+gif_path = os.path.join(OUT_ANIMS_DIR, f"{CHAR_SLUG}_fart_animation.gif")
+webp_path = os.path.join(OUT_ANIMS_DIR, f"{CHAR_SLUG}_fart_animation.webp")
+story_path = os.path.join(OUT_ANIMS_DIR, f"{CHAR_SLUG}_fart_storyboard.png")
+
+subprocess.run([
+    "ffmpeg", "-y", "-framerate", "12",
+    "-i", os.path.join(anim_frames_dir, "frame_%03d.png"),
+    "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "20", mp4_path
+], check=True)
+
+subprocess.run([
+    "ffmpeg", "-y", "-framerate", "12",
+    "-i", os.path.join(anim_frames_dir, "frame_%03d.png"),
+    "-vf", "split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse",
+    "-loop", "0", gif_path
+], check=True)
+
+# Try libwebp_anim or copy gif if libwebp not compiled into ffmpeg
+res_webp = subprocess.run([
+    "ffmpeg", "-y", "-framerate", "12",
+    "-i", os.path.join(anim_frames_dir, "frame_%03d.png"),
+    "-loop", "0", "-q:v", "80", webp_path
+])
+
+subprocess.run([
+    "ffmpeg", "-y",
+    "-i", os.path.join(anim_frames_dir, "frame_000.png"),
+    "-i", os.path.join(anim_frames_dir, "frame_009.png"),
+    "-i", os.path.join(anim_frames_dir, "frame_014.png"),
+    "-i", os.path.join(anim_frames_dir, "frame_018.png"),
+    "-filter_complex", "[0:v][1:v][2:v][3:v]hstack=inputs=4[out]",
+    "-map", "[out]", "-frames:v", "1", story_path
+], check=True)
+
+# Save per-character Blender generator script in models/build_<slug>_blender.py
+with open(__file__, "r", encoding="utf-8") as f_in:
+    src_code = f_in.read()
+src_code = src_code.replace('CHAR_SLUG = argv[0] if len(argv) >= 1 else "hoppy_hopscotch"', f'CHAR_SLUG = argv[0] if len(argv) >= 1 else "{CHAR_SLUG}"')
+with open(os.path.join(OUT_MODELS_DIR, f"build_{CHAR_SLUG}_blender.py"), "w", encoding="utf-8") as f_out:
+    f_out.write(src_code)
+
+print("FULL_PIPELINE_COMPLETE:", CHAR_SLUG, stitch_info)
+

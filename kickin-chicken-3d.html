@@ -220,7 +220,7 @@
         <h2 class="section-title">🎯 #053 Ref vs. Blender 4.3 Cycles</h2>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
           <div class="ref-card" style="padding:6px;">
-            <img src="images/053_KickinChicken.webp" alt="053_KickinChicken Reference" style="max-height:175px;" />
+            <img src="images/325_OfficialKickinChickenRender.png" alt="#325 Official Toy Render Reference" style="max-height:175px;" />
             <div class="ref-caption" style="font-size:0.7rem;">#053 Target Ref</div>
           </div>
           <div class="ref-card" style="padding:6px;">
@@ -228,6 +228,7 @@
             <div class="ref-caption" style="font-size:0.7rem;">Blender Cycles Render</div>
           </div>
         </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:6px;"><a class="btn" href="models/kickin_chicken_Front.png" target="_blank" style="padding:3px 4px;font-size:0.68rem;justify-content:center;">Front</a><a class="btn" href="models/kickin_chicken_Three-quarter.png" target="_blank" style="padding:3px 4px;font-size:0.68rem;justify-content:center;">3/4</a><a class="btn" href="models/kickin_chicken_Back.png" target="_blank" style="padding:3px 4px;font-size:0.68rem;justify-content:center;">Back</a><a class="btn" href="models/kickin_chicken_Stitch-detail.png" target="_blank" style="padding:3px 4px;font-size:0.68rem;justify-content:center;">Stitches</a></div>
       </div>
 
       <div>
@@ -498,6 +499,7 @@
       }
       kickin.root.traverse(obj => {
         if (!obj.isMesh) return;
+        if (!origMats.has(obj)) origMats.set(obj, obj.material);
         const baseM = origMats.get(obj);
         if (mode === 'pbr') {
           obj.material = baseM;

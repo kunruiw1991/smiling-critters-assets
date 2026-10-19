@@ -26,46 +26,46 @@ Every character model features:
 ## 🖼️ 4-Panel Reference Plush vs. Blender 4.3 Cycles Turnaround Sheets (All 9 Characters)
 
 ### 1. 🐑💀 Baba Chops (`baba_chops_plush_base_model`) — White Skull Pendant
-- **Reference Plush Image**: [`../images/121_BabaChopsPlush1.webp`](../images/121_BabaChopsPlush1.webp) · **Interactive 3D Studio**: [`../baba-chops-3d.html`](../baba-chops-3d.html) · **Blender Generator**: [`build_baba_chops_blender.py`](build_baba_chops_blender.py)
+- **Reference Plush Image**: [`../images/128_BabaToyRenderNew.webp`](../images/128_BabaToyRenderNew.webp) · **Interactive 3D Studio**: [`../baba-chops-3d.html`](../baba-chops-3d.html) · **Blender Generator**: [`build_baba_chops_blender.py`](build_baba_chops_blender.py)
 
 ![Baba Chops 4-Panel Reference vs Cycles Turnaround](baba_chops_3d_preview.png)
 
 ### 2. 🐱🌙 CatNap (`catnap_plush_base_model`) — Gold Crescent Moon Pendant
-- **Reference Plush Image**: [`../images/022_CatNap_Plushie.webp`](../images/022_CatNap_Plushie.webp) · **Interactive 3D Studio**: [`../catnap-3d.html`](../catnap-3d.html) · **Blender Generator**: [`build_catnap_blender.py`](build_catnap_blender.py)
+- **Reference Plush Image**: [`../images/319_OfficialToyCatNapRender.png`](../images/319_OfficialToyCatNapRender.png) · **Interactive 3D Studio**: [`../catnap-3d.html`](../catnap-3d.html) · **Blender Generator**: [`build_catnap_blender.py`](build_catnap_blender.py)
 
 ![CatNap 4-Panel Reference vs Cycles Turnaround](catnap_3d_preview.png)
 
 ### 3. 🐶☀️ DogDay (`dogday_plush_base_model`) — Gold Sun Pendant with Orange Center
-- **Reference Plush Image**: [`../images/008_DogDay_Plushie.webp`](../images/008_DogDay_Plushie.webp) · **Interactive 3D Studio**: [`../dogday-3d.html`](../dogday-3d.html) · **Blender Generator**: [`build_dogday_blender.py`](build_dogday_blender.py)
+- **Reference Plush Image**: [`../images/323_OfficialToyDogDayRender.png`](../images/323_OfficialToyDogDayRender.png) · **Interactive 3D Studio**: [`../dogday-3d.html`](../dogday-3d.html) · **Blender Generator**: [`build_dogday_blender.py`](build_dogday_blender.py)
 
 ![DogDay 4-Panel Reference vs Cycles Turnaround](dogday_3d_preview.png)
 
 ### 4. 🐻❤️ Bobby BearHug (`bobby_bearhug_plush_base_model`) — Red Heart Pendant
-- **Reference Plush Image**: [`../images/018_Bobby_BearHug_Plushie.webp`](../images/018_Bobby_BearHug_Plushie.webp) · **Interactive 3D Studio**: [`../bobby-bearhug-3d.html`](../bobby-bearhug-3d.html) · **Blender Generator**: [`build_bobby_bearhug_blender.py`](build_bobby_bearhug_blender.py)
+- **Reference Plush Image**: [`../images/320_OfficialBobbyRender.png`](../images/320_OfficialBobbyRender.png) · **Interactive 3D Studio**: [`../bobby-bearhug-3d.html`](../bobby-bearhug-3d.html) · **Blender Generator**: [`build_bobby_bearhug_blender.py`](build_bobby_bearhug_blender.py)
 
 ![Bobby BearHug 4-Panel Reference vs Cycles Turnaround](bobby_bearhug_3d_preview.png)
 
 ### 5. 🐘💡 Bubba Bubbaphant (`bubba_bubbaphant_plush_base_model`) — Bright Yellow Lightbulb Pendant
-- **Reference Plush Image**: [`../images/024_BubbaBubbaphantPlush.webp`](../images/024_BubbaBubbaphantPlush.webp) · **Interactive 3D Studio**: [`../bubba-bubbaphant-3d.html`](../bubba-bubbaphant-3d.html) · **Blender Generator**: [`build_bubba_bubbaphant_blender.py`](build_bubba_bubbaphant_blender.py)
+- **Reference Plush Image**: [`../images/321_OfficialBubbaRender.png`](../images/321_OfficialBubbaRender.png) · **Interactive 3D Studio**: [`../bubba-bubbaphant-3d.html`](../bubba-bubbaphant-3d.html) · **Blender Generator**: [`build_bubba_bubbaphant_blender.py`](build_bubba_bubbaphant_blender.py)
 
 ![Bubba Bubbaphant 4-Panel Reference vs Cycles Turnaround](bubba_bubbaphant_3d_preview.png)
 
 ### 6. 🦄🌈 CraftyCorn (`craftycorn_plush_base_model`) — Rainbow-Petaled Flower Pendant
-- **Reference Plush Image**: [`../images/011_CraftyCorn_Plushie.webp`](../images/011_CraftyCorn_Plushie.webp) · **Interactive 3D Studio**: [`../craftycorn-3d.html`](../craftycorn-3d.html) · **Blender Generator**: [`build_craftycorn_blender.py`](build_craftycorn_blender.py)
+- **Reference Plush Image**: [`../images/322_OfficialCraftyCornRender.png`](../images/322_OfficialCraftyCornRender.png) · **Interactive 3D Studio**: [`../craftycorn-3d.html`](../craftycorn-3d.html) · **Blender Generator**: [`build_craftycorn_blender.py`](build_craftycorn_blender.py)
 
 ![CraftyCorn 4-Panel Reference vs Cycles Turnaround](craftycorn_3d_preview.png)
 
 ### 7. 🐰⚡ Hoppy Hopscotch (`hoppy_hopscotch_plush_base_model`) — Yellow Lightning Bolt Pendant
-- **Reference Plush Image**: [`../images/012_Hoppy_Hopscotch_Plushie.webp`](../images/012_Hoppy_Hopscotch_Plushie.webp) · **Interactive 3D Studio**: [`../hoppy-hopscotch-3d.html`](../hoppy-hopscotch-3d.html) · **Blender Generator**: [`build_hoppy_hopscotch_blender.py`](build_hoppy_hopscotch_blender.py)
+- **Reference Plush Image**: [`../images/324_OfficialHoppyRender.png`](../images/324_OfficialHoppyRender.png) · **Interactive 3D Studio**: [`../hoppy-hopscotch-3d.html`](../hoppy-hopscotch-3d.html) · **Blender Generator**: [`build_hoppy_hopscotch_blender.py`](build_hoppy_hopscotch_blender.py)
 
 ![Hoppy Hopscotch 4-Panel Reference vs Cycles Turnaround](hoppy_hopscotch_3d_preview.png)
 
 ### 8. 🐓⭐ KickinChicken (`kickin_chicken_plush_base_model`) — Gold 5-Pointed Star Pendant
-- **Reference Plush Image**: [`../images/053_KickinChicken.webp`](../images/053_KickinChicken.webp) · **Interactive 3D Studio**: [`../kickin-chicken-3d.html`](../kickin-chicken-3d.html) · **Blender Generator**: [`build_kickin_chicken_blender.py`](build_kickin_chicken_blender.py)
+- **Reference Plush Image**: [`../images/325_OfficialKickinChickenRender.png`](../images/325_OfficialKickinChickenRender.png) · **Interactive 3D Studio**: [`../kickin-chicken-3d.html`](../kickin-chicken-3d.html) · **Blender Generator**: [`build_kickin_chicken_blender.py`](build_kickin_chicken_blender.py)
 
 ![KickinChicken 4-Panel Reference vs Cycles Turnaround](kickin_chicken_3d_preview.png)
 
 ### 9. 🐷🍎 PickyPiggy (`picky_piggy_plush_base_model`) — Red Apple with Green Leaf Pendant
-- **Reference Plush Image**: [`../images/025_PickyPiggy_Plushie.webp`](../images/025_PickyPiggy_Plushie.webp) · **Interactive 3D Studio**: [`../picky-piggy-3d.html`](../picky-piggy-3d.html) · **Blender Generator**: [`build_picky_piggy_blender.py`](build_picky_piggy_blender.py)
+- **Reference Plush Image**: [`../images/326_OfficialPickyPiggyRender.png`](../images/326_OfficialPickyPiggyRender.png) · **Interactive 3D Studio**: [`../picky-piggy-3d.html`](../picky-piggy-3d.html) · **Blender Generator**: [`build_picky_piggy_blender.py`](build_picky_piggy_blender.py)
 
 ![PickyPiggy 4-Panel Reference vs Cycles Turnaround](picky_piggy_3d_preview.png)

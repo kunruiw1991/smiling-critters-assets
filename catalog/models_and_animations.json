@@ -8,7 +8,7 @@
       "group": "Nightmare Critters",
       "species": "Black Sheep",
       "pendant": "White Skull Pendant",
-      "reference_image": "images/121_BabaChopsPlush1.webp",
+      "reference_image": "images/128_BabaToyRenderNew.webp",
       "blender_version": "4.3.2",
       "render_engine": "CYCLES",
       "armature": "BabaChops_Armature",
@@ -30,8 +30,13 @@
         "threejs_procedural_module": "models/baba_chops_model.js",
         "cycles_hero_render_png": "models/baba_chops_blender_cycles_render.png",
         "cycles_4panel_turnaround_png": "models/baba_chops_3d_preview.png",
-        "interactive_3d_studio_html": "baba-chops-3d.html"
-      }
+        "interactive_3d_studio_html": "baba-chops-3d.html",
+        "studio_front_png": "models/baba_chops_Front.png",
+        "studio_three_quarter_png": "models/baba_chops_Three-quarter.png",
+        "studio_back_png": "models/baba_chops_Back.png",
+        "studio_stitch_detail_png": "models/baba_chops_Stitch-detail.png"
+      },
+      "architecture": "critter-3d v11 (CatNap-Final-v11 multi-stage voxel-unioned plush & ray-cast 3D cotton stitches)"
     },
     {
       "id": "catnap_plush_base_model",
@@ -40,7 +45,7 @@
       "group": "Smiling Critters",
       "species": "Purple Cat",
       "pendant": "Gold Crescent Moon Pendant",
-      "reference_image": "images/022_CatNap_Plushie.webp",
+      "reference_image": "images/319_OfficialToyCatNapRender.png",
       "blender_version": "4.3.2",
       "render_engine": "CYCLES",
       "armature": "CatNap_Armature",
@@ -62,8 +67,13 @@
         "threejs_procedural_module": "models/catnap_model.js",
         "cycles_hero_render_png": "models/catnap_blender_cycles_render.png",
         "cycles_4panel_turnaround_png": "models/catnap_3d_preview.png",
-        "interactive_3d_studio_html": "catnap-3d.html"
-      }
+        "interactive_3d_studio_html": "catnap-3d.html",
+        "studio_front_png": "models/catnap_Front.png",
+        "studio_three_quarter_png": "models/catnap_Three-quarter.png",
+        "studio_back_png": "models/catnap_Back.png",
+        "studio_stitch_detail_png": "models/catnap_Stitch-detail.png"
+      },
+      "architecture": "critter-3d v11 (CatNap-Final-v11 multi-stage voxel-unioned plush & ray-cast 3D cotton stitches)"
     },
     {
       "id": "dogday_plush_base_model",
@@ -72,7 +82,7 @@
       "group": "Smiling Critters",
       "species": "Orange-Gold Spaniel Dog",
       "pendant": "Gold Sun Pendant with Orange Center",
-      "reference_image": "images/008_DogDay_Plushie.webp",
+      "reference_image": "images/323_OfficialToyDogDayRender.png",
       "blender_version": "4.3.2",
       "render_engine": "CYCLES",
       "armature": "DogDay_Armature",
@@ -94,8 +104,13 @@
         "threejs_procedural_module": "models/dogday_model.js",
         "cycles_hero_render_png": "models/dogday_blender_cycles_render.png",
         "cycles_4panel_turnaround_png": "models/dogday_3d_preview.png",
-        "interactive_3d_studio_html": "dogday-3d.html"
-      }
+        "interactive_3d_studio_html": "dogday-3d.html",
+        "studio_front_png": "models/dogday_Front.png",
+        "studio_three_quarter_png": "models/dogday_Three-quarter.png",
+        "studio_back_png": "models/dogday_Back.png",
+        "studio_stitch_detail_png": "models/dogday_Stitch-detail.png"
+      },
+      "architecture": "critter-3d v11 (CatNap-Final-v11 multi-stage voxel-unioned plush & ray-cast 3D cotton stitches)"
     },
     {
       "id": "bobby_bearhug_plush_base_model",
@@ -104,7 +119,7 @@
       "group": "Smiling Critters",
       "species": "Rose-Red Bear",
       "pendant": "Red Heart Pendant",
-      "reference_image": "images/018_Bobby_BearHug_Plushie.webp",
+      "reference_image": "images/320_OfficialBobbyRender.png",
       "blender_version": "4.3.2",
       "render_engine": "CYCLES",
       "armature": "BobbyBearHug_Armature",
@@ -126,8 +141,13 @@
         "threejs_procedural_module": "models/bobby_bearhug_model.js",
         "cycles_hero_render_png": "models/bobby_bearhug_blender_cycles_render.png",
         "cycles_4panel_turnaround_png": "models/bobby_bearhug_3d_preview.png",
-        "interactive_3d_studio_html": "bobby-bearhug-3d.html"
-      }
+        "interactive_3d_studio_html": "bobby-bearhug-3d.html",
+        "studio_front_png": "models/bobby_bearhug_Front.png",
+        "studio_three_quarter_png": "models/bobby_bearhug_Three-quarter.png",
+        "studio_back_png": "models/bobby_bearhug_Back.png",
+        "studio_stitch_detail_png": "models/bobby_bearhug_Stitch-detail.png"
+      },
+      "architecture": "critter-3d v11 (CatNap-Final-v11 multi-stage voxel-unioned plush & ray-cast 3D cotton stitches)"
     },
     {
       "id": "bubba_bubbaphant_plush_base_model",
@@ -136,7 +156,7 @@
       "group": "Smiling Critters",
       "species": "Sky-Blue Elephant",
       "pendant": "Bright Yellow Lightbulb Pendant",
-      "reference_image": "images/024_BubbaBubbaphantPlush.webp",
+      "reference_image": "images/321_OfficialBubbaRender.png",
       "blender_version": "4.3.2",
       "render_engine": "CYCLES",
       "armature": "BubbaBubbaphant_Armature",
@@ -158,8 +178,13 @@
         "threejs_procedural_module": "models/bubba_bubbaphant_model.js",
         "cycles_hero_render_png": "models/bubba_bubbaphant_blender_cycles_render.png",
         "cycles_4panel_turnaround_png": "models/bubba_bubbaphant_3d_preview.png",
-        "interactive_3d_studio_html": "bubba-bubbaphant-3d.html"
-      }
+        "interactive_3d_studio_html": "bubba-bubbaphant-3d.html",
+        "studio_front_png": "models/bubba_bubbaphant_Front.png",
+        "studio_three_quarter_png": "models/bubba_bubbaphant_Three-quarter.png",
+        "studio_back_png": "models/bubba_bubbaphant_Back.png",
+        "studio_stitch_detail_png": "models/bubba_bubbaphant_Stitch-detail.png"
+      },
+      "architecture": "critter-3d v11 (CatNap-Final-v11 multi-stage voxel-unioned plush & ray-cast 3D cotton stitches)"
     },
     {
       "id": "craftycorn_plush_base_model",
@@ -168,7 +193,7 @@
       "group": "Smiling Critters",
       "species": "White & Cyan Unicorn",
       "pendant": "Rainbow-Petaled Flower Pendant",
-      "reference_image": "images/011_CraftyCorn_Plushie.webp",
+      "reference_image": "images/322_OfficialCraftyCornRender.png",
       "blender_version": "4.3.2",
       "render_engine": "CYCLES",
       "armature": "CraftyCorn_Armature",
@@ -190,8 +215,13 @@
         "threejs_procedural_module": "models/craftycorn_model.js",
         "cycles_hero_render_png": "models/craftycorn_blender_cycles_render.png",
         "cycles_4panel_turnaround_png": "models/craftycorn_3d_preview.png",
-        "interactive_3d_studio_html": "craftycorn-3d.html"
-      }
+        "interactive_3d_studio_html": "craftycorn-3d.html",
+        "studio_front_png": "models/craftycorn_Front.png",
+        "studio_three_quarter_png": "models/craftycorn_Three-quarter.png",
+        "studio_back_png": "models/craftycorn_Back.png",
+        "studio_stitch_detail_png": "models/craftycorn_Stitch-detail.png"
+      },
+      "architecture": "critter-3d v11 (CatNap-Final-v11 multi-stage voxel-unioned plush & ray-cast 3D cotton stitches)"
     },
     {
       "id": "hoppy_hopscotch_plush_base_model",
@@ -200,7 +230,7 @@
       "group": "Smiling Critters",
       "species": "Mint-Green Rabbit",
       "pendant": "Yellow Lightning Bolt Pendant",
-      "reference_image": "images/012_Hoppy_Hopscotch_Plushie.webp",
+      "reference_image": "images/324_OfficialHoppyRender.png",
       "blender_version": "4.3.2",
       "render_engine": "CYCLES",
       "armature": "HoppyHopscotch_Armature",
@@ -222,8 +252,13 @@
         "threejs_procedural_module": "models/hoppy_hopscotch_model.js",
         "cycles_hero_render_png": "models/hoppy_hopscotch_blender_cycles_render.png",
         "cycles_4panel_turnaround_png": "models/hoppy_hopscotch_3d_preview.png",
-        "interactive_3d_studio_html": "hoppy-hopscotch-3d.html"
-      }
+        "interactive_3d_studio_html": "hoppy-hopscotch-3d.html",
+        "studio_front_png": "models/hoppy_hopscotch_Front.png",
+        "studio_three_quarter_png": "models/hoppy_hopscotch_Three-quarter.png",
+        "studio_back_png": "models/hoppy_hopscotch_Back.png",
+        "studio_stitch_detail_png": "models/hoppy_hopscotch_Stitch-detail.png"
+      },
+      "architecture": "critter-3d v11 (CatNap-Final-v11 multi-stage voxel-unioned plush & ray-cast 3D cotton stitches)"
     },
     {
       "id": "kickin_chicken_plush_base_model",
@@ -232,7 +267,7 @@
       "group": "Smiling Critters",
       "species": "Golden-Yellow Rooster",
       "pendant": "Gold 5-Pointed Star Pendant",
-      "reference_image": "images/053_KickinChicken.webp",
+      "reference_image": "images/325_OfficialKickinChickenRender.png",
       "blender_version": "4.3.2",
       "render_engine": "CYCLES",
       "armature": "KickinChicken_Armature",
@@ -254,8 +289,13 @@
         "threejs_procedural_module": "models/kickin_chicken_model.js",
         "cycles_hero_render_png": "models/kickin_chicken_blender_cycles_render.png",
         "cycles_4panel_turnaround_png": "models/kickin_chicken_3d_preview.png",
-        "interactive_3d_studio_html": "kickin-chicken-3d.html"
-      }
+        "interactive_3d_studio_html": "kickin-chicken-3d.html",
+        "studio_front_png": "models/kickin_chicken_Front.png",
+        "studio_three_quarter_png": "models/kickin_chicken_Three-quarter.png",
+        "studio_back_png": "models/kickin_chicken_Back.png",
+        "studio_stitch_detail_png": "models/kickin_chicken_Stitch-detail.png"
+      },
+      "architecture": "critter-3d v11 (CatNap-Final-v11 multi-stage voxel-unioned plush & ray-cast 3D cotton stitches)"
     },
     {
       "id": "picky_piggy_plush_base_model",
@@ -264,7 +304,7 @@
       "group": "Smiling Critters",
       "species": "Bubblegum-Pink Pig",
       "pendant": "Red Apple with Green Leaf Pendant",
-      "reference_image": "images/025_PickyPiggy_Plushie.webp",
+      "reference_image": "images/326_OfficialPickyPiggyRender.png",
       "blender_version": "4.3.2",
       "render_engine": "CYCLES",
       "armature": "PickyPiggy_Armature",
@@ -286,8 +326,13 @@
         "threejs_procedural_module": "models/picky_piggy_model.js",
         "cycles_hero_render_png": "models/picky_piggy_blender_cycles_render.png",
         "cycles_4panel_turnaround_png": "models/picky_piggy_3d_preview.png",
-        "interactive_3d_studio_html": "picky-piggy-3d.html"
-      }
+        "interactive_3d_studio_html": "picky-piggy-3d.html",
+        "studio_front_png": "models/picky_piggy_Front.png",
+        "studio_three_quarter_png": "models/picky_piggy_Three-quarter.png",
+        "studio_back_png": "models/picky_piggy_Back.png",
+        "studio_stitch_detail_png": "models/picky_piggy_Stitch-detail.png"
+      },
+      "architecture": "critter-3d v11 (CatNap-Final-v11 multi-stage voxel-unioned plush & ray-cast 3D cotton stitches)"
     }
   ],
   "animations": [

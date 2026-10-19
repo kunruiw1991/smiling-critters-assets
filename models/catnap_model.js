@@ -1,3 +1,192 @@
+
+// ============================================================================
+// critter-3d (CatNap-Final-v11) Binary GLB Loader (Zero External Dependencies)
+// Automatically replaces procedural placeholder primitives with the exact
+// voxel-unioned Blender 4.3 plush mesh, recessed perforated speaker grille,
+// skin-fitted button eyes, and 700+ 3D cotton stitch arcs.
+// ============================================================================
+function loadCritterV11GLB(THREE, glbUrl, rigGroups, bumpTex) {
+  if (typeof fetch === 'undefined') return;
+  fetch(glbUrl)
+    .then(res => {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.arrayBuffer();
+    })
+    .then(buffer => {
+      const dv = new DataView(buffer);
+      const magic = dv.getUint32(0, true);
+      if (magic !== 0x46546C67) throw new Error('Invalid GLB magic');
+      const jsonLen = dv.getUint32(12, true);
+      const jsonStr = new TextDecoder().decode(new Uint8Array(buffer, 20, jsonLen));
+      const gltf = JSON.parse(jsonStr);
+      const binOffset = 20 + jsonLen + 8;
+
+      function getAccessorData(accIdx) {
+        const acc = gltf.accessors[accIdx];
+        const bv = gltf.bufferViews[acc.bufferView];
+        const byteOffset = binOffset + (bv.byteOffset || 0) + (acc.byteOffset || 0);
+        const numComp = { SCALAR: 1, VEC2: 2, VEC3: 3, VEC4: 4, MAT4: 16 }[acc.type] || 1;
+        const TypedArr = {
+          5126: Float32Array,
+          5123: Uint16Array,
+          5125: Uint32Array,
+          5121: Uint8Array,
+          5122: Int16Array,
+          5120: Int8Array
+        }[acc.componentType] || Float32Array;
+        const elemBytes = TypedArr.BYTES_PER_ELEMENT;
+        const stride = bv.byteStride || (numComp * elemBytes);
+        if (stride === numComp * elemBytes) {
+          return new TypedArr(buffer, byteOffset, acc.count * numComp);
+        }
+        const out = new TypedArr(acc.count * numComp);
+        for (let i = 0; i < acc.count; i++) {
+          const rowOff = byteOffset + i * stride;
+          for (let c = 0; c < numComp; c++) {
+            if (acc.componentType === 5126) out[i * numComp + c] = dv.getFloat32(rowOff + c * 4, true);
+            else if (acc.componentType === 5123) out[i * numComp + c] = dv.getUint16(rowOff + c * 2, true);
+            else if (acc.componentType === 5125) out[i * numComp + c] = dv.getUint32(rowOff + c * 4, true);
+          }
+        }
+        return out;
+      }
+
+      const threeMats = (gltf.materials || []).map(m => {
+        const pbr = m.pbrMetallicRoughness || {};
+        const bc = pbr.baseColorFactor || [0.8, 0.8, 0.8, 1.0];
+        const rough = pbr.roughnessFactor !== undefined ? pbr.roughnessFactor : 0.84;
+        const metal = pbr.metallicFactor !== undefined ? pbr.metallicFactor : 0.0;
+        const col = new THREE.Color();
+        if (col.setRGB) {
+          col.setRGB(bc[0], bc[1], bc[2], THREE.LinearSRGBColorSpace || 'srgb-linear');
+        } else {
+          col.setRGB(Math.pow(bc[0], 1 / 2.2), Math.pow(bc[1], 1 / 2.2), Math.pow(bc[2], 1 / 2.2));
+        }
+        const isPlush = rough >= 0.78 && metal < 0.1;
+        return new THREE.MeshStandardMaterial({
+          name: m.name || 'CritterV11Mat',
+          color: col,
+          roughness: rough,
+          metalness: metal,
+          bumpMap: isPlush ? bumpTex : null,
+          bumpScale: isPlush ? 0.005 : 0.0,
+          side: THREE.DoubleSide
+        });
+      });
+      const fallbackMat = new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.8 });
+
+      // Scale & offset from Blender critter-3d space (feet=0.275, crown=4.6..5.8) to Studio space (feet=0.0, height~2.05)
+      const SCALE = 0.44;
+      const Y_OFFSET = -0.275 * SCALE;
+      const NECK_PIVOT_Y = 2.75 * SCALE + Y_OFFSET;
+      const PENDANT_PIVOT_Y = 2.58 * SCALE + Y_OFFSET;
+      const PENDANT_PIVOT_Z = 0.46 * SCALE;
+
+      const v11Body = new THREE.Group();
+      v11Body.name = 'CritterV11_Body_Group';
+      const v11Head = new THREE.Group();
+      v11Head.name = 'CritterV11_Head_Group';
+      const v11Pendant = new THREE.Group();
+      v11Pendant.name = 'CritterV11_Pendant_Group';
+
+      function processNode(nodeIdx, parentMat) {
+        const node = gltf.nodes[nodeIdx];
+        const localMat = new THREE.Matrix4();
+        if (node.matrix) {
+          localMat.fromArray(node.matrix);
+        } else {
+          const pos = node.translation ? new THREE.Vector3(...node.translation) : new THREE.Vector3();
+          const quat = node.rotation ? new THREE.Quaternion(...node.rotation) : new THREE.Quaternion();
+          const scl = node.scale ? new THREE.Vector3(...node.scale) : new THREE.Vector3(1, 1, 1);
+          localMat.compose(pos, quat, scl);
+        }
+        const worldMat = parentMat.clone().multiply(localMat);
+
+        if (node.mesh !== undefined) {
+          const meshDef = gltf.meshes[node.mesh];
+          const nName = node.name || meshDef.name || '';
+          const isHeadPart = /^(Head|Eye|Mouth|Nose|Wool|Ear|Crest)/i.test(nName) ||
+            /(Ear panel|Forehead|Chin|Mouth lining|Floppy ear|Nostril)/i.test(nName);
+          const isPendantPart = /^Pendant/i.test(nName);
+
+          for (const prim of meshDef.primitives) {
+            if (prim.attributes.POSITION === undefined) continue;
+            const geo = new THREE.BufferGeometry();
+            const posArr = getAccessorData(prim.attributes.POSITION);
+            geo.setAttribute('position', new THREE.BufferAttribute(posArr, 3));
+            if (prim.attributes.NORMAL !== undefined) {
+              const normArr = getAccessorData(prim.attributes.NORMAL);
+              geo.setAttribute('normal', new THREE.BufferAttribute(normArr, 3));
+            }
+            if (prim.indices !== undefined) {
+              const idxArr = getAccessorData(prim.indices);
+              geo.setIndex(new THREE.BufferAttribute(idxArr, 1));
+            }
+            geo.applyMatrix4(worldMat);
+            // Convert glTF (+Z front) or Blender (-Y front -> +Z front in glTF) and apply SCALE + Y_OFFSET
+            const scaleMat = new THREE.Matrix4().makeScale(SCALE, SCALE, SCALE);
+            const transMat = new THREE.Matrix4().makeTranslation(0, Y_OFFSET, 0);
+            geo.applyMatrix4(scaleMat);
+            geo.applyMatrix4(transMat);
+            if (!prim.attributes.NORMAL) geo.computeVertexNormals();
+
+            const mat = (prim.material !== undefined && threeMats[prim.material]) ? threeMats[prim.material] : fallbackMat;
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.name = nName;
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+
+            if (isHeadPart) {
+              geo.translate(0, -NECK_PIVOT_Y, 0);
+              v11Head.add(mesh);
+            } else if (isPendantPart) {
+              geo.translate(0, -PENDANT_PIVOT_Y, -PENDANT_PIVOT_Z);
+              v11Pendant.add(mesh);
+            } else {
+              v11Body.add(mesh);
+            }
+          }
+        }
+        if (node.children) {
+          for (const ch of node.children) processNode(ch, worldMat);
+        }
+      }
+
+      const sceneDef = gltf.scenes[gltf.scene || 0];
+      const ident = new THREE.Matrix4();
+      for (const rIdx of (sceneDef.nodes || [])) {
+        processNode(rIdx, ident);
+      }
+
+      // Remove procedural placeholder meshes from bodyRig (preserving fartCloudGroup)
+      const { root, bodyRig, headGroup, pendantGroup, fartCloudGroup } = rigGroups;
+      const keepGroups = new Set([headGroup, pendantGroup, fartCloudGroup]);
+      for (const child of [...bodyRig.children]) {
+        if (!keepGroups.has(child)) {
+          bodyRig.remove(child);
+        }
+      }
+      if (headGroup) {
+        headGroup.clear();
+        headGroup.position.set(0, NECK_PIVOT_Y, 0);
+        headGroup.rotation.set(0, 0, 0);
+        headGroup.add(v11Head);
+        if (headGroup.parent !== bodyRig) bodyRig.add(headGroup);
+      }
+      if (pendantGroup) {
+        pendantGroup.clear();
+        pendantGroup.position.set(0, PENDANT_PIVOT_Y, PENDANT_PIVOT_Z);
+        pendantGroup.rotation.set(0, 0, 0);
+        pendantGroup.add(v11Pendant);
+        if (pendantGroup.parent !== bodyRig) bodyRig.add(pendantGroup);
+      }
+      bodyRig.add(v11Body);
+    })
+    .catch(err => {
+      console.warn('CritterV11 GLB fallback to procedural:', err);
+    });
+}
+
 /**
  * CatNap 3D Plush Base Model Generator (Three.js r161 ESM)
  * ============================================================================
@@ -735,6 +924,9 @@ export function buildCatNapPlushModel(THREE) {
     p.scale.set(sx, sy, sz);
     fartStage3.add(p);
   });
+
+
+  loadCritterV11GLB(THREE, './models/catnap_plush_base_model.glb', { root, bodyRig, headGroup, pendantGroup: pendantGroup, fartCloudGroup }, velourBump);
 
   return {
     root,
