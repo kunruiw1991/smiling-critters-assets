@@ -1,0 +1,23 @@
+{
+  "stitch_counts": {
+    "Cuff 1": 66,
+    "Cuff 2": 37,
+    "Cuff 3": 66,
+    "Cuff 4": 37,
+    "Ear panel 1": 171,
+    "Ear panel 2": 51,
+    "Ear panel 3": 51,
+    "Forehead": 27,
+    "Chin": 6,
+    "Mouth lining 2.86": 8,
+    "Mouth lining 3.52": 24,
+    "Tail longitudinal": 125,
+    "Inner leg -1": 22,
+    "Shoulder -1": 8,
+    "Inner leg 1": 22,
+    "Shoulder 1": 8,
+    "Back body": 32
+  },
+  "total_stitches": 761,
+  "method": "surface-projected individual cotton thread arcs; preserved base geometry"
+}
