@@ -6,6 +6,29 @@
 
 ---
 
+<!-- LINE_ART_SECTION_START -->
+## ✏️🎨 Smiling Critters 简笔画 (Single-Character Line Art — All 8 Characters, Unified Stroke & Scale)
+
+All **8 Smiling Critters** single-character `1024×1024` coloring-book / 简笔画 PNGs (`line_art/`) drawn in **8 distinct, upright official 2D poses** with unified visual occupancy (`29–38%` silhouette area) and smooth `8.75 px` `pycairo` vector stroke weight:
+
+<p align="center">
+  <a href="line_art/contact_sheet.jpg"><img src="line_art/contact_sheet.jpg" width="860" alt="Smiling Critters 8-Character Line Art Contact Sheet" /></a>
+</p>
+
+| # | Preview | Character | Pose & Official Reference | Dimensions | File & Direct Link |
+| :-: | :-: | :--- | :--- | :-: | :--- |
+| `#831` | <img src="line_art/catnap_line_art.png" width="110" alt="CatNap Line Art" /> | **🐱🌙 CatNap** | Sitting with S-Curved Tail & Crescent Moon Pendant (from #037) | `1024×1024` (`PNG` · 172 KB) | [`line_art/catnap_line_art.png`](line_art/catnap_line_art.png) · [Live URL](https://kunruiw1991.github.io/smiling-critters-assets/line_art/catnap_line_art.png) |
+| `#832` | <img src="line_art/dogday_line_art.png" width="110" alt="DogDay Line Art" /> | **🐶☀️ DogDay** | Symmetric Joyful Cheer Pose & Sun Pendant (from #050) | `1024×1024` (`PNG` · 175 KB) | [`line_art/dogday_line_art.png`](line_art/dogday_line_art.png) · [Live URL](https://kunruiw1991.github.io/smiling-critters-assets/line_art/dogday_line_art.png) |
+| `#833` | <img src="line_art/bobby_bearhug_line_art.png" width="110" alt="Bobby BearHug Line Art" /> | **🐻❤️ Bobby BearHug** | Cheek-Touch & Open-Hug Step with Heart Pendant (from #392) | `1024×1024` (`PNG` · 156 KB) | [`line_art/bobby_bearhug_line_art.png`](line_art/bobby_bearhug_line_art.png) · [Live URL](https://kunruiw1991.github.io/smiling-critters-assets/line_art/bobby_bearhug_line_art.png) |
+| `#834` | <img src="line_art/bubba_bubbaphant_line_art.png" width="110" alt="Bubba Bubbaphant Line Art" /> | **🐘💡 Bubba Bubbaphant** | Hand-on-Hip & Raised-Hand Pose with Lightbulb Pendant (from #041) | `1024×1024` (`PNG` · 174 KB) | [`line_art/bubba_bubbaphant_line_art.png`](line_art/bubba_bubbaphant_line_art.png) · [Live URL](https://kunruiw1991.github.io/smiling-critters-assets/line_art/bubba_bubbaphant_line_art.png) |
+| `#835` | <img src="line_art/craftycorn_line_art.png" width="110" alt="CraftyCorn Line Art" /> | **🦄🌸 CraftyCorn** | Graceful 3/4 Step, Shy Hoof & Flower Pendant (from #038) | `1024×1024` (`PNG` · 165 KB) | [`line_art/craftycorn_line_art.png`](line_art/craftycorn_line_art.png) · [Live URL](https://kunruiw1991.github.io/smiling-critters-assets/line_art/craftycorn_line_art.png) |
+| `#836` | <img src="line_art/hoppy_hopscotch_line_art.png" width="110" alt="Hoppy Hopscotch Line Art" /> | **🐰⚡ Hoppy Hopscotch** | Mid-Hopscotch Leap & Lightning Bolt Pendant (from #052) | `1024×1024` (`PNG` · 177 KB) | [`line_art/hoppy_hopscotch_line_art.png`](line_art/hoppy_hopscotch_line_art.png) · [Live URL](https://kunruiw1991.github.io/smiling-critters-assets/line_art/hoppy_hopscotch_line_art.png) |
+| `#837` | <img src="line_art/kickin_chicken_line_art.png" width="110" alt="KickinChicken Line Art" /> | **🐓⭐ KickinChicken** | Cool Pointing Stance & Star Pendant (from #681) | `1024×1024` (`PNG` · 150 KB) | [`line_art/kickin_chicken_line_art.png`](line_art/kickin_chicken_line_art.png) · [Live URL](https://kunruiw1991.github.io/smiling-critters-assets/line_art/kickin_chicken_line_art.png) |
+| `#838` | <img src="line_art/picky_piggy_line_art.png" width="110" alt="PickyPiggy Line Art" /> | **🐷🍎 PickyPiggy** | Cheerful Sitting Pose, Curly Tail & Apple Pendant (from #090) | `1024×1024` (`PNG` · 181 KB) | [`line_art/picky_piggy_line_art.png`](line_art/picky_piggy_line_art.png) · [Live URL](https://kunruiw1991.github.io/smiling-critters-assets/line_art/picky_piggy_line_art.png) |
+
+---
+<!-- LINE_ART_SECTION_END -->
+
 ## 🎮💨 All 9 Interactive 3D Plush Base Model Studios & Blender 4.3 Cycles Fart Blast Animations
 
 Every **Smiling Critter** (**CatNap**, **DogDay**, **Bobby BearHug**, **Bubba Bubbaphant**, **CraftyCorn**, **Hoppy Hopscotch**, **KickinChicken**, **PickyPiggy**) plus **Baba Chops** has a complete **25-bone Blender 4.3 3D Plush Base Model (`.blend` / `.glb` / `.obj`)**, an **Interactive Three.js WebGL 3D Studio (`<slug>-3d.html`)**, and a path-traced **36-frame 24fps Blender Cycles Fart Blast Animation (`.mp4` with cartoon toot + giggle audio, `.gif`, `.webp`, and 4-act storyboard `.png`)**:

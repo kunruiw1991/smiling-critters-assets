@@ -1,10 +1,22 @@
 {
-  "total_images": 830,
+  "total_images": 838,
   "character_count": 19,
   "characters": {
     "CatNap": {
-      "count": 242,
+      "count": 243,
       "items": [
+        {
+          "id": 831,
+          "filename": "line_art/catnap_line_art.png",
+          "title": "CatNap \u2014 \u7b80\u7b14\u753b Single-Character Line Art (Sitting with S-Curved Tail & Crescent Moon Pendant (from #037))",
+          "character": "CatNap",
+          "wiki_section": "\u7b80\u7b14\u753b Line Art (Unified Stroke & Scale)",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 176446,
+          "format": "PNG",
+          "source_url": "https://kunruiw1991.github.io/smiling-critters-assets/line_art/catnap_line_art.png"
+        },
         {
           "id": 4,
           "filename": "images/004_CatNap_Cardboard_Cutout.webp",
@@ -4025,8 +4037,20 @@
       ]
     },
     "DogDay": {
-      "count": 66,
+      "count": 67,
       "items": [
+        {
+          "id": 832,
+          "filename": "line_art/dogday_line_art.png",
+          "title": "DogDay \u2014 \u7b80\u7b14\u753b Single-Character Line Art (Symmetric Joyful Cheer Pose & Sun Pendant (from #050))",
+          "character": "DogDay",
+          "wiki_section": "\u7b80\u7b14\u753b Line Art (Unified Stroke & Scale)",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 178822,
+          "format": "PNG",
+          "source_url": "https://kunruiw1991.github.io/smiling-critters-assets/line_art/dogday_line_art.png"
+        },
         {
           "id": 3,
           "filename": "images/003_DogDay_Cardboard_Cutout.webp",
@@ -4816,8 +4840,20 @@
       ]
     },
     "Bobby BearHug": {
-      "count": 44,
+      "count": 45,
       "items": [
+        {
+          "id": 833,
+          "filename": "line_art/bobby_bearhug_line_art.png",
+          "title": "Bobby BearHug \u2014 \u7b80\u7b14\u753b Single-Character Line Art (Cheek-Touch & Open-Hug Step with Heart Pendant (from #392))",
+          "character": "Bobby BearHug",
+          "wiki_section": "\u7b80\u7b14\u753b Line Art (Unified Stroke & Scale)",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 159730,
+          "format": "PNG",
+          "source_url": "https://kunruiw1991.github.io/smiling-critters-assets/line_art/bobby_bearhug_line_art.png"
+        },
         {
           "id": 26,
           "filename": "images/026_Bobby_BearHug_s_second_cutout_artwork_pose.webp",
@@ -5346,8 +5382,20 @@
       ]
     },
     "CraftyCorn": {
-      "count": 38,
+      "count": 39,
       "items": [
+        {
+          "id": 835,
+          "filename": "line_art/craftycorn_line_art.png",
+          "title": "CraftyCorn \u2014 \u7b80\u7b14\u753b Single-Character Line Art (Graceful 3/4 Step, Shy Hoof & Flower Pendant (from #038))",
+          "character": "CraftyCorn",
+          "wiki_section": "\u7b80\u7b14\u753b Line Art (Unified Stroke & Scale)",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 168752,
+          "format": "PNG",
+          "source_url": "https://kunruiw1991.github.io/smiling-critters-assets/line_art/craftycorn_line_art.png"
+        },
         {
           "id": 11,
           "filename": "images/011_CraftyCorn_Plushie.webp",
@@ -5802,8 +5850,20 @@
       ]
     },
     "KickinChicken": {
-      "count": 33,
+      "count": 34,
       "items": [
+        {
+          "id": 837,
+          "filename": "line_art/kickin_chicken_line_art.png",
+          "title": "KickinChicken \u2014 \u7b80\u7b14\u753b Single-Character Line Art (Cool Pointing Stance & Star Pendant (from #681))",
+          "character": "KickinChicken",
+          "wiki_section": "\u7b80\u7b14\u753b Line Art (Unified Stroke & Scale)",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 153478,
+          "format": "PNG",
+          "source_url": "https://kunruiw1991.github.io/smiling-critters-assets/line_art/kickin_chicken_line_art.png"
+        },
         {
           "id": 2,
           "filename": "images/002_KickinChicken_Cardboard_Cutout.webp",
@@ -6196,8 +6256,20 @@
       ]
     },
     "Hoppy Hopscotch": {
-      "count": 32,
+      "count": 33,
       "items": [
+        {
+          "id": 836,
+          "filename": "line_art/hoppy_hopscotch_line_art.png",
+          "title": "Hoppy Hopscotch \u2014 \u7b80\u7b14\u753b Single-Character Line Art (Mid-Hopscotch Leap & Lightning Bolt Pendant (from #052))",
+          "character": "Hoppy Hopscotch",
+          "wiki_section": "\u7b80\u7b14\u753b Line Art (Unified Stroke & Scale)",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 180885,
+          "format": "PNG",
+          "source_url": "https://kunruiw1991.github.io/smiling-critters-assets/line_art/hoppy_hopscotch_line_art.png"
+        },
         {
           "id": 5,
           "filename": "images/005_Hoppy_Hopscotch_Cardboard_Cutout.webp",
@@ -6578,8 +6650,20 @@
       ]
     },
     "PickyPiggy": {
-      "count": 32,
+      "count": 33,
       "items": [
+        {
+          "id": 838,
+          "filename": "line_art/picky_piggy_line_art.png",
+          "title": "PickyPiggy \u2014 \u7b80\u7b14\u753b Single-Character Line Art (Cheerful Sitting Pose, Curly Tail & Apple Pendant (from #090))",
+          "character": "PickyPiggy",
+          "wiki_section": "\u7b80\u7b14\u753b Line Art (Unified Stroke & Scale)",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 184971,
+          "format": "PNG",
+          "source_url": "https://kunruiw1991.github.io/smiling-critters-assets/line_art/picky_piggy_line_art.png"
+        },
         {
           "id": 16,
           "filename": "images/016_PickyPiggy_Cardboard_Cutout.webp",
@@ -6961,8 +7045,20 @@
       ]
     },
     "Bubba Bubbaphant": {
-      "count": 30,
+      "count": 31,
       "items": [
+        {
+          "id": 834,
+          "filename": "line_art/bubba_bubbaphant_line_art.png",
+          "title": "Bubba Bubbaphant \u2014 \u7b80\u7b14\u753b Single-Character Line Art (Hand-on-Hip & Raised-Hand Pose with Lightbulb Pendant (from #041))",
+          "character": "Bubba Bubbaphant",
+          "wiki_section": "\u7b80\u7b14\u753b Line Art (Unified Stroke & Scale)",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 178147,
+          "format": "PNG",
+          "source_url": "https://kunruiw1991.github.io/smiling-critters-assets/line_art/bubba_bubbaphant_line_art.png"
+        },
         {
           "id": 6,
           "filename": "images/006_Bubba_BubbaPhant_s_second_cutout_artwork_pose_POST.webp",
