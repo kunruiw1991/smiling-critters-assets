@@ -9736,5 +9736,101 @@
     "bytes": 184971,
     "format": "PNG",
     "source_url": "https://kunruiw1991.github.io/smiling-critters-assets/line_art/picky_piggy_line_art.png"
+  },
+  {
+    "id": 839,
+    "filename": "colored/catnap_colored.png",
+    "title": "CatNap \u2014 Colored Cartoon Edition (Pixel-Locked to \u7b80\u7b14\u753b Line Art, Sitting with S-Curved Tail & Crescent Moon Pendant (from #037))",
+    "character": "CatNap",
+    "wiki_section": "\u5f69\u8272\u7b80\u7b14\u753b Colored Edition (Pixel-Locked to Line Art)",
+    "width": 1024,
+    "height": 1024,
+    "bytes": 184754,
+    "format": "PNG",
+    "source_url": "https://kunruiw1991.github.io/smiling-critters-assets/colored/catnap_colored.png"
+  },
+  {
+    "id": 840,
+    "filename": "colored/dogday_colored.png",
+    "title": "DogDay \u2014 Colored Cartoon Edition (Pixel-Locked to \u7b80\u7b14\u753b Line Art, Symmetric Joyful Cheer Pose & Sun Pendant (from #050))",
+    "character": "DogDay",
+    "wiki_section": "\u5f69\u8272\u7b80\u7b14\u753b Colored Edition (Pixel-Locked to Line Art)",
+    "width": 1024,
+    "height": 1024,
+    "bytes": 463870,
+    "format": "PNG",
+    "source_url": "https://kunruiw1991.github.io/smiling-critters-assets/colored/dogday_colored.png"
+  },
+  {
+    "id": 841,
+    "filename": "colored/bobby_bearhug_colored.png",
+    "title": "Bobby BearHug \u2014 Colored Cartoon Edition (Pixel-Locked to \u7b80\u7b14\u753b Line Art, Cheek-Touch & Open-Hug Step with Heart Pendant (from #392))",
+    "character": "Bobby BearHug",
+    "wiki_section": "\u5f69\u8272\u7b80\u7b14\u753b Colored Edition (Pixel-Locked to Line Art)",
+    "width": 1024,
+    "height": 1024,
+    "bytes": 377915,
+    "format": "PNG",
+    "source_url": "https://kunruiw1991.github.io/smiling-critters-assets/colored/bobby_bearhug_colored.png"
+  },
+  {
+    "id": 842,
+    "filename": "colored/bubba_bubbaphant_colored.png",
+    "title": "Bubba Bubbaphant \u2014 Colored Cartoon Edition (Pixel-Locked to \u7b80\u7b14\u753b Line Art, Hand-on-Hip & Raised-Hand Pose with Lightbulb Pendant (from #041))",
+    "character": "Bubba Bubbaphant",
+    "wiki_section": "\u5f69\u8272\u7b80\u7b14\u753b Colored Edition (Pixel-Locked to Line Art)",
+    "width": 1024,
+    "height": 1024,
+    "bytes": 456920,
+    "format": "PNG",
+    "source_url": "https://kunruiw1991.github.io/smiling-critters-assets/colored/bubba_bubbaphant_colored.png"
+  },
+  {
+    "id": 843,
+    "filename": "colored/craftycorn_colored.png",
+    "title": "CraftyCorn \u2014 Colored Cartoon Edition (Pixel-Locked to \u7b80\u7b14\u753b Line Art, Graceful 3/4 Step, Shy Hoof & Flower Pendant (from #038))",
+    "character": "CraftyCorn",
+    "wiki_section": "\u5f69\u8272\u7b80\u7b14\u753b Colored Edition (Pixel-Locked to Line Art)",
+    "width": 1024,
+    "height": 1024,
+    "bytes": 389024,
+    "format": "PNG",
+    "source_url": "https://kunruiw1991.github.io/smiling-critters-assets/colored/craftycorn_colored.png"
+  },
+  {
+    "id": 844,
+    "filename": "colored/hoppy_hopscotch_colored.png",
+    "title": "Hoppy Hopscotch \u2014 Colored Cartoon Edition (Pixel-Locked to \u7b80\u7b14\u753b Line Art, Mid-Hopscotch Leap & Lightning Bolt Pendant (from #052))",
+    "character": "Hoppy Hopscotch",
+    "wiki_section": "\u5f69\u8272\u7b80\u7b14\u753b Colored Edition (Pixel-Locked to Line Art)",
+    "width": 1024,
+    "height": 1024,
+    "bytes": 450790,
+    "format": "PNG",
+    "source_url": "https://kunruiw1991.github.io/smiling-critters-assets/colored/hoppy_hopscotch_colored.png"
+  },
+  {
+    "id": 845,
+    "filename": "colored/kickin_chicken_colored.png",
+    "title": "KickinChicken \u2014 Colored Cartoon Edition (Pixel-Locked to \u7b80\u7b14\u753b Line Art, Cool Pointing Stance & Star Pendant (from #681))",
+    "character": "KickinChicken",
+    "wiki_section": "\u5f69\u8272\u7b80\u7b14\u753b Colored Edition (Pixel-Locked to Line Art)",
+    "width": 1024,
+    "height": 1024,
+    "bytes": 364699,
+    "format": "PNG",
+    "source_url": "https://kunruiw1991.github.io/smiling-critters-assets/colored/kickin_chicken_colored.png"
+  },
+  {
+    "id": 846,
+    "filename": "colored/picky_piggy_colored.png",
+    "title": "PickyPiggy \u2014 Colored Cartoon Edition (Pixel-Locked to \u7b80\u7b14\u753b Line Art, Cheerful Sitting Pose, Curly Tail & Apple Pendant (from #090))",
+    "character": "PickyPiggy",
+    "wiki_section": "\u5f69\u8272\u7b80\u7b14\u753b Colored Edition (Pixel-Locked to Line Art)",
+    "width": 1024,
+    "height": 1024,
+    "bytes": 401337,
+    "format": "PNG",
+    "source_url": "https://kunruiw1991.github.io/smiling-critters-assets/colored/picky_piggy_colored.png"
   }
 ]
