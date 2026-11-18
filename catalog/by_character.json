@@ -1,10 +1,22 @@
 {
-  "total_images": 846,
+  "total_images": 854,
   "character_count": 19,
   "characters": {
     "CatNap": {
-      "count": 244,
+      "count": 245,
       "items": [
+        {
+          "id": 847,
+          "filename": "line_art_letter/catnap_letter.png",
+          "title": "CatNap \u2014 Print-Ready US Letter Coloring Page (8.5\u00d711 in \u00b7 300 DPI \u00b7 2550\u00d73300)",
+          "character": "CatNap",
+          "wiki_section": "\ud83d\udda8\ufe0f Print-Ready US Letter Coloring Pages (8.5\u00d711 in)",
+          "width": 2550,
+          "height": 3300,
+          "bytes": 182989,
+          "format": "PNG",
+          "source_url": "https://kunruiw1991.github.io/smiling-critters-assets/line_art_letter/catnap_letter.png"
+        },
         {
           "id": 839,
           "filename": "colored/catnap_colored.png",
@@ -4049,8 +4061,20 @@
       ]
     },
     "DogDay": {
-      "count": 68,
+      "count": 69,
       "items": [
+        {
+          "id": 848,
+          "filename": "line_art_letter/dogday_letter.png",
+          "title": "DogDay \u2014 Print-Ready US Letter Coloring Page (8.5\u00d711 in \u00b7 300 DPI \u00b7 2550\u00d73300)",
+          "character": "DogDay",
+          "wiki_section": "\ud83d\udda8\ufe0f Print-Ready US Letter Coloring Pages (8.5\u00d711 in)",
+          "width": 2550,
+          "height": 3300,
+          "bytes": 199558,
+          "format": "PNG",
+          "source_url": "https://kunruiw1991.github.io/smiling-critters-assets/line_art_letter/dogday_letter.png"
+        },
         {
           "id": 840,
           "filename": "colored/dogday_colored.png",
@@ -4864,8 +4888,20 @@
       ]
     },
     "Bobby BearHug": {
-      "count": 46,
+      "count": 47,
       "items": [
+        {
+          "id": 849,
+          "filename": "line_art_letter/bobby_bearhug_letter.png",
+          "title": "Bobby BearHug \u2014 Print-Ready US Letter Coloring Page (8.5\u00d711 in \u00b7 300 DPI \u00b7 2550\u00d73300)",
+          "character": "Bobby BearHug",
+          "wiki_section": "\ud83d\udda8\ufe0f Print-Ready US Letter Coloring Pages (8.5\u00d711 in)",
+          "width": 2550,
+          "height": 3300,
+          "bytes": 182478,
+          "format": "PNG",
+          "source_url": "https://kunruiw1991.github.io/smiling-critters-assets/line_art_letter/bobby_bearhug_letter.png"
+        },
         {
           "id": 841,
           "filename": "colored/bobby_bearhug_colored.png",
@@ -5418,8 +5454,20 @@
       ]
     },
     "CraftyCorn": {
-      "count": 40,
+      "count": 41,
       "items": [
+        {
+          "id": 851,
+          "filename": "line_art_letter/craftycorn_letter.png",
+          "title": "CraftyCorn \u2014 Print-Ready US Letter Coloring Page (8.5\u00d711 in \u00b7 300 DPI \u00b7 2550\u00d73300)",
+          "character": "CraftyCorn",
+          "wiki_section": "\ud83d\udda8\ufe0f Print-Ready US Letter Coloring Pages (8.5\u00d711 in)",
+          "width": 2550,
+          "height": 3300,
+          "bytes": 185164,
+          "format": "PNG",
+          "source_url": "https://kunruiw1991.github.io/smiling-critters-assets/line_art_letter/craftycorn_letter.png"
+        },
         {
           "id": 843,
           "filename": "colored/craftycorn_colored.png",
@@ -5898,8 +5946,20 @@
       ]
     },
     "KickinChicken": {
-      "count": 35,
+      "count": 36,
       "items": [
+        {
+          "id": 853,
+          "filename": "line_art_letter/kickin_chicken_letter.png",
+          "title": "KickinChicken \u2014 Print-Ready US Letter Coloring Page (8.5\u00d711 in \u00b7 300 DPI \u00b7 2550\u00d73300)",
+          "character": "KickinChicken",
+          "wiki_section": "\ud83d\udda8\ufe0f Print-Ready US Letter Coloring Pages (8.5\u00d711 in)",
+          "width": 2550,
+          "height": 3300,
+          "bytes": 181884,
+          "format": "PNG",
+          "source_url": "https://kunruiw1991.github.io/smiling-critters-assets/line_art_letter/kickin_chicken_letter.png"
+        },
         {
           "id": 845,
           "filename": "colored/kickin_chicken_colored.png",
@@ -6316,8 +6376,20 @@
       ]
     },
     "Hoppy Hopscotch": {
-      "count": 34,
+      "count": 35,
       "items": [
+        {
+          "id": 852,
+          "filename": "line_art_letter/hoppy_hopscotch_letter.png",
+          "title": "Hoppy Hopscotch \u2014 Print-Ready US Letter Coloring Page (8.5\u00d711 in \u00b7 300 DPI \u00b7 2550\u00d73300)",
+          "character": "Hoppy Hopscotch",
+          "wiki_section": "\ud83d\udda8\ufe0f Print-Ready US Letter Coloring Pages (8.5\u00d711 in)",
+          "width": 2550,
+          "height": 3300,
+          "bytes": 190412,
+          "format": "PNG",
+          "source_url": "https://kunruiw1991.github.io/smiling-critters-assets/line_art_letter/hoppy_hopscotch_letter.png"
+        },
         {
           "id": 844,
           "filename": "colored/hoppy_hopscotch_colored.png",
@@ -6722,8 +6794,20 @@
       ]
     },
     "PickyPiggy": {
-      "count": 34,
+      "count": 35,
       "items": [
+        {
+          "id": 854,
+          "filename": "line_art_letter/picky_piggy_letter.png",
+          "title": "PickyPiggy \u2014 Print-Ready US Letter Coloring Page (8.5\u00d711 in \u00b7 300 DPI \u00b7 2550\u00d73300)",
+          "character": "PickyPiggy",
+          "wiki_section": "\ud83d\udda8\ufe0f Print-Ready US Letter Coloring Pages (8.5\u00d711 in)",
+          "width": 2550,
+          "height": 3300,
+          "bytes": 200718,
+          "format": "PNG",
+          "source_url": "https://kunruiw1991.github.io/smiling-critters-assets/line_art_letter/picky_piggy_letter.png"
+        },
         {
           "id": 846,
           "filename": "colored/picky_piggy_colored.png",
@@ -7129,8 +7213,20 @@
       ]
     },
     "Bubba Bubbaphant": {
-      "count": 32,
+      "count": 33,
       "items": [
+        {
+          "id": 850,
+          "filename": "line_art_letter/bubba_bubbaphant_letter.png",
+          "title": "Bubba Bubbaphant \u2014 Print-Ready US Letter Coloring Page (8.5\u00d711 in \u00b7 300 DPI \u00b7 2550\u00d73300)",
+          "character": "Bubba Bubbaphant",
+          "wiki_section": "\ud83d\udda8\ufe0f Print-Ready US Letter Coloring Pages (8.5\u00d711 in)",
+          "width": 2550,
+          "height": 3300,
+          "bytes": 185548,
+          "format": "PNG",
+          "source_url": "https://kunruiw1991.github.io/smiling-critters-assets/line_art_letter/bubba_bubbaphant_letter.png"
+        },
         {
           "id": 842,
           "filename": "colored/bubba_bubbaphant_colored.png",
