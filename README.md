@@ -1,4 +1,4 @@
-# 🎨🌙 Smiling Critters High-Resolution Asset Library (素材库 — 830 Verified Images (+512 Official Poppy Playtime Wiki Assets) + All 9 Blender 4.3 3D Plush Base Models & Fart Blast Animations)
+# 🎨🌙 Smiling Critters High-Resolution Asset Library (素材库 — 893 Verified Images (+39 New Poppy Playtime Email Characters & Store Plushies + Official Wiki Assets) + All 9 Blender 4.3 3D Plush Base Models & Fart Blast Animations)
 
 > **Organized Repository of 318 High-Resolution 2D Character Assets (`images/`), All 9 Native Blender 4.3 3D Plush Base Models (`models/`), 9 Rendered Cycles 3D Fart Blast Animations (`animations/`), Interactive WebGL 3D Studios (`*-3d.html`), and Structured JSON Manifests (`catalog/`)**
 
@@ -6,6 +6,36 @@
 
 ---
 
+<!-- POPPY_EMAIL_SECTION_START -->
+## 🧸✉️ New Poppy Playtime Characters from Email (`"Our Toys Don’t Forget A Face"` — `39` New High-Res Assets `#855`–`#893`)
+
+Collected directly from the official **Poppy Playtime Store** (`playtimeco.store`) email drop (**Nov 25, 2026**) — **30 ultra-crisp `1400×1400` multi-angle studio plush photos** (`#855`–`#884`) across **6 official plush editions**, plus **9 lossless RGBA `.PNG` official Poppy Playtime Wiki 3D & cartoon renders** (`#885`–`#893`) for newly added characters **Huggy Wuggy** and **Bron the Dinosaur**:
+
+| Character & Edition | Studio Main (`1400×1400`) | Alternate View (`1400×1400`) | Assets Collected | Category |
+| :--- | :-: | :-: | :--- | :--- |
+| **🎄🧸 Holiday Huggy Wuggy 18" Plush** | <img src="images/855_Holiday_Huggy_Wuggy_18in_Plush_Main.jpg" width="100" /> | <img src="images/856_Holiday_Huggy_Wuggy_18in_Plush_Waving.jpg" width="100" /> | `6` studio turnaround photos ([`#855`](images/855_Holiday_Huggy_Wuggy_18in_Plush_Main.jpg)–[`#860`](images/860_Holiday_Huggy_Wuggy_18in_Plush_Pose.jpg)) | **Huggy Wuggy** *(New)* |
+| **💙😊 Smiling Huggy Wuggy 18" Plush** | <img src="images/861_Smiling_Huggy_Wuggy_18in_Plush_Main.jpg" width="100" /> | <img src="images/865_Smiling_Huggy_Wuggy_18in_Plush_Sitting.jpg" width="100" /> | `5` studio turnaround photos ([`#861`](images/861_Smiling_Huggy_Wuggy_18in_Plush_Main.jpg)–[`#865`](images/865_Smiling_Huggy_Wuggy_18in_Plush_Sitting.jpg)) | **Huggy Wuggy** *(New)* |
+| **🦷💙 Scary Huggy Wuggy 18" Plush** | <img src="images/866_Scary_Huggy_Wuggy_18in_Plush_Main.jpg" width="100" /> | <img src="images/870_Scary_Huggy_Wuggy_18in_Plush_Action_Pose.jpg" width="100" /> | `7` studio turnaround photos ([`#866`](images/866_Scary_Huggy_Wuggy_18in_Plush_Main.jpg)–[`#872`](images/872_Scary_Huggy_Wuggy_18in_Plush_Sitting.jpg)) | **Huggy Wuggy** *(New)* |
+| **🦕❤️ Bron the Dinosaur 20" Plush** | <img src="images/873_Bron_the_Dinosaur_20in_Plush_Main.jpg" width="100" /> | <img src="images/877_Bron_the_Dinosaur_20in_Plush_Face_Detail.png" width="100" /> | `5` studio turnaround photos ([`#873`](images/873_Bron_the_Dinosaur_20in_Plush_Main.jpg)–[`#877`](images/877_Bron_the_Dinosaur_20in_Plush_Face_Detail.png)) | **Bron the Dinosaur** *(New)* |
+| **👾🌙 Monster CatNap 18" Plush** | <img src="images/878_Monster_CatNap_18in_Plush_Main.png" width="100" /> | <img src="images/881_Monster_CatNap_18in_Plush_Standing.png" width="100" /> | `4` studio turnaround photos ([`#878`](images/878_Monster_CatNap_18in_Plush_Main.png)–[`#881`](images/881_Monster_CatNap_18in_Plush_Standing.png)) | **CatNap** |
+| **🐱🌙 CatNap 14" Plush (Updated)** | <img src="images/882_CatNap_14in_Plush_Update_Main.png" width="100" /> | <img src="images/884_CatNap_14in_Plush_Update_Zipper_Detail.png" width="100" /> | `3` studio photos incl. zipper detail ([`#882`](images/882_CatNap_14in_Plush_Update_Main.png)–[`#884`](images/884_CatNap_14in_Plush_Update_Zipper_Detail.png)) | **CatNap** |
+
+### 🏆 Official Poppy Playtime Wiki Lossless RGBA `.PNG` Renders for Huggy Wuggy & Bron the Dinosaur (`#885`–`#893`)
+
+| # | Preview | Character | Title | Dimensions | File Path & Source |
+| :---: | :---: | :--- | :--- | :---: | :--- |
+| `#885` | <img src="images/885_HuggyRenderRemake.png" width="84" /> | **Huggy Wuggy** | **HuggyRenderRemake — Huggy Wuggy Official Wiki 3D Render (Transparent RGBA PNG)** | `2035×3000` (`PNG`) | [`images/885_HuggyRenderRemake.png`](images/885_HuggyRenderRemake.png) · [Wiki Original](https://static.wikia.nocookie.net/pplaytime/images/0/0e/HuggyRenderRemake.png/revision/latest?cb=20260922013516&format=original) |
+| `#886` | <img src="images/886_HuggyToyRemake.png" width="84" /> | **Huggy Wuggy** | **HuggyToyRemake — Huggy Wuggy Toy Form Official Wiki 3D Render (Transparent RGBA PNG)** | `2711×2938` (`PNG`) | [`images/886_HuggyToyRemake.png`](images/886_HuggyToyRemake.png) · [Wiki Original](https://static.wikia.nocookie.net/pplaytime/images/4/43/HuggyToyRemake.png/revision/latest?cb=20260922013559&format=original) |
+| `#887` | <img src="images/887_OfficialHuggyRender.png" width="84" /> | **Huggy Wuggy** | **OfficialHuggyRender — Huggy Wuggy Official Fluffy Render (Transparent RGBA PNG)** | `656×1200` (`PNG`) | [`images/887_OfficialHuggyRender.png`](images/887_OfficialHuggyRender.png) · [Wiki Original](https://static.wikia.nocookie.net/pplaytime/images/a/a1/OfficialHuggyRender.png/revision/latest?cb=20260918115240&format=original) |
+| `#888` | <img src="images/888_Huggy_Wuggy_Cartoon.png" width="84" /> | **Huggy Wuggy** | **Huggy Wuggy (Cartoon) — Official Playtime Co. Cartoon Artwork (Transparent RGBA PNG)** | `1640×1703` (`PNG`) | [`images/888_Huggy_Wuggy_Cartoon.png`](images/888_Huggy_Wuggy_Cartoon.png) · [Wiki Original](https://static.wikia.nocookie.net/pplaytime/images/6/67/Huggy_Wuggy_%28Cartoon%29.png/revision/latest?cb=20211211162503&format=original) |
+| `#889` | <img src="images/889_HuggyAggressiveRemake.png" width="84" /> | **Huggy Wuggy** | **HuggyAggressiveRemake — Huggy Wuggy Scary/Aggressive Form 3D Render (Transparent RGBA PNG)** | `1521×3000` (`PNG`) | [`images/889_HuggyAggressiveRemake.png`](images/889_HuggyAggressiveRemake.png) · [Wiki Original](https://static.wikia.nocookie.net/pplaytime/images/6/67/HuggyAggressiveRemake.png/revision/latest?cb=20260922013533&format=original) |
+| `#890` | <img src="images/890_OfficialNightmareHuggyTVRender.png" width="84" /> | **Huggy Wuggy** | **OfficialNightmareHuggyTVRender — Nightmare Huggy Wuggy TV Render (Transparent RGBA PNG)** | `720×720` (`PNG`) | [`images/890_OfficialNightmareHuggyTVRender.png`](images/890_OfficialNightmareHuggyTVRender.png) · [Wiki Original](https://static.wikia.nocookie.net/pplaytime/images/a/a8/OfficialNightmareHuggyTVRender.png/revision/latest?cb=20260911223249&format=original) |
+| `#891` | <img src="images/891_BronRemastered.png" width="84" /> | **Bron the Dinosaur** | **BronRemastered — Bron the Dinosaur Toy Form Official Wiki 3D Render (Transparent RGBA PNG)** | `2415×3500` (`PNG`) | [`images/891_BronRemastered.png`](images/891_BronRemastered.png) · [Wiki Original](https://static.wikia.nocookie.net/pplaytime/images/9/9e/BronRemastered.png/revision/latest?cb=20260403173614&format=original) |
+| `#892` | <img src="images/892_BiggerBodyBronRemake.png" width="84" /> | **Bron the Dinosaur** | **BiggerBodyBronRemake — Bigger Body Bron the Dinosaur Official Wiki 3D Render (Transparent RGBA PNG)** | `4000×3031` (`PNG`) | [`images/892_BiggerBodyBronRemake.png`](images/892_BiggerBodyBronRemake.png) · [Wiki Original](https://static.wikia.nocookie.net/pplaytime/images/1/1f/BiggerBodyBronRemake.png/revision/latest?cb=20260909002021&format=original) |
+| `#893` | <img src="images/893_BronMural.png" width="84" /> | **Bron the Dinosaur** | **BronMural — Bron the Dinosaur Official Playtime Co. Cartoon Mural Artwork (Transparent RGBA PNG)** | `755×916` (`PNG`) | [`images/893_BronMural.png`](images/893_BronMural.png) · [Wiki Original](https://static.wikia.nocookie.net/pplaytime/images/a/ab/BronMural.png/revision/latest?cb=20220302183938&format=original) |
+
+---
+<!-- POPPY_EMAIL_SECTION_END -->
 <!-- LINE_ART_SECTION_START -->
 ## 🖨️✏️🎨 Smiling Critters Print-Ready US Letter Coloring Pages (`8.5"×11"`), Square 简笔画 & Pixel-Locked 彩色版
 
